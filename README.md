@@ -8,6 +8,8 @@ I wanted it portable and be able to be ran both locally and remotely.  After all
 
 This does it all.  Starting with the Local Version upload.  Still working on the remote version.
 
+Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.
+
 
   
 ![image](https://github.com/SHIFTYProjects/TREX-RAPID-RESPONSE/assets/115837132/bbac4fe9-1788-4e25-ab5d-a8de4b875a1b)
