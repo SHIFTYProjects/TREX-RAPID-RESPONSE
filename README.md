@@ -15,6 +15,12 @@ Remote Version Uploaded 02/12/2024.  The only thing that needs changed in this s
 Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.
 
 
-  
+  (LOCAL VERSION)
 ![image](https://github.com/SHIFTYProjects/TREX-RAPID-RESPONSE/assets/115837132/bbac4fe9-1788-4e25-ab5d-a8de4b875a1b)
+
+
+(REMOTE VERSION)
+
+![image](https://github.com/SHIFTYProjects/TREX-RAPID-RESPONSE/assets/115837132/a23ab3df-d29f-407c-890d-c0d0fa28ab40)
+
 
