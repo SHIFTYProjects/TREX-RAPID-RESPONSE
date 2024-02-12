@@ -992,15 +992,12 @@ $($NetstatOutput | ForEach-Object {
 ###############################################################################################################################################################################
 
 
+
 function LogonReport {
-
-$outputBox.AppendText("`n`n`r Running Logon Report... `r`n`n" + [Environment]::NewLine)
-
-
     param (
         [string]$ComputerName = $script:globalComputerName
     )
-
+    $outputBox.AppendText("`n`n`r Running Logon Report...`r`n`n`n" + [Environment]::NewLine)
     try {
         # Function to get logon type definition
         function Get-LogonTypeDefinition {
@@ -1023,7 +1020,7 @@ $outputBox.AppendText("`n`n`r Running Logon Report... `r`n`n" + [Environment]::N
         }
 
         # Set the path for the report folder on the local desktop
-        $ReportFolderPath = "$env:USERPROFILE\Desktop\$script:globalComputerName TREX REPORTS"
+        $ReportFolderPath = "$env:USERPROFILE\Desktop\$ComputerName TREX REPORTS"
 
         # Create the report folder if it doesn't exist
         if (-not (Test-Path -Path $ReportFolderPath)) {
@@ -1114,12 +1111,12 @@ $outputBox.AppendText("`n`n`r Running Logon Report... `r`n`n" + [Environment]::N
         Write-HTMLContent -content "<h2>Date and Time: $(Get-Date)</h2>"
 
         # Section 1: Show all logins with timestamps
-        $loginEvents = Get-WinEvent -FilterHashtable @{
+        $loginEvents = Get-WinEvent -ComputerName $ComputerName -FilterHashtable @{
             LogName = 'Security'
             ID = 4624, 4625
         } -MaxEvents ([int]::MaxValue)
 
-        Write-HTMLContent -content "<h2 style='color: #cc0000;'>$script:globalComputerName Logins</h2>"
+        Write-HTMLContent -content "<h2 style='color: #cc0000;'>$ComputerName Logins</h2>"
         Write-HTMLContent -content ("<p>Number of login events: " + $loginEvents.Count + "</p>")
         Write-HTMLContent -content "<table><tr><th>Time</th><th>User</th><th>Status</th><th>Status Definition</th><th>Description</th></tr>"
         foreach ($event in $loginEvents) {
@@ -1136,9 +1133,9 @@ $outputBox.AppendText("`n`n`r Running Logon Report... `r`n`n" + [Environment]::N
         # Close the HTML tags
         Write-HTMLFooter
 
-        $outputBox.AppendText("`n`n`r Report generated and saved to $OutputFilePath Logon Report... `r`n`n" + [Environment]::NewLine)
 
-        #Write-Host "Logon report generated successfully."
+        $outputBox.AppendText("`n`n`r Report generated and saved to $OutputFilePath Logon Report... `r`n`n" + [Environment]::NewLine)
+       
 
         # Return the output path for confirmation
         $OutputFilePath
@@ -1146,13 +1143,6 @@ $outputBox.AppendText("`n`n`r Running Logon Report... `r`n`n" + [Environment]::N
         Write-Host "Error: $_"
     }
 }
-
-
-
-
-
-
-
 
 
 
@@ -2275,7 +2265,7 @@ function REMOTEC {
 $outputBox.AppendText("`r`n`n`r Accessing C: on  $script:globalComputerName .... `r`n`r`n" + [Environment]::NewLine)
 
 
- ii -path \\$script:globalComputerName.<YOUR DOMAIN HERE.net\c$ 
+ ii -path \\$script:globalComputerName.<YOUR DOMAIN HERE>.net\c$ 
 
 
 }
