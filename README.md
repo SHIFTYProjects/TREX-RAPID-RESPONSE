@@ -16,6 +16,8 @@ Just download the script.  Rename it to a .ps1 file and run as an admin with pow
 
 
   (LOCAL VERSION)
+
+  
 ![image](https://github.com/SHIFTYProjects/TREX-RAPID-RESPONSE/assets/115837132/bbac4fe9-1788-4e25-ab5d-a8de4b875a1b)
 
 
