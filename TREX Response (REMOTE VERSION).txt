@@ -34,7 +34,7 @@ $wshell = New-Object -comObject Wscript.Shell
 #######       FORM SIZE       #######
 
 $Form = New-Object system.Windows.Forms.Form
-$Form.ClientSize = '700,700' #Width,Height
+$Form.ClientSize = '710,710' #Width,Height
 $form.BackColor = ''
 $Form.text = "T-REX RAPID RESPONSE (REMOTE PC VERSION)"
 $Form.FormBorderStyle = 'Fixed3D'
@@ -104,15 +104,15 @@ function logAction ($action) {
 
 
 
-  function setFilePath {
-    $initialDirectory = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
-    $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-    $OpenFileDialog.initialDirectory = $initialDirectory
-    $OpenFileDialog.filter = "All files (*.*)| *.*"
-    $OpenFileDialog.ShowDialog() | Out-Null
-    $filePath = $OpenFileDialog.filename
-    $filePathBox.text = $filePath
-  }
+function setFilePath {
+  $initialDirectory = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
+  $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+  $OpenFileDialog.initialDirectory = $initialDirectory
+  $OpenFileDialog.filter = "All files (*.*)| *.*"
+  $OpenFileDialog.ShowDialog() | Out-Null
+  $filePath = $OpenFileDialog.filename
+  $filePathBox.text = $filePath
+}
 
 
 
@@ -127,68 +127,76 @@ function logAction ($action) {
 
 #Machine Report Button Function - Generates a report of logins, scheduled tasks, and installed software in 1 HTML report.
 function MACHINEREPORT {
-$outputBox.AppendText("Running All Machine Reports.......`n`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("Running All Machine Reports.......`n`n`n" + [Environment]::NewLine)
 
 
-$outputBox.AppendText("`n`n`n Running Report 1 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 1 of 16.....`n`n`n " + [Environment]::NewLine)
  
-pcinfo
+  pcinfo
 
-$outputBox.AppendText("`n`n`n Running Report 2 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 2 of 16.....`n`n`n " + [Environment]::NewLine)
 
-LOCALACCOUNTS
+  LOCALACCOUNTS
 
-$outputBox.AppendText("`n`n`n Running Report 3 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 3 of 16.....`n`n`n " + [Environment]::NewLine)
 
-FIREWALLRULES
+  FIREWALLRULES
 
-$outputBox.AppendText("`n`n`n Running Report 4 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 4 of 16.....`n`n`n " + [Environment]::NewLine)
 
-NETSTATCONNECTIONS
+  NETSTATCONNECTIONS
 
-$outputBox.AppendText("`n`n`n Running Report 5 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 5 of 16.....`n`n`n " + [Environment]::NewLine)
 
-LogonReport
+  LogonReport
 
-$outputBox.AppendText("`n`n`n Running Report 6 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 6 of 16.....`n`n`n " + [Environment]::NewLine)
 
-ANTIVIRUS
+  ANTIVIRUS
 
-$outputBox.AppendText("`n`n`n Running Report 7 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 7 of 16.....`n`n`n " + [Environment]::NewLine)
 
-WEBHISTORY
+  WEBHISTORY
 
-$outputBox.AppendText("`n`n`n Running Report 8 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 8 of 16.....`n`n`n " + [Environment]::NewLine)
 
-GPOStatus
+  GPOStatus
 
-$outputBox.AppendText("`n`n`n Running Report 9 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 9 of 16.....`n`n`n " + [Environment]::NewLine)
 
-SCHEDULEDTASKS
+  SCHEDULEDTASKS
 
-$outputBox.AppendText("`n`n`n Running Report 10 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 10 of 16.....`n`n`n " + [Environment]::NewLine)
 
-INSTALLEDSOFTWARE
+  INSTALLEDSOFTWARE
 
-$outputBox.AppendText("`n`n`n Running Report 11 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 11 of 16.....`n`n`n " + [Environment]::NewLine)
 
-WIFINETWORK
+  WIFINETWORK
 
-$outputBox.AppendText("`n`n`n Running Report 12 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 12 of 16.....`n`n`n " + [Environment]::NewLine)
 
-STARTUP
+  STARTUP
 
-$outputBox.AppendText("`n`n`n Running Report 13 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 13 of 16.....`n`n`n " + [Environment]::NewLine)
 
-USBDEVICE
+  USBDEVICE
 
-$outputBox.AppendText("`n`n`n Running Report 14 of 14.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 14 of 16.....`n`n`n " + [Environment]::NewLine)
 
-RUNNINGPROCESS
+  RUNNINGPROCESS
+
+  $outputBox.AppendText("`n`n`n Running Report 15 of 16.....`n`n`n " + [Environment]::NewLine)
+
+  EVENTVIEWER
+
+  $outputBox.AppendText("`n`n`n Running Report 16 of 16.....`n`n`n " + [Environment]::NewLine)
+
+  ImageThumbnails
 
 
 
-$outputBox.AppendText("`n`n`r Reports Completed." + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Reports Completed." + [Environment]::NewLine)
 
 }
 
@@ -202,44 +210,44 @@ $outputBox.AppendText("`n`n`r Reports Completed." + [Environment]::NewLine)
 
 function pcinfo {
 
-$outputBox.AppendText("`n`n`r Running PC Info Report..." + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Running PC Info Report..." + [Environment]::NewLine)
 
 
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
 
-    # Define the folder path on the local PC's desktop
-    $ReportFolder = "$env:USERPROFILE\Desktop\$script:globalComputerName TREX REPORTS"
+  # Define the folder path on the local PC's desktop
+  $ReportFolder = "$env:USERPROFILE\Desktop\$script:globalComputerName TREX REPORTS"
 
-    # Create the folder if it doesn't exist
-    if (-not (Test-Path -Path $ReportFolder)) {
-        New-Item -Path $ReportFolder -ItemType Directory
-    }
+  # Create the folder if it doesn't exist
+  if (-not (Test-Path -Path $ReportFolder)) {
+    New-Item -Path $ReportFolder -ItemType Directory
+  }
 
-    # Import the Active Directory module
-    Import-Module ActiveDirectory -ErrorAction SilentlyContinue
+  # Import the Active Directory module
+  Import-Module ActiveDirectory -ErrorAction SilentlyContinue
 
-    # Get the current date and time
-    $CurrentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  # Get the current date and time
+  $CurrentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Get information from the remote computer
-    $ComputerSystem = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName
-    $Memory = Get-WmiObject -Class Win32_PhysicalMemory -ComputerName $ComputerName
-    $DiskDrive = Get-WmiObject -Class Win32_DiskDrive -ComputerName $ComputerName
-    $Processor = Get-WmiObject -Class Win32_Processor -ComputerName $ComputerName
-    $Bios = Get-WmiObject -Class Win32_BIOS -ComputerName $ComputerName
-    $Battery = Get-WmiObject -Class Win32_Battery -ComputerName $ComputerName
+  # Get information from the remote computer
+  $ComputerSystem = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName
+  $Memory = Get-WmiObject -Class Win32_PhysicalMemory -ComputerName $ComputerName
+  $DiskDrive = Get-WmiObject -Class Win32_DiskDrive -ComputerName $ComputerName
+  $Processor = Get-WmiObject -Class Win32_Processor -ComputerName $ComputerName
+  $Bios = Get-WmiObject -Class Win32_BIOS -ComputerName $ComputerName
+  $Battery = Get-WmiObject -Class Win32_Battery -ComputerName $ComputerName
 
-    # Get the Organizational Unit (OU) information using Get-AdComputer
-    try {
-        $OU = (Get-AdComputer -Identity $ComputerName).DistinguishedName
-    } catch {
-        $OU = "N/A"
-    }
+  # Get the Organizational Unit (OU) information using Get-AdComputer
+  try {
+    $OU = (Get-AdComputer -Identity $ComputerName).DistinguishedName
+  } catch {
+    $OU = "N/A"
+  }
 
-    # Create the HTML report content
-    $ReportContent = @"
+  # Create the HTML report content
+  $ReportContent = @"
 <html>
 <head>
     <title>PC Information Report</title>
@@ -305,11 +313,11 @@ $outputBox.AppendText("`n`n`r Running PC Info Report..." + [Environment]::NewLin
 </html>
 "@
 
-    # Save the report to an HTML file with the filename "PCINFO_Report.html"
-    $ReportPath = Join-Path $ReportFolder "PCINFO_Report.html"
-    $ReportContent | Out-File -FilePath $ReportPath -Force
+  # Save the report to an HTML file with the filename "PCINFO_Report.html"
+  $ReportPath = Join-Path $ReportFolder "PCINFO_Report.html"
+  $ReportContent | Out-File -FilePath $ReportPath -Force
 
-    $outputBox.AppendText("`n`n`r Report Generated for $ComputerName and saved to: $ReportPath" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Report Generated for $ComputerName and saved to: $ReportPath" + [Environment]::NewLine)
 
     
 }
@@ -374,7 +382,7 @@ function MACINFO {
 
       $outputBox.AppendText("MAC address information for $macAddress" + [Environment]::NewLine)
       outputBox.AppendText("$result" + [Environment]::NewLine)
-     # logAction "$result."
+      # logAction "$result."
         
     }
     catch {
@@ -445,7 +453,7 @@ function TINYURL {
 #function to check the MD5 Hash of a file
 
 function HASH {
- # logAction "Hash Tool Started"
+  # logAction "Hash Tool Started"
   $outputBox.AppendText("Hash Tool Started." + [Environment]::NewLine)
 
   # Add Windows Forms assembly
@@ -523,147 +531,147 @@ function HASH {
 }
 ###############################################################################################################################################################################
 function WHOIS{
-    $outputBox.AppendText("Opening WHOIS Tool in separate window..." + [Environment]::NewLine)
+  $outputBox.AppendText("Opening WHOIS Tool in separate window..." + [Environment]::NewLine)
 
-    Add-Type -AssemblyName System.Windows.Forms
+  Add-Type -AssemblyName System.Windows.Forms
 
-    function Get-WhoisInformation {
-      $form = New-Object System.Windows.Forms.Form
-      $form.Size = New-Object System.Drawing.Size(400, 600)
-      $form.Text = "Whois Lookup"
+  function Get-WhoisInformation {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Size = New-Object System.Drawing.Size(400, 600)
+    $form.Text = "Whois Lookup"
 
-      $ipLabel = New-Object System.Windows.Forms.Label
-      $ipLabel.Location = New-Object System.Drawing.Point(20, 20)
-      $ipLabel.Text = "Enter IP Address or URL:"
+    $ipLabel = New-Object System.Windows.Forms.Label
+    $ipLabel.Location = New-Object System.Drawing.Point(20, 20)
+    $ipLabel.Text = "Enter IP Address or URL:"
 
-      $ipTextBox = New-Object System.Windows.Forms.TextBox
-      $ipTextBox.Location = New-Object System.Drawing.Point(20, 50)
-      $ipTextBox.Size = New-Object System.Drawing.Size(200, 20)
+    $ipTextBox = New-Object System.Windows.Forms.TextBox
+    $ipTextBox.Location = New-Object System.Drawing.Point(20, 50)
+    $ipTextBox.Size = New-Object System.Drawing.Size(200, 20)
 
-      $outputTextBox = New-Object System.Windows.Forms.TextBox
-      $outputTextBox.Location = New-Object System.Drawing.Point(20, 100)
-      $outputTextBox.Size = New-Object System.Drawing.Size(360, 420)
-      $outputTextBox.Multiline = $true
-      $outputTextBox.ScrollBars = "Vertical"
-      $outputTextBox.ReadOnly = $true
-      $outputTextBox.Font = New-Object System.Drawing.Font("Consolas", 10)
+    $outputTextBox = New-Object System.Windows.Forms.TextBox
+    $outputTextBox.Location = New-Object System.Drawing.Point(20, 100)
+    $outputTextBox.Size = New-Object System.Drawing.Size(360, 420)
+    $outputTextBox.Multiline = $true
+    $outputTextBox.ScrollBars = "Vertical"
+    $outputTextBox.ReadOnly = $true
+    $outputTextBox.Font = New-Object System.Drawing.Font("Consolas", 10)
 
-      $lookupButton = New-Object System.Windows.Forms.Button
-      $lookupButton.Location = New-Object System.Drawing.Point(230, 50)
-      $lookupButton.Size = New-Object System.Drawing.Size(150, 20)
-      $lookupButton.Text = "Lookup"
-      $lookupButton.Add_Click({
-          $input = $ipTextBox.Text
+    $lookupButton = New-Object System.Windows.Forms.Button
+    $lookupButton.Location = New-Object System.Drawing.Point(230, 50)
+    $lookupButton.Size = New-Object System.Drawing.Size(150, 20)
+    $lookupButton.Text = "Lookup"
+    $lookupButton.Add_Click({
+        $input = $ipTextBox.Text
 
-          if ($input -as [ipaddress]) {
-            # Input is an IP address
-            $ip = $input
-            try {
-              $resolvedUrls = Resolve-DnsName -Name $ip -Type PTR -ErrorAction Stop | Select-Object -ExpandProperty NameHost
-              $resolvedUrl = $resolvedUrls -join ', '
-            } catch {
-              $resolvedUrl = "Unable to resolve IP to URL."
-            }
-          } else {
-            # Input is a URL
-            try {
-              $resolvedIps = Resolve-DnsName -Name $input -ErrorAction Stop | Where-Object { $_.IPAddress -match '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' } | Select-Object -ExpandProperty IPAddress
-              $ip = $resolvedIps -join ', '
-              $resolvedUrl = $input
-            } catch {
-              $resolvedUrl = "Unable to resolve URL to IP."
-            }
+        if ($input -as [ipaddress]) {
+          # Input is an IP address
+          $ip = $input
+          try {
+            $resolvedUrls = Resolve-DnsName -Name $ip -Type PTR -ErrorAction Stop | Select-Object -ExpandProperty NameHost
+            $resolvedUrl = $resolvedUrls -join ', '
+          } catch {
+            $resolvedUrl = "Unable to resolve IP to URL."
           }
-
-          $apiUrl = "http://ip-api.com/json/$ip"
-          $webClient = New-Object System.Net.WebClient
-          $whoisResult = $webClient.DownloadString($apiUrl)
-          $formattedResult = $whoisResult | ConvertFrom-Json | ConvertTo-Json -Depth 10
-          $formattedResult = $formattedResult.Replace('"', '')
-
-          # Add IP address and resolved URL to the result
-          $formattedResult = "IP Address(s): $ip`r`nResolved URL(s): $resolvedUrl`r`n" + $formattedResult
-
-          $outputTextBox.Text = $formattedResult
-      })
-
-      $form.Controls.Add($ipLabel)
-      $form.Controls.Add($ipTextBox)
-      $form.Controls.Add($outputTextBox)
-      $form.Controls.Add($lookupButton)
-
-      $form.Add_Shown({$form.Activate()})
-      [void]$form.ShowDialog()
-    }
-
-    function Format-Json {
-      param($json)
-      $indentSize = 4
-      $indentChar = " "
-
-      $result = ""
-
-      $quoteEscapeChar = '\u005C"'
-      $quoteChar = '"'
-      $newlineChar = "`r`n"
-
-      $indentLevel = 0
-      $inString = $false
-
-      for ($i = 0; $i -lt $json.Length; $i++) {
-        $currentChar = $json[$i]
-
-        if ($currentChar -eq $quoteChar -and ($i -eq 0 -or $json[$i -1] -ne $quoteEscapeChar)) {
-          $inString = !$inString
-        }
-
-        if ($inString) {
-          $result += $currentChar
-          continue
-        }
-
-        switch -regex ($currentChar) {
-          '\{' {
-            $result += $currentChar + $newlineChar + ($indentChar * ($indentLevel + 1))
-            $indentLevel++
-            break
-          }
-          '\[' {
-            $result += $currentChar + $newlineChar + ($indentChar * ($indentLevel + 1))
-            $indentLevel++
-            break
-          }
-          '\}' {
-            $indentLevel--
-            $result = $result.TrimEnd("`r", "`n", $indentChar)
-            $result += $newlineChar + ($indentChar * $indentLevel) + $currentChar
-            break
-          }
-          '\]' {
-            $indentLevel--
-            $result = $result.TrimEnd("`r", "`n", $indentChar)
-            $result += $newlineChar + ($indentChar * $indentLevel) + $currentChar
-            break
-          }
-          ',' {
-            $result += $currentChar + $newlineChar + ($indentChar * $indentLevel)
-            break
-          }
-          ':' {
-            $result += " -"
-            break
-          }
-          default {
-            $result += $currentChar
-            break
+        } else {
+          # Input is a URL
+          try {
+            $resolvedIps = Resolve-DnsName -Name $input -ErrorAction Stop | Where-Object { $_.IPAddress -match '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' } | Select-Object -ExpandProperty IPAddress
+            $ip = $resolvedIps -join ', '
+            $resolvedUrl = $input
+          } catch {
+            $resolvedUrl = "Unable to resolve URL to IP."
           }
         }
+
+        $apiUrl = "http://ip-api.com/json/$ip"
+        $webClient = New-Object System.Net.WebClient
+        $whoisResult = $webClient.DownloadString($apiUrl)
+        $formattedResult = $whoisResult | ConvertFrom-Json | ConvertTo-Json -Depth 10
+        $formattedResult = $formattedResult.Replace('"', '')
+
+        # Add IP address and resolved URL to the result
+        $formattedResult = "IP Address(s): $ip`r`nResolved URL(s): $resolvedUrl`r`n" + $formattedResult
+
+        $outputTextBox.Text = $formattedResult
+    })
+
+    $form.Controls.Add($ipLabel)
+    $form.Controls.Add($ipTextBox)
+    $form.Controls.Add($outputTextBox)
+    $form.Controls.Add($lookupButton)
+
+    $form.Add_Shown({$form.Activate()})
+    [void]$form.ShowDialog()
+  }
+
+  function Format-Json {
+    param($json)
+    $indentSize = 4
+    $indentChar = " "
+
+    $result = ""
+
+    $quoteEscapeChar = '\u005C"'
+    $quoteChar = '"'
+    $newlineChar = "`r`n"
+
+    $indentLevel = 0
+    $inString = $false
+
+    for ($i = 0; $i -lt $json.Length; $i++) {
+      $currentChar = $json[$i]
+
+      if ($currentChar -eq $quoteChar -and ($i -eq 0 -or $json[$i -1] -ne $quoteEscapeChar)) {
+        $inString = !$inString
       }
 
-      $result
+      if ($inString) {
+        $result += $currentChar
+        continue
+      }
+
+      switch -regex ($currentChar) {
+        '\{' {
+          $result += $currentChar + $newlineChar + ($indentChar * ($indentLevel + 1))
+          $indentLevel++
+          break
+        }
+        '\[' {
+          $result += $currentChar + $newlineChar + ($indentChar * ($indentLevel + 1))
+          $indentLevel++
+          break
+        }
+        '\}' {
+          $indentLevel--
+          $result = $result.TrimEnd("`r", "`n", $indentChar)
+          $result += $newlineChar + ($indentChar * $indentLevel) + $currentChar
+          break
+        }
+        '\]' {
+          $indentLevel--
+          $result = $result.TrimEnd("`r", "`n", $indentChar)
+          $result += $newlineChar + ($indentChar * $indentLevel) + $currentChar
+          break
+        }
+        ',' {
+          $result += $currentChar + $newlineChar + ($indentChar * $indentLevel)
+          break
+        }
+        ':' {
+          $result += " -"
+          break
+        }
+        default {
+          $result += $currentChar
+          break
+        }
+      }
     }
 
-    Get-WhoisInformation
+    $result
+  }
+
+  Get-WhoisInformation
 }
 
 
@@ -673,82 +681,82 @@ function WHOIS{
 
 function LOCALACCOUNTS {
 
-$outputBox.AppendText("`n`n`r Checking for Computer Accounts... " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Checking for Computer Accounts... " + [Environment]::NewLine)
 
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
 
-    $currentUserDesktop = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop')
-    $reportFolderName = "$ComputerName TREX REPORTS"
-    $outputFolder = [System.IO.Path]::Combine($currentUserDesktop, $reportFolderName)
-    $outputFile = [System.IO.Path]::Combine($outputFolder, 'UserProfilesAndLocalAdminsReport.html')
-    $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  $currentUserDesktop = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop')
+  $reportFolderName = "$ComputerName TREX REPORTS"
+  $outputFolder = [System.IO.Path]::Combine($currentUserDesktop, $reportFolderName)
+  $outputFile = [System.IO.Path]::Combine($outputFolder, 'UserProfilesAndLocalAdminsReport.html')
+  $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Create output folder if it doesn't exist
-    if (-not (Test-Path -Path $outputFolder)) {
-        New-Item -ItemType Directory -Path $outputFolder | Out-Null
+  # Create output folder if it doesn't exist
+  if (-not (Test-Path -Path $outputFolder)) {
+    New-Item -ItemType Directory -Path $outputFolder | Out-Null
+  }
+
+  # Invoke command on the remote machine to get local admin accounts and user profiles
+  $htmlContent = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    # Get the built-in administrators group
+    $administratorsGroup = Get-LocalGroup -Name Administrators
+
+    # Get all local user accounts
+    $localUsers = Get-LocalUser | Where-Object { $_.Enabled -eq $true }
+
+    # Get all user profiles on the computer
+    $userProfiles = Get-WmiObject Win32_NetworkLoginProfile
+
+    # Start building HTML content
+    $htmlContent = "<html><head><style>"
+    $htmlContent += "table { border-collapse: collapse; width: 100%; }"
+    $htmlContent += "th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }"
+    $htmlContent += "th { background-color: #f2f2f2; }"
+    $htmlContent += "</style></head><body>"
+    $htmlContent += "<h2>User Profiles and Local Admins Report - $env:COMPUTERNAME</h2>"
+    $htmlContent += "<p>Report generated on: $using:currentDateTime</p>"
+    $htmlContent += "<h3>Local Admin Accounts:</h3>"
+    $htmlContent += "<table><tr><th>Account Name</th><th>Account SID</th><th>Is Admin Account</th></tr>"
+
+    # Output local user information
+    foreach ($user in $localUsers) {
+      $isAdmin = $administratorsGroup | Get-LocalGroupMember -Member $user -ErrorAction SilentlyContinue
+      $isAdmin = [bool]$isAdmin  # Convert to boolean
+      $htmlContent += "<tr>"
+      $htmlContent += "<td>$($user.Name)</td>"
+      $htmlContent += "<td>$($user.SID)</td>"
+      $htmlContent += "<td>$isAdmin</td>"
+      $htmlContent += "</tr>"
     }
 
-    # Invoke command on the remote machine to get local admin accounts and user profiles
-    $htmlContent = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-        # Get the built-in administrators group
-        $administratorsGroup = Get-LocalGroup -Name Administrators
+    $htmlContent += "</table>"
+    $htmlContent += "<h3>All User Profiles:</h3>"
+    $htmlContent += "<table><tr><th>User Profile</th></tr>"
 
-        # Get all local user accounts
-        $localUsers = Get-LocalUser | Where-Object { $_.Enabled -eq $true }
-
-        # Get all user profiles on the computer
-        $userProfiles = Get-WmiObject Win32_NetworkLoginProfile
-
-        # Start building HTML content
-        $htmlContent = "<html><head><style>"
-        $htmlContent += "table { border-collapse: collapse; width: 100%; }"
-        $htmlContent += "th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }"
-        $htmlContent += "th { background-color: #f2f2f2; }"
-        $htmlContent += "</style></head><body>"
-        $htmlContent += "<h2>User Profiles and Local Admins Report - $env:COMPUTERNAME</h2>"
-        $htmlContent += "<p>Report generated on: $using:currentDateTime</p>"
-        $htmlContent += "<h3>Local Admin Accounts:</h3>"
-        $htmlContent += "<table><tr><th>Account Name</th><th>Account SID</th><th>Is Admin Account</th></tr>"
-
-        # Output local user information
-        foreach ($user in $localUsers) {
-            $isAdmin = $administratorsGroup | Get-LocalGroupMember -Member $user -ErrorAction SilentlyContinue
-            $isAdmin = [bool]$isAdmin  # Convert to boolean
-            $htmlContent += "<tr>"
-            $htmlContent += "<td>$($user.Name)</td>"
-            $htmlContent += "<td>$($user.SID)</td>"
-            $htmlContent += "<td>$isAdmin</td>"
-            $htmlContent += "</tr>"
-        }
-
-        $htmlContent += "</table>"
-        $htmlContent += "<h3>All User Profiles:</h3>"
-        $htmlContent += "<table><tr><th>User Profile</th></tr>"
-
-        # Output user profile information
-        foreach ($profile in $userProfiles) {
-            $htmlContent += "<tr>"
-            $htmlContent += "<td>$($profile.Name)</td>"
-            $htmlContent += "</tr>"
-        }
-
-        # End HTML content
-        $htmlContent += "</table></body></html>"
-
-        # Output the HTML content
-        $htmlContent
+    # Output user profile information
+    foreach ($profile in $userProfiles) {
+      $htmlContent += "<tr>"
+      $htmlContent += "<td>$($profile.Name)</td>"
+      $htmlContent += "</tr>"
     }
 
-    # Save HTML content to a file
-    $htmlContent | Out-File -FilePath $outputFile
+    # End HTML content
+    $htmlContent += "</table></body></html>"
 
-    # Open the file
-    #Invoke-Item $outputFile
+    # Output the HTML content
+    $htmlContent
+  }
 
-    # Notify the user
-    $outputBox.AppendText("`n`n`r Local Admin Accounts and User Profile Check completed.`n`n`r The Report is saved to:`r`n`n $outputFile`n`n " + [Environment]::NewLine)
+  # Save HTML content to a file
+  $htmlContent | Out-File -FilePath $outputFile
+
+  # Open the file
+  #Invoke-Item $outputFile
+
+  # Notify the user
+  $outputBox.AppendText("`n`n`r Local Admin Accounts and User Profile Check completed.`n`n`r The Report is saved to:`r`n`n $outputFile`n`n " + [Environment]::NewLine)
   
 }
 
@@ -773,37 +781,37 @@ $outputBox.AppendText("`n`n`r Checking for Computer Accounts... " + [Environment
 
 function FIREWALLRULES {
 
- $outputBox.AppendText("`n`n`r Running Firewall Rule Report... `r`n`n`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Running Firewall Rule Report... `r`n`n`n`n" + [Environment]::NewLine)
 
 
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
 
-    # Define the report folder path
-    $reportFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
+  # Define the report folder path
+  $reportFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
 
-    # Create the folder if it doesn't exist
-    if (-not (Test-Path $reportFolder)) {
-        New-Item -ItemType Directory -Force -Path $reportFolder
-    }
+  # Create the folder if it doesn't exist
+  if (-not (Test-Path $reportFolder)) {
+    New-Item -ItemType Directory -Force -Path $reportFolder
+  }
 
-    # Define the report file path
-    $reportPath = Join-Path -Path $reportFolder -ChildPath 'FirewallRulesReport.html'
+  # Define the report file path
+  $reportPath = Join-Path -Path $reportFolder -ChildPath 'FirewallRulesReport.html'
 
-    # Invoke command on the remote machine to get firewall rules
-    $firewallRules = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-        Get-NetFirewallRule | Sort-Object DisplayName
-    }
+  # Invoke command on the remote machine to get firewall rules
+  $firewallRules = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    Get-NetFirewallRule | Sort-Object DisplayName
+  }
 
-    # Count of rules
-    $ruleCount = $firewallRules.Count
+  # Count of rules
+  $ruleCount = $firewallRules.Count
 
-    # Current date and time
-    $reportDateTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+  # Current date and time
+  $reportDateTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 
-    # HTML content
-    $htmlContent = @"
+  # HTML content
+  $htmlContent = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -850,12 +858,12 @@ function FIREWALLRULES {
         </tr>
 "@
 
-    # Populate HTML content with firewall rules
-    $firewallRules | ForEach-Object {
-        # Check if the rule is disallowed and apply CSS class accordingly
-        $disallowedClass = if ($_.Action -eq 'Allow' -and -not $_.Enabled) { 'disallowed-rule' } else { '' }
+  # Populate HTML content with firewall rules
+  $firewallRules | ForEach-Object {
+    # Check if the rule is disallowed and apply CSS class accordingly
+    $disallowedClass = if ($_.Action -eq 'Allow' -and -not $_.Enabled) { 'disallowed-rule' } else { '' }
 
-        $htmlContent += @"
+    $htmlContent += @"
         <tr class="$disallowedClass">
             <td>$($_.DisplayName)</td>
             <td>$($_.Action)</td>
@@ -871,25 +879,25 @@ function FIREWALLRULES {
             <td>$($_.Service)</td>
         </tr>
 "@
-    }
+  }
 
-    $htmlContent += @"
+  $htmlContent += @"
     </table>
 </body>
 </html>
 "@
 
-    # Write the HTML content to the file
-    $htmlContent | Out-File -FilePath $reportPath
+  # Write the HTML content to the file
+  $htmlContent | Out-File -FilePath $reportPath
 
-    # Output the file path
+  # Output the file path
 
-    $outputBox.AppendText("`n`n`r Firewall Rule Check completed. `n`n`r`n`n The Report is saved to:`r`n`n $reportPath`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Firewall Rule Check completed. `n`n`r`n`n The Report is saved to:`r`n`n $reportPath`n`n" + [Environment]::NewLine)
 
   
 
-    # Open the HTML report in the default web browser
-    #Invoke-Item $reportPath
+  # Open the HTML report in the default web browser
+  #Invoke-Item $reportPath
 }
 
 
@@ -907,33 +915,33 @@ function FIREWALLRULES {
 
 
 function NETSTATCONNECTIONS {
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
 
-    $outputBox.AppendText("`n`n`r Starting Netstat Report...`r`n`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Starting Netstat Report...`r`n`n`n" + [Environment]::NewLine)
 
-    # Use Invoke-Command to run Netstat remotely
-    $NetstatOutput = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-        netstat -a
-    }
+  # Use Invoke-Command to run Netstat remotely
+  $NetstatOutput = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    netstat -a
+  }
 
-    # Get the current date and time
-    $CurrentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  # Get the current date and time
+  $CurrentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Create a folder path for the reports on the desktop
-    $FolderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
+  # Create a folder path for the reports on the desktop
+  $FolderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
 
-    # Create the folder if it doesn't exist
-    if (-not (Test-Path -Path $FolderPath -PathType Container)) {
-        New-Item -Path $FolderPath -ItemType Directory | Out-Null
-    }
+  # Create the folder if it doesn't exist
+  if (-not (Test-Path -Path $FolderPath -PathType Container)) {
+    New-Item -Path $FolderPath -ItemType Directory | Out-Null
+  }
 
-    # Define the file path for the HTML report
-    $ReportFilePath = [System.IO.Path]::Combine($FolderPath, 'NetstatReport.html')
+  # Define the file path for the HTML report
+  $ReportFilePath = [System.IO.Path]::Combine($FolderPath, 'NetstatReport.html')
 
-    # Create an HTML template for the report
-    $HtmlTemplate = @"
+  # Create an HTML template for the report
+  $HtmlTemplate = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -975,14 +983,14 @@ $($NetstatOutput | ForEach-Object {
 </html>
 "@
 
-    # Save the HTML template to the report file
-    $HtmlTemplate | Out-File -FilePath $ReportFilePath -Encoding UTF8
+  # Save the HTML template to the report file
+  $HtmlTemplate | Out-File -FilePath $ReportFilePath -Encoding UTF8
 
-    # Display a message with the path to the saved report
-    $outputBox.AppendText("`n`n`r Netstat Report completed. `n`n`r`n`n The Report is saved to:`r`n`n $ReportFilePath`n`n" + [Environment]::NewLine)
+  # Display a message with the path to the saved report
+  $outputBox.AppendText("`n`n`r Netstat Report completed. `n`n`r`n`n The Report is saved to:`r`n`n $ReportFilePath`n`n" + [Environment]::NewLine)
 
-    # Open the file with the default associated program
-    #Invoke-Item $ReportFilePath
+  # Open the file with the default associated program
+  #Invoke-Item $ReportFilePath
 }
 
 
@@ -994,59 +1002,59 @@ $($NetstatOutput | ForEach-Object {
 
 
 function LogonReport {
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
-    $outputBox.AppendText("`n`n`r Running Logon Report...`r`n`n`n" + [Environment]::NewLine)
-    try {
-        # Function to get logon type definition
-        function Get-LogonTypeDefinition {
-            param (
-                [string]$logonType
-            )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
+  $outputBox.AppendText("`n`n`r Running Logon Report...`r`n`n`n" + [Environment]::NewLine)
+  try {
+    # Function to get logon type definition
+    function Get-LogonTypeDefinition {
+      param (
+        [string]$logonType
+      )
 
-            switch ($logonType) {
-                "2" { "Interactive (Logon at keyboard and screen of system or PS Remote)" }
-                "3" { "Network (Logon to shared resources on the system)" }
-                "4" { "Batch (Logon for batch servers)" }
-                "5" { "Service (Logon for a service)" }
-                "7" { "Unlock (Unlock workstation)" }
-                "8" { "NetworkCleartext (Cleartext logon using NetLogon)" }
-                "9" { "NewCredentials (RunAs using alternate credentials)" }
-                "10" { "RemoteInteractive (Terminal Services, Remote Desktop, or Remote Assistance)" }
-                "11" { "CachedInteractive (Cached interactive logon)" }
-                default { "Unknown Logon Type" }
-            }
-        }
+      switch ($logonType) {
+        "2" { "Interactive (Logon at keyboard and screen of system or PS Remote)" }
+        "3" { "Network (Logon to shared resources on the system)" }
+        "4" { "Batch (Logon for batch servers)" }
+        "5" { "Service (Logon for a service)" }
+        "7" { "Unlock (Unlock workstation)" }
+        "8" { "NetworkCleartext (Cleartext logon using NetLogon)" }
+        "9" { "NewCredentials (RunAs using alternate credentials)" }
+        "10" { "RemoteInteractive (Terminal Services, Remote Desktop, or Remote Assistance)" }
+        "11" { "CachedInteractive (Cached interactive logon)" }
+        default { "Unknown Logon Type" }
+      }
+    }
 
-        # Set the path for the report folder on the local desktop
-        $ReportFolderPath = "$env:USERPROFILE\Desktop\$ComputerName TREX REPORTS"
+    # Set the path for the report folder on the local desktop
+    $ReportFolderPath = "$env:USERPROFILE\Desktop\$ComputerName TREX REPORTS"
 
-        # Create the report folder if it doesn't exist
-        if (-not (Test-Path -Path $ReportFolderPath)) {
-            New-Item -Path $ReportFolderPath -ItemType Directory -Force
-        }
+    # Create the report folder if it doesn't exist
+    if (-not (Test-Path -Path $ReportFolderPath)) {
+      New-Item -Path $ReportFolderPath -ItemType Directory -Force
+    }
 
-        # Output file path for the HTML report
-        $OutputFilePath = [System.IO.Path]::Combine($ReportFolderPath, 'LogonReport.html')
+    # Output file path for the HTML report
+    $OutputFilePath = [System.IO.Path]::Combine($ReportFolderPath, 'LogonReport.html')
 
-        # Start creating the HTML file
-        #Write-Host "Running Logon Report on $ComputerName..."
+    # Start creating the HTML file
+    #Write-Host "Running Logon Report on $ComputerName..."
 
-        # Function to write content to the HTML file
-        function Write-HTMLContent {
-            param (
-                [string]$content
-            )
-            Add-Content -Path $OutputFilePath -Value $content
-        }
+    # Function to write content to the HTML file
+    function Write-HTMLContent {
+      param (
+        [string]$content
+      )
+      Add-Content -Path $OutputFilePath -Value $content
+    }
 
-        # Function to create HTML headers
-        function Write-HTMLHeader {
-            param (
-                [string]$title
-            )
-            $header = @"
+    # Function to create HTML headers
+    function Write-HTMLHeader {
+      param (
+        [string]$title
+      )
+      $header = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -1095,53 +1103,53 @@ function LogonReport {
 <body>
     <h1>$title</h1>
 "@
-            Write-HTMLContent -content $header
-        }
+      Write-HTMLContent -content $header
+    }
 
-        # Function to create HTML footers
-        function Write-HTMLFooter {
-            $footer = @"
+    # Function to create HTML footers
+    function Write-HTMLFooter {
+      $footer = @"
 </body>
 </html>
 "@
-            Write-HTMLContent -content $footer
-        }
+      Write-HTMLContent -content $footer
+    }
 
-        # Display the current date and time
-        Write-HTMLContent -content "<h2>Date and Time: $(Get-Date)</h2>"
+    # Display the current date and time
+    Write-HTMLContent -content "<h2>Date and Time: $(Get-Date)</h2>"
 
-        # Section 1: Show all logins with timestamps
-        $loginEvents = Get-WinEvent -ComputerName $ComputerName -FilterHashtable @{
-            LogName = 'Security'
-            ID = 4624, 4625
-        } -MaxEvents ([int]::MaxValue)
+    # Section 1: Show all logins with timestamps
+    $loginEvents = Get-WinEvent -ComputerName $ComputerName -FilterHashtable @{
+      LogName = 'Security'
+      ID = 4624, 4625
+    } -MaxEvents ([int]::MaxValue)
 
-        Write-HTMLContent -content "<h2 style='color: #cc0000;'>$ComputerName Logins</h2>"
-        Write-HTMLContent -content ("<p>Number of login events: " + $loginEvents.Count + "</p>")
-        Write-HTMLContent -content "<table><tr><th>Time</th><th>User</th><th>Status</th><th>Status Definition</th><th>Description</th></tr>"
-        foreach ($event in $loginEvents) {
-            $time = $event.TimeCreated
-            $user = $event.Properties[5].Value
-            $status = $event.Properties[8].Value
-            $logonType = $event.Properties[8].Value
-            $statusDefinition = Get-LogonTypeDefinition $logonType
-            $description = if ($event.Id -eq 4624) { "Successful Login" } else { "Failed Login" }
-            $cssClass = if ($event.Id -eq 4625) { "failed-login" } else { "" }
-            Write-HTMLContent -content ("<tr class='$cssClass'><td>$time</td><td>$user</td><td>$logonType</td><td>$statusDefinition</td><td>$description</td></tr>")
-        }
+    Write-HTMLContent -content "<h2 style='color: #cc0000;'>$ComputerName Logins</h2>"
+    Write-HTMLContent -content ("<p>Number of login events: " + $loginEvents.Count + "</p>")
+    Write-HTMLContent -content "<table><tr><th>Time</th><th>User</th><th>Status</th><th>Status Definition</th><th>Description</th></tr>"
+    foreach ($event in $loginEvents) {
+      $time = $event.TimeCreated
+      $user = $event.Properties[5].Value
+      $status = $event.Properties[8].Value
+      $logonType = $event.Properties[8].Value
+      $statusDefinition = Get-LogonTypeDefinition $logonType
+      $description = if ($event.Id -eq 4624) { "Successful Login" } else { "Failed Login" }
+      $cssClass = if ($event.Id -eq 4625) { "failed-login" } else { "" }
+      Write-HTMLContent -content ("<tr class='$cssClass'><td>$time</td><td>$user</td><td>$logonType</td><td>$statusDefinition</td><td>$description</td></tr>")
+    }
 
-        # Close the HTML tags
-        Write-HTMLFooter
+    # Close the HTML tags
+    Write-HTMLFooter
 
 
-        $outputBox.AppendText("`n`n`r Report generated and saved to $OutputFilePath Logon Report... `r`n`n" + [Environment]::NewLine)
+    $outputBox.AppendText("`n`n`r Report generated and saved to $OutputFilePath Logon Report... `r`n`n" + [Environment]::NewLine)
        
 
-        # Return the output path for confirmation
-        $OutputFilePath
-    } catch {
-        Write-Host "Error: $_"
-    }
+    # Return the output path for confirmation
+    $OutputFilePath
+  } catch {
+    Write-Host "Error: $_"
+  }
 }
 
 
@@ -1152,28 +1160,85 @@ function LogonReport {
 
 
 
-function Copy-ChromeHistory {
+function WEBHISTORY {
 
-$outputBox.AppendText("`n`n`r Copying Chrome History Database files to local Desktop.... `r`n`n" + [Environment]::NewLine)
+  Copy-BrowserHistory -Browser 'Chrome'
+  Copy-BrowserHistory -Browser 'Brave'
+  Copy-BrowserHistory -Browser 'Opera'
+  Copy-BrowserHistory -Browser 'Firefox'
+  Copy-BrowserHistory -Browser 'Edge'
+
+  $destinationFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS", 'Browser Histories')
+
+  param (
+    [string]$destinationFolder
+  )
+
+  $Regex = '\b(?:https?|www|\w{2,}\.\w{2,}|\.com|\.org|\.gov)\S*\b'
+
+  try {
+    # Get all browser history files in the specified folder
+    $historyFiles = Get-ChildItem -Path $destinationFolder -Include "ChromeHistory_*.db", "BraveHistory_*.db", "OperaHistory_*.db", "FirefoxHistory_*.sqlite", "EdgeHistory_*.db"
+
+    # Loop through each history file
+    foreach ($historyFile in $historyFiles) {
+      $outputTxtFile = [System.IO.Path]::ChangeExtension($historyFile.FullName, 'txt')
+
+      # For Firefox, read SQLite database directly
+      if ($historyFile.Name -like "FirefoxHistory_*.sqlite") {
+        $firefoxProfile = [System.IO.Path]::GetDirectoryName($historyFile.FullName)
+        $firefoxHistoryFile = Get-ChildItem -Path $firefoxProfile -Filter "places.sqlite"
+        Copy-Item -Path $firefoxHistoryFile.FullName -Destination $destinationFolder -Force
+      }
+
+      $outputBox.AppendText("`n`n`r Browser History Database File Found.... copied and parsed to local desktop `r`n`n" + [Environment]::NewLine)
+
+      #Write-Host "Parsed Browser history from $historyFile to $outputTxtFile"
+    }
+
+    #Write-Host "Parsing completed for all Browser history files in $destinationFolder"
+
+  } catch {
+    #Write-Host "Error: $_"
+  }
+}
+
+function Copy-BrowserHistory {
+
+  param (
+    [string]$Browser
+  )
+
+  $outputBox.AppendText("`n`n`r Copying $Browser History Database files to local Desktop.... `r`n`n" + [Environment]::NewLine)
 
   # Define the remote PC's hostname or IP address
   $remotePC = $script:globalComputerName
 
   # Define the destination path on the local desktop
-  $destinationPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$remotepc TREX REPORTS", 'Chrome History')
-  
-
+  $destinationPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$remotepc TREX REPORTS", 'Browser Histories')
 
   # Get a list of user profiles on the remote PC
   $userProfiles = Get-ChildItem "\\$remotePC\C$\Users" | Where-Object { $_.PSIsContainer }
 
-  # Loop through each user profile and copy the Chrome history file
+  # Loop through each user profile and copy the browser history file
   foreach ($profile in $userProfiles) {
     $username = $profile.Name
-    $chromeHistoryFolder = "\\$remotePC\C$\Users\$username\AppData\Local\Google\Chrome\User Data\Default"
+    $browserHistoryFolder = switch ($Browser) {
+      'Chrome' { "\\$remotePC\C$\Users\$username\AppData\Local\Google\Chrome\User Data\Default" }
+      'Brave' { "\\$remotePC\C$\Users\$username\AppData\Local\BraveSoftware\Brave-Browser\User Data\Default" }
+      'Opera' { "\\$remotePC\C$\Users\$username\AppData\Roaming\Opera Software\Opera Stable" }
+      'Firefox' { "\\$remotePC\C$\Users\$username\AppData\Roaming\Mozilla\Firefox\Profiles" }
+      'Edge' { "\\$remotePC\C$\Users\$username\AppData\Local\Microsoft\Edge\User Data\Default" }
+    }
 
-    # Search for the Chrome history file within the user's Chrome profile folder
-    $historyFilePath = Get-ChildItem -Path $chromeHistoryFolder -Filter "History" -Recurse | Select-Object -First 1
+    # Search for the browser history file within the user's profile folder
+    $historyFilePath = switch ($Browser) {
+      'Chrome' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
+      'Brave' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
+      'Opera' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
+      'Firefox' { Get-ChildItem -Path $browserHistoryFolder -Filter "places.sqlite" -Recurse | Select-Object -First 1 }
+      'Edge' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
+    }
 
     if ($historyFilePath) {
       # Create the destination folder if it doesn't exist
@@ -1182,68 +1247,25 @@ $outputBox.AppendText("`n`n`r Copying Chrome History Database files to local Des
       }
 
       # Construct the destination filename with the username
-      $destinationFileName = "ChromeHistory_$username.db"
+      $destinationFileName = switch ($Browser) {
+        'Chrome' { "ChromeHistory_$username.db" }
+        'Brave' { "BraveHistory_$username.db" }
+        'Opera' { "OperaHistory_$username.db" }
+        'Firefox' { "FirefoxHistory_$username.sqlite" }
+        'Edge' { "EdgeHistory_$username.db" }
+      }
       $destinationFilePath = Join-Path $destinationPath -ChildPath $destinationFileName
 
-      # Copy the Chrome history file to the destination folder with a unique filename
+      # Copy the browser history file to the destination folder with a unique filename
       Copy-Item -Path $historyFilePath.FullName -Destination $destinationFilePath -Force
 
-      #Write-Host "Chrome history file copied for $username to $destinationFilePath"
+      #Write-Host "$Browser history file copied for $username to $destinationFilePath"
     } else {
-      #Write-Host "Chrome history file not found for $username"
+      #Write-Host "$Browser history file not found for $username"
     }
   }
 }
-  
 
-
-
-  function WEBHISTORY {
-
-  Copy-ChromeHistory
-
-  $destinationFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS", 'Chrome History')
-
-
-    param (
-        [string]$destinationFolder
-    )
-
-    $Regex = '\b(?:https?|www|\w{2,}\.\w{2,}|\.com|\.org|\.gov)\S*\b'
-
-    try {
-        # Get all Chrome history files in the specified folder
-        $historyFiles = Get-ChildItem -Path $destinationFolder -Filter "ChromeHistory_*.db"
-
-        # Loop through each history file
-        foreach ($historyFile in $historyFiles) {
-            $outputTxtFile = [System.IO.Path]::ChangeExtension($historyFile.FullName, 'txt')
-
-            # Read the content of the history file
-            $historyContent = Get-Content -Path $historyFile.FullName -Raw
-
-            # Extract URLs using the specified regex pattern
-            $historyEntries = $historyContent | Select-String -Pattern $Regex -AllMatches | ForEach-Object {
-                $_.Matches.Value
-            }
-
-            # Join the URLs with line breaks and format them
-            $formattedHistory = $historyEntries -join "`n" -replace '(https?://)', "`n`$1"
-
-            # Save the parsed data to the output text file
-            $formattedHistory | Out-File -FilePath $outputTxtFile -Force
-
-            $outputBox.AppendText("`n`n`r Chrome History Database File Found.... copied and parsed to local desktop `r`n`n" + [Environment]::NewLine)
-
-            #Write-Host "Parsed Chrome history from $historyFile to $outputTxtFile"
-        }
-
-        #Write-Host "Parsing completed for all Chrome history files in $destinationFolder"
-
-    } catch {
-        #Write-Host "Error: $_"
-    }
-}
 
 
 
@@ -1280,39 +1302,39 @@ $outputBox.AppendText("`n`n`r Copying Chrome History Database files to local Des
 
 function ANTIVIRUS {
 
-$outputBox.AppendText("`n`n`r Running Antivirus Status Report... `r`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Running Antivirus Status Report... `r`n`n" + [Environment]::NewLine)
 
 
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
 
-    try {
-        # Set the path for the report folder on the desktop
-        $ReportFolderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
+  try {
+    # Set the path for the report folder on the desktop
+    $ReportFolderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
 
-        # Create the report folder if it doesn't exist
-        if (-not (Test-Path -Path $ReportFolderPath)) {
-            New-Item -Path $ReportFolderPath -ItemType Directory -Force
-        }
+    # Create the report folder if it doesn't exist
+    if (-not (Test-Path -Path $ReportFolderPath)) {
+      New-Item -Path $ReportFolderPath -ItemType Directory -Force
+    }
 
-        # Output file path for the HTML report
-        $OutputFilePath = [System.IO.Path]::Combine($ReportFolderPath, 'AntivirusReport.html')
+    # Output file path for the HTML report
+    $OutputFilePath = [System.IO.Path]::Combine($ReportFolderPath, 'AntivirusReport.html')
 
-        # Function to write content to the HTML file
-        function Write-HTMLContent {
-            param (
-                [string]$content
-            )
-            Add-Content -Path $OutputFilePath -Value $content
-        }
+    # Function to write content to the HTML file
+    function Write-HTMLContent {
+      param (
+        [string]$content
+      )
+      Add-Content -Path $OutputFilePath -Value $content
+    }
 
-        # Function to create HTML headers
-        function Write-HTMLHeader {
-            param (
-                [string]$title
-            )
-            $header = @"
+    # Function to create HTML headers
+    function Write-HTMLHeader {
+      param (
+        [string]$title
+      )
+      $header = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -1364,103 +1386,103 @@ $outputBox.AppendText("`n`n`r Running Antivirus Status Report... `r`n`n" + [Envi
 <body>
     <h1>$title</h1>
 "@
-            Write-HTMLContent -content $header
-        }
+      Write-HTMLContent -content $header
+    }
 
-        # Function to create HTML footers
-        function Write-HTMLFooter {
-            $footer = @"
+    # Function to create HTML footers
+    function Write-HTMLFooter {
+      $footer = @"
 </body>
 </html>
 "@
-            Write-HTMLContent -content $footer
-        }
-
-        # Function to get Microsoft Defender status and exclusions
-        function Get-MicrosoftDefenderStatus {
-            $defenderStatus = Get-MpComputerStatus
-            $defenderRealTimeProtection = Get-MpPreference | Select-Object -ExpandProperty RealTimeProtectionEnabled
-
-            $antivirusStatus = if ($defenderRealTimeProtection) { 'Active' } else { 'Inactive' }
-            $antivirusExclusions = "Microsoft Defender Exclusions:"
-            
-            # Retrieve Microsoft Defender exclusions
-            $exclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
-            $exclusionContent = if ($exclusions) {
-                $exclusions -join "`r`n"
-            } else {
-                "No exclusions configured."
-            }
-
-            Write-HTMLContent -content ("<h3>Microsoft Defender Status: $antivirusStatus</h3>")
-            Write-HTMLContent -content ("<p>$antivirusExclusions</p>")
-            Write-HTMLContent -content ("<pre class='exclusion'>$exclusionContent</pre>")
-        }
-
-        # Function to get Sophos status
-        function Get-SophosStatus {
-            # Attempt to retrieve Sophos status from the registry
-            $sophosStatus = "Sophos Status: Not Implemented (Check Registry)"
-            $sophosRegistryKey = "HKLM:\SOFTWARE\Sophos"
-
-            if (Test-Path $sophosRegistryKey) {
-                $sophosStatus = "Sophos Status: Installed"
-            } else {
-                $sophosStatus = "Sophos Status: Not Installed"
-            }
-
-            Write-HTMLContent -content ("<h3>$sophosStatus</h3>")
-        }
-
-        # Function to get antivirus products installed on the system
-        function Get-InstalledAntivirusProducts {
-            $antivirusProducts = Get-WmiObject -Namespace "root\SecurityCenter2" -Query "SELECT * FROM AntiVirusProduct"
-
-            foreach ($product in $antivirusProducts) {
-                $productName = $product.displayName
-                Write-HTMLContent -content "<h2>$productName</h2>"
-
-                $status = $product.productState
-                $statusClass = if ($status -eq 397568) { 'active' } else { 'inactive' }
-
-                $statusText = if ($status -eq 397568) { 'Active' } else { 'Inactive' }
-                Write-HTMLContent -content "<p class='$statusClass'>Status: $statusText</p>"
-
-                # Add logic here to retrieve antivirus exclusions for each product
-                # Example: $antivirusExclusions = Get-AntivirusExclusionsFunction
-
-                Write-HTMLContent -content "<h3>Antivirus Exclusions:</h3>"
-                Write-HTMLContent -content "<p>$antivirusExclusions</p>"
-            }
-        }
-
-        # Start creating the HTML file
-        Write-HTMLHeader -title "Antivirus Report - $ComputerName"
-
-        # Display the current date and time
-        Write-HTMLContent -content "<h2>Date and Time: $(Get-Date)</h2>"
-
-        # Section 1: Microsoft Defender status and exclusions
-        Get-MicrosoftDefenderStatus
-
-        # Section 2: Sophos status
-        Get-SophosStatus
-
-        # Section 3: Antivirus products and their status
-        Get-InstalledAntivirusProducts
-
-        # Close the HTML tags
-        Write-HTMLFooter
-
-        $outputBox.AppendText("`n`n`r Antivirus report generated successfully: $OutputFilePath `r`n`n" + [Environment]::NewLine)
-
-        #Write-Host "Antivirus report generated successfully."
-
-        # Return the output path for confirmation
-        $OutputFilePath
-    } catch {
-        #Write-Host "Error: $_"
+      Write-HTMLContent -content $footer
     }
+
+    # Function to get Microsoft Defender status and exclusions
+    function Get-MicrosoftDefenderStatus {
+      $defenderStatus = Get-MpComputerStatus
+      $defenderRealTimeProtection = Get-MpPreference | Select-Object -ExpandProperty RealTimeProtectionEnabled
+
+      $antivirusStatus = if ($defenderRealTimeProtection) { 'Active' } else { 'Inactive' }
+      $antivirusExclusions = "Microsoft Defender Exclusions:"
+            
+      # Retrieve Microsoft Defender exclusions
+      $exclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
+      $exclusionContent = if ($exclusions) {
+        $exclusions -join "`r`n"
+      } else {
+        "No exclusions configured."
+      }
+
+      Write-HTMLContent -content ("<h3>Microsoft Defender Status: $antivirusStatus</h3>")
+      Write-HTMLContent -content ("<p>$antivirusExclusions</p>")
+      Write-HTMLContent -content ("<pre class='exclusion'>$exclusionContent</pre>")
+    }
+
+    # Function to get Sophos status
+    function Get-SophosStatus {
+      # Attempt to retrieve Sophos status from the registry
+      $sophosStatus = "Sophos Status: Not Implemented (Check Registry)"
+      $sophosRegistryKey = "HKLM:\SOFTWARE\Sophos"
+
+      if (Test-Path $sophosRegistryKey) {
+        $sophosStatus = "Sophos Status: Installed"
+      } else {
+        $sophosStatus = "Sophos Status: Not Installed"
+      }
+
+      Write-HTMLContent -content ("<h3>$sophosStatus</h3>")
+    }
+
+    # Function to get antivirus products installed on the system
+    function Get-InstalledAntivirusProducts {
+      $antivirusProducts = Get-WmiObject -Namespace "root\SecurityCenter2" -Query "SELECT * FROM AntiVirusProduct"
+
+      foreach ($product in $antivirusProducts) {
+        $productName = $product.displayName
+        Write-HTMLContent -content "<h2>$productName</h2>"
+
+        $status = $product.productState
+        $statusClass = if ($status -eq 397568) { 'active' } else { 'inactive' }
+
+        $statusText = if ($status -eq 397568) { 'Active' } else { 'Inactive' }
+        Write-HTMLContent -content "<p class='$statusClass'>Status: $statusText</p>"
+
+        # Add logic here to retrieve antivirus exclusions for each product
+        # Example: $antivirusExclusions = Get-AntivirusExclusionsFunction
+
+        Write-HTMLContent -content "<h3>Antivirus Exclusions:</h3>"
+        Write-HTMLContent -content "<p>$antivirusExclusions</p>"
+      }
+    }
+
+    # Start creating the HTML file
+    Write-HTMLHeader -title "Antivirus Report - $ComputerName"
+
+    # Display the current date and time
+    Write-HTMLContent -content "<h2>Date and Time: $(Get-Date)</h2>"
+
+    # Section 1: Microsoft Defender status and exclusions
+    Get-MicrosoftDefenderStatus
+
+    # Section 2: Sophos status
+    Get-SophosStatus
+
+    # Section 3: Antivirus products and their status
+    Get-InstalledAntivirusProducts
+
+    # Close the HTML tags
+    Write-HTMLFooter
+
+    $outputBox.AppendText("`n`n`r Antivirus report generated successfully: $OutputFilePath `r`n`n" + [Environment]::NewLine)
+
+    #Write-Host "Antivirus report generated successfully."
+
+    # Return the output path for confirmation
+    $OutputFilePath
+  } catch {
+    #Write-Host "Error: $_"
+  }
 }
 
 
@@ -1478,23 +1500,23 @@ $outputBox.AppendText("`n`n`r Running Antivirus Status Report... `r`n`n" + [Envi
 
 
 function WIFINETWORK {
-    param (
-        [string]$ComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$ComputerName = $script:globalComputerName
+  )
 
-    $outputBox.AppendText("`n`n`r Running WIFI and Network Report... `r`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Running WIFI and Network Report... `r`n`n" + [Environment]::NewLine)
 
-    # Create a folder on the desktop
-    $FolderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
-    if (-not (Test-Path -Path $FolderPath)) {
-        New-Item -ItemType Directory -Path $FolderPath | Out-Null
-    }
+  # Create a folder on the desktop
+  $FolderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
+  if (-not (Test-Path -Path $FolderPath)) {
+    New-Item -ItemType Directory -Path $FolderPath | Out-Null
+  }
 
-    # Get the current date and time
-    $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  # Get the current date and time
+  $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Create an HTML report
-    $htmlReport = @"
+  # Create an HTML report
+  $htmlReport = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -1544,32 +1566,32 @@ function WIFINETWORK {
         </tr>
 "@
 
-    $wifiProfiles = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-        netsh wlan show profiles | ForEach-Object {
-            if ($_ -match "All User Profile\s*:\s*(.+)") {
-                $matches[1].Trim()
-            }
-        }
+  $wifiProfiles = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    netsh wlan show profiles | ForEach-Object {
+      if ($_ -match "All User Profile\s*:\s*(.+)") {
+        $matches[1].Trim()
+      }
+    }
+  }
+
+  foreach ($ssid in $wifiProfiles) {
+    $output = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+      netsh wlan show profile name="$using:ssid" key=clear
     }
 
-    foreach ($ssid in $wifiProfiles) {
-        $output = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-            netsh wlan show profile name="$using:ssid" key=clear
-        }
+    $keyContentLine = $output | Select-String "Key Content"
+    if ($keyContentLine -match "Key Content\s*:\s*(.+)") {
+      $password = $matches[1].Trim()
 
-        $keyContentLine = $output | Select-String "Key Content"
-        if ($keyContentLine -match "Key Content\s*:\s*(.+)") {
-            $password = $matches[1].Trim()
-
-            # Append to the HTML report
-            $htmlReport += "        <tr><td>$ssid</td><td class='password-cell hidden-password'>$password</td></tr>`n"
-        } else {
-            # Append to the HTML report with 'Not found'
-            $htmlReport += "        <tr><td>$ssid</td><td>Not found</td></tr>`n"
-        }
+      # Append to the HTML report
+      $htmlReport += "        <tr><td>$ssid</td><td class='password-cell hidden-password'>$password</td></tr>`n"
+    } else {
+      # Append to the HTML report with 'Not found'
+      $htmlReport += "        <tr><td>$ssid</td><td>Not found</td></tr>`n"
     }
+  }
 
-    $htmlReport += @"
+  $htmlReport += @"
     </table>
     <h3>Network Adapters</h3>
     <table>
@@ -1581,39 +1603,39 @@ function WIFINETWORK {
         </tr>
 "@
 
-    $networkAdapters = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-        Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+  $networkAdapters = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+  }
+
+  foreach ($adapter in $networkAdapters) {
+    $adapterName = $adapter.Name
+    $macAddress = $adapter.MacAddress
+    $ipv4Addresses = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+      (Get-NetIPAddress -InterfaceAlias $using:adapterName -AddressFamily IPv4).IPAddress
+    }
+    $ipv6Addresses = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+      (Get-NetIPAddress -InterfaceAlias $using:adapterName -AddressFamily IPv6).IPAddress
     }
 
-    foreach ($adapter in $networkAdapters) {
-        $adapterName = $adapter.Name
-        $macAddress = $adapter.MacAddress
-        $ipv4Addresses = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-            (Get-NetIPAddress -InterfaceAlias $using:adapterName -AddressFamily IPv4).IPAddress
-        }
-        $ipv6Addresses = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-            (Get-NetIPAddress -InterfaceAlias $using:adapterName -AddressFamily IPv6).IPAddress
-        }
+    # Append to the HTML report
+    $htmlReport += "        <tr><td>$adapterName</td><td>$macAddress</td><td>$ipv4Addresses</td><td>$ipv6Addresses</td></tr>`n"
+  }
 
-        # Append to the HTML report
-        $htmlReport += "        <tr><td>$adapterName</td><td>$macAddress</td><td>$ipv4Addresses</td><td>$ipv6Addresses</td></tr>`n"
-    }
-
-    $htmlReport += @"
+  $htmlReport += @"
     </table>
 </body>
 </html>
 "@
 
-    # Save the HTML report to the folder on the local desktop
-    $reportPath = [System.IO.Path]::Combine($FolderPath, "NetworkAdapterReport.html")
-    $htmlReport | Out-File -FilePath $reportPath -Encoding UTF8
+  # Save the HTML report to the folder on the local desktop
+  $reportPath = [System.IO.Path]::Combine($FolderPath, "NetworkAdapterReport.html")
+  $htmlReport | Out-File -FilePath $reportPath -Encoding UTF8
 
-    # Display a message with the report path
-    $outputBox.AppendText("`n`n`r Report saved to: $reportPath`n`n" + [Environment]::NewLine)
+  # Display a message with the report path
+  $outputBox.AppendText("`n`n`r Report saved to: $reportPath`n`n" + [Environment]::NewLine)
 
-    # Open the report
-    # Invoke-Item $reportPath
+  # Open the report
+  # Invoke-Item $reportPath
 }
 
 
@@ -1630,44 +1652,44 @@ function WIFINETWORK {
 
 
 function GPOStatus {
-    $outputBox.AppendText("`n`n`r Running GPO Report....`n`n`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Running GPO Report....`n`n`n`n" + [Environment]::NewLine)
 
-    $item = "$script:globalComputerName"
+  $item = "$script:globalComputerName"
 
-    try {
-        If (Test-Connection -Count 1 -ComputerName $item -Quiet) {
-            $outputBox.AppendText("$item ONLINE" + [Environment]::NewLine)
+  try {
+    If (Test-Connection -Count 1 -ComputerName $item -Quiet) {
+      $outputBox.AppendText("$item ONLINE" + [Environment]::NewLine)
 
-            # Define the location outside the script block
-            $GPRESULTLocation = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS")
+      # Define the location outside the script block
+      $GPRESULTLocation = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS")
 
-            # Create the folder if it doesn't exist
-            if (-not (Test-Path -Path $GPRESULTLocation -PathType Container)) {
-                New-Item -Path $GPRESULTLocation -ItemType Directory | Out-Null
-            }
+      # Create the folder if it doesn't exist
+      if (-not (Test-Path -Path $GPRESULTLocation -PathType Container)) {
+        New-Item -Path $GPRESULTLocation -ItemType Directory | Out-Null
+      }
 
-            # INSERT SCRIPT TO PERFORM HERE
+      # INSERT SCRIPT TO PERFORM HERE
 
-            # Construct the remote file path
-            $RemoteFilePath = "C$\Gpresult.html"
+      # Construct the remote file path
+      $RemoteFilePath = "C$\Gpresult.html"
 
-            # Copy the file from the remote machine to your local machine's desktop
-            Copy-Item -Path "\\$item\$RemoteFilePath" -Destination $GPRESULTLocation -Force
+      # Copy the file from the remote machine to your local machine's desktop
+      Copy-Item -Path "\\$item\$RemoteFilePath" -Destination $GPRESULTLocation -Force
 
-            #Opens the file after output.
-            #ii "$GPRESULTLocation\Gpresult.html"
+      #Opens the file after output.
+      #ii "$GPRESULTLocation\Gpresult.html"
 
-        } else {
-            $outputBox.AppendText("$item offline)" + [Environment]::NewLine)
-        }
-
-    } catch {
-        $outputBox.AppendText("$item | $_.Exception.Message)" + [Environment]::NewLine)
+    } else {
+      $outputBox.AppendText("$item offline)" + [Environment]::NewLine)
     }
 
-    $outputBox.AppendText("`n`n`r GPO Report saved to: $GPRESULTLocation. `n`n`r" + [Environment]::NewLine)
-    Start-Sleep -Seconds 1
-    $statusText.text = ""
+  } catch {
+    $outputBox.AppendText("$item | $_.Exception.Message)" + [Environment]::NewLine)
+  }
+
+  $outputBox.AppendText("`n`n`r GPO Report saved to: $GPRESULTLocation. `n`n`r" + [Environment]::NewLine)
+  Start-Sleep -Seconds 1
+  $statusText.text = ""
 }
 
 
@@ -1688,20 +1710,20 @@ function SCHEDULEDTASKS {
 
 
 
-    param (
-        [string]$remoteComputer = $script:globalComputerName,
-        [string]$outputPath = "$env:USERPROFILE\Desktop\$script:globalComputerName TREX REPORTS\ScheduledTasks.html"
-    )
+  param (
+    [string]$remoteComputer = $script:globalComputerName,
+    [string]$outputPath = "$env:USERPROFILE\Desktop\$script:globalComputerName TREX REPORTS\ScheduledTasks.html"
+  )
 
-    # Check if the directory exists, if not, create it
-    $outputDirectory = Split-Path -Path $outputPath
-    if (-not (Test-Path $outputDirectory -PathType Container)) {
-        New-Item -Path $outputDirectory -ItemType Directory -Force
-    }
-    $outputBox.AppendText("`n`n`r Generating Scheduled Task Report.... `n`n`r" + [Environment]::NewLine)
-    $tasks = Get-ScheduledTask -CimSession $remoteComputer
+  # Check if the directory exists, if not, create it
+  $outputDirectory = Split-Path -Path $outputPath
+  if (-not (Test-Path $outputDirectory -PathType Container)) {
+    New-Item -Path $outputDirectory -ItemType Directory -Force
+  }
+  $outputBox.AppendText("`n`n`r Generating Scheduled Task Report.... `n`n`r" + [Environment]::NewLine)
+  $tasks = Get-ScheduledTask -CimSession $remoteComputer
 
-    $htmlContent = @"
+  $htmlContent = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -1732,20 +1754,20 @@ function SCHEDULEDTASKS {
         </tr>
 "@
 
-    foreach ($task in $tasks) {
-        $status = if ($task.State -eq 'Running') { 'Running' } else { 'Not Running' }
+  foreach ($task in $tasks) {
+    $status = if ($task.State -eq 'Running') { 'Running' } else { 'Not Running' }
 
-        $nextRunTime = if ($task.NextRunTime) {
-            $task.NextRunTime.ToString('yyyy-MM-dd HH:mm:ss')
-        } else {
-            'N/A'
-        }
+    $nextRunTime = if ($task.NextRunTime) {
+      $task.NextRunTime.ToString('yyyy-MM-dd HH:mm:ss')
+    } else {
+      'N/A'
+    }
 
-        $actions = $task.Actions | ForEach-Object {
-            $_.ActionType + ": " + $_.Arguments
-        }
+    $actions = $task.Actions | ForEach-Object {
+      $_.ActionType + ": " + $_.Arguments
+    }
 
-        $htmlContent += @"
+    $htmlContent += @"
         <tr>
             <td>$($task.TaskName)</td>
             <td>$nextRunTime</td>
@@ -1753,18 +1775,18 @@ function SCHEDULEDTASKS {
             <td>$($actions -join '<br>')</td>
         </tr>
 "@
-    }
+  }
 
-    $htmlContent += @"
+  $htmlContent += @"
     </table>
 </body>
 </html>
 "@
 
-    $htmlContent | Out-File -FilePath $outputPath -Encoding UTF8
-    #Write-Host "Scheduled tasks information saved to: $outputPath"
+  $htmlContent | Out-File -FilePath $outputPath -Encoding UTF8
+  #Write-Host "Scheduled tasks information saved to: $outputPath"
 
-    $outputBox.AppendText("`n`n`r Scheduled Task Report saved to: $outputPath. `n`n`r" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Scheduled Task Report saved to: $outputPath. `n`n`r" + [Environment]::NewLine)
 }
 
 
@@ -1781,31 +1803,31 @@ function SCHEDULEDTASKS {
 
 
 function STARTUP {
-    param (
-        [string]$remoteComputerName = $script:globalComputerName
-    )
+  param (
+    [string]$remoteComputerName = $script:globalComputerName
+  )
 
-    # Define local output folder and path
-    $outputFolder = "$env:USERPROFILE\Desktop\$remoteComputerName TREX REPORTS"
-    $outputPath = Join-Path $outputFolder "StartupItems.html"
+  # Define local output folder and path
+  $outputFolder = "$env:USERPROFILE\Desktop\$remoteComputerName TREX REPORTS"
+  $outputPath = Join-Path $outputFolder "StartupItems.html"
 
-    $outputBox.AppendText("`n`n`r Running Startup Report.... `n`n`r" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Running Startup Report.... `n`n`r" + [Environment]::NewLine)
 
-    # Create the output folder if it doesn't exist
-    if (-not (Test-Path -Path $outputFolder -PathType Container)) {
-        New-Item -Path $outputFolder -ItemType Directory | Out-Null
-    }
+  # Create the output folder if it doesn't exist
+  if (-not (Test-Path -Path $outputFolder -PathType Container)) {
+    New-Item -Path $outputFolder -ItemType Directory | Out-Null
+  }
 
-    # Get current date and time
-    $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  # Get current date and time
+  $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Get startup items from remote machine
-    $startupItems = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
-        Get-CimInstance -Query "SELECT * FROM Win32_StartupCommand" | Select-Object Caption, Command, Location
-    }
+  # Get startup items from remote machine
+  $startupItems = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
+    Get-CimInstance -Query "SELECT * FROM Win32_StartupCommand" | Select-Object Caption, Command, Location
+  }
 
-    # Create HTML content
-    $htmlContent = @"
+  # Create HTML content
+  $htmlContent = @"
     <html>
     <head>
         <title>Startup Items</title>
@@ -1838,28 +1860,28 @@ function STARTUP {
             </tr>
 "@
 
-    # Add rows to HTML content
-    foreach ($item in $startupItems) {
-        $htmlContent += @"
+  # Add rows to HTML content
+  foreach ($item in $startupItems) {
+    $htmlContent += @"
             <tr>
                 <td>$($item.Caption)</td>
                 <td>$($item.Command)</td>
                 <td>$($item.Location)</td>
             </tr>
 "@
-    }
+  }
 
-    # Close HTML content
-    $htmlContent += @"
+  # Close HTML content
+  $htmlContent += @"
         </table>
     </body>
     </html>
 "@
 
-    # Save HTML content to the local output path
-    $htmlContent | Out-File -FilePath $outputPath -Force
+  # Save HTML content to the local output path
+  $htmlContent | Out-File -FilePath $outputPath -Force
 
-    $outputBox.AppendText("`n`n`r Startup Report saved to: $outputPath. `n`n`r" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Startup Report saved to: $outputPath. `n`n`r" + [Environment]::NewLine)
 }
 
 
@@ -1873,52 +1895,52 @@ function STARTUP {
 function SHUTDOWNPC {
   
 
-    $outputBox.AppendText("Shutdown Tool Started." + [Environment]::NewLine)
+  $outputBox.AppendText("Shutdown Tool Started." + [Environment]::NewLine)
 
-    $item = $script:globalComputerName
+  $item = $script:globalComputerName
 
-    $confirmationResult = [System.Windows.Forms.MessageBox]::Show("Are you sure you want to Shutdown the pc?", "Confirm", "YesNo", "Question")
+  $confirmationResult = [System.Windows.Forms.MessageBox]::Show("Are you sure you want to Shutdown the pc?", "Confirm", "YesNo", "Question")
 
-    switch ($confirmationResult) {
-        'Yes' {
-            $outputBox.AppendText("User confirmed.  Starting Shutdown process." + [Environment]::NewLine)
+  switch ($confirmationResult) {
+    'Yes' {
+      $outputBox.AppendText("User confirmed.  Starting Shutdown process." + [Environment]::NewLine)
 
-            try {
-                If (Test-Connection -Count 1 -ComputerName $item -Quiet) {
-                    $outputBox.AppendText("$item Connected and is ONLINE.  Starting Shutdown, please wait... " + [Environment]::NewLine)
+      try {
+        If (Test-Connection -Count 1 -ComputerName $item -Quiet) {
+          $outputBox.AppendText("$item Connected and is ONLINE.  Starting Shutdown, please wait... " + [Environment]::NewLine)
 
                     
-                    Stop-Computer -ComputerName $item -Force
+          Stop-Computer -ComputerName $item -Force
                    
 
-                    # Wait for a bit
-                    Start-Sleep -Seconds 5  # Adjust the delay as needed
+          # Wait for a bit
+          Start-Sleep -Seconds 5  # Adjust the delay as needed
 
-                    # Check if the computer is still reachable
-                    $timeout = 60  # Adjust the timeout as needed
-                    $start = Get-Date
-                    while ((Test-Connection -ComputerName $item -Count 1 -Quiet) -and ((Get-Date) -lt ($start.AddSeconds($timeout)))) {
-                        Start-Sleep -Seconds 5
-                    }
+          # Check if the computer is still reachable
+          $timeout = 60  # Adjust the timeout as needed
+          $start = Get-Date
+          while ((Test-Connection -ComputerName $item -Count 1 -Quiet) -and ((Get-Date) -lt ($start.AddSeconds($timeout)))) {
+            Start-Sleep -Seconds 5
+          }
 
-                    if (Test-Connection -ComputerName $item -Count 1 -Quiet) {
-                        $outputBox.AppendText("$item is still reachable. Shutdown may not have completed successfully." + [Environment]::NewLine)
-                    } else {
-                        $outputBox.AppendText("$item is not reachable. Shutdown appears to be successful." + [Environment]::NewLine)
-                    }
-                } else {
-                    $outputBox.AppendText("$item OFFLINE" + [Environment]::NewLine)
-                }
-            } catch {
-                #$outputBox.AppendText("$item | $_.Exception.Message" + [Environment]::NewLine)
-            }
-
-            $outputBox.AppendText("Shutdown Operation Complete" + [Environment]::NewLine)
+          if (Test-Connection -ComputerName $item -Count 1 -Quiet) {
+            $outputBox.AppendText("$item is still reachable. Shutdown may not have completed successfully." + [Environment]::NewLine)
+          } else {
+            $outputBox.AppendText("$item is not reachable. Shutdown appears to be successful." + [Environment]::NewLine)
+          }
+        } else {
+          $outputBox.AppendText("$item OFFLINE" + [Environment]::NewLine)
         }
-        'No' {
-            $outputBox.AppendText("User aborted the operation. (Confirmation declined)" + [Environment]::NewLine)
-        }
+      } catch {
+        #$outputBox.AppendText("$item | $_.Exception.Message" + [Environment]::NewLine)
+      }
+
+      $outputBox.AppendText("Shutdown Operation Complete" + [Environment]::NewLine)
     }
+    'No' {
+      $outputBox.AppendText("User aborted the operation. (Confirmation declined)" + [Environment]::NewLine)
+    }
+  }
 }
 
 
@@ -1928,55 +1950,55 @@ function SHUTDOWNPC {
 ###############################################################################################################################################################################
 
 function USBDEVICE {
-    param (
-        [string]$remoteComputerName = $global:globalComputerName,
-        [string]$localFolderPath = "$env:USERPROFILE\Desktop"
-    )
+  param (
+    [string]$remoteComputerName = $global:globalComputerName,
+    [string]$localFolderPath = "$env:USERPROFILE\Desktop"
+  )
 
-    $outputBox.AppendText("`n`n`r Getting USB Drive Report on $remoteComputerName....`r`n`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`r Getting USB Drive Report on $remoteComputerName....`r`n`n" + [Environment]::NewLine)
 
-    # Get computer hostname on the remote machine
-    $hostname = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock { $env:COMPUTERNAME }
+  # Get computer hostname on the remote machine
+  $hostname = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock { $env:COMPUTERNAME }
 
-    # Specify the folder name
-    $folderName = "$hostname TREX REPORTS"
+  # Specify the folder name
+  $folderName = "$hostname TREX REPORTS"
 
-    # Create a folder on the local machine if it doesn't exist
-    $localFolderFullPath = Join-Path $localFolderPath $folderName
-    if (-not (Test-Path -Path $localFolderFullPath -PathType Container)) {
-        New-Item -Path $localFolderFullPath -ItemType Directory | Out-Null
+  # Create a folder on the local machine if it doesn't exist
+  $localFolderFullPath = Join-Path $localFolderPath $folderName
+  if (-not (Test-Path -Path $localFolderFullPath -PathType Container)) {
+    New-Item -Path $localFolderFullPath -ItemType Directory | Out-Null
+  }
+
+  # Get current date and time on the remote machine
+  $currentDateTime = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock { Get-Date -Format "yyyy-MM-dd HH:mm:ss" }
+
+  # Run the command to get USB storage information on the remote machine
+  $usbInfo = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
+    Get-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Enum\USBSTOR\*\* | Select FriendlyName, Service
+  }
+
+  # Get information about each USB storage device on the remote machine
+  $allDevices = foreach ($device in $usbInfo) {
+    [PSCustomObject]@{
+      FriendlyName = $device.FriendlyName
+      Service = $device.Service
+      IsConnectedDisk = $false
     }
+  }
 
-    # Get current date and time on the remote machine
-    $currentDateTime = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock { Get-Date -Format "yyyy-MM-dd HH:mm:ss" }
-
-    # Run the command to get USB storage information on the remote machine
-    $usbInfo = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
-        Get-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Enum\USBSTOR\*\* | Select FriendlyName, Service
+  # Get information about currently connected USB storage devices with service "Disk" on the remote machine
+  $connectedDiskDevices = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
+    Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' -and $_.Service -eq 'Disk' } | ForEach-Object {
+      [PSCustomObject]@{
+        FriendlyName = $_.FriendlyName
+        Service = $_.Service
+        IsConnectedDisk = $true
+      }
     }
+  }
 
-    # Get information about each USB storage device on the remote machine
-    $allDevices = foreach ($device in $usbInfo) {
-        [PSCustomObject]@{
-            FriendlyName = $device.FriendlyName
-            Service = $device.Service
-            IsConnectedDisk = $false
-        }
-    }
-
-    # Get information about currently connected USB storage devices with service "Disk" on the remote machine
-    $connectedDiskDevices = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
-        Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' -and $_.Service -eq 'Disk' } | ForEach-Object {
-            [PSCustomObject]@{
-                FriendlyName = $_.FriendlyName
-                Service = $_.Service
-                IsConnectedDisk = $true
-            }
-        }
-    }
-
-    # Convert the information to HTML format
-    $htmlContent = @"
+  # Convert the information to HTML format
+  $htmlContent = @"
 <html>
 <head>
     <title>USB Storage Information</title>
@@ -2017,17 +2039,17 @@ function USBDEVICE {
 </html>
 "@
 
-    # Specify the path for the HTML file inside the folder on the local machine
-    $localHtmlFilePath = Join-Path $localFolderFullPath 'USBStorageInfo.html'
+  # Specify the path for the HTML file inside the folder on the local machine
+  $localHtmlFilePath = Join-Path $localFolderFullPath 'USBStorageInfo.html'
 
-    # Save the HTML content to the file on the local machine
-    $htmlContent | Out-File -FilePath $localHtmlFilePath
+  # Save the HTML content to the file on the local machine
+  $htmlContent | Out-File -FilePath $localHtmlFilePath
 
-    # Open the HTML file with the default web browser on the local machine
-    #Start-Process $localHtmlFilePath
+  # Open the HTML file with the default web browser on the local machine
+  #Start-Process $localHtmlFilePath
 
-    # Display a message indicating the file has been created and opened on the local machine
-    $outputBox.AppendText("`n`n`r HTML file created and opened successfully at: $localHtmlFilePath`n`n`r" + [Environment]::NewLine)
+  # Display a message indicating the file has been created and opened on the local machine
+  $outputBox.AppendText("`n`n`r HTML file created and opened successfully at: $localHtmlFilePath`n`n`r" + [Environment]::NewLine)
 }
 
 
@@ -2040,26 +2062,26 @@ function USBDEVICE {
 
 function RUNNINGPROCESS {
 
-    param (
-        [string]$remoteComputer = $global:globalComputerName
-    )
-    $outputBox.AppendText("`n`n`r Starting Running Process Report....`n`n`r" + [Environment]::NewLine)
+  param (
+    [string]$remoteComputer = $global:globalComputerName
+  )
+  $outputBox.AppendText("`n`n`r Starting Running Process Report....`n`n`r" + [Environment]::NewLine)
 
 
-    # Create folder name with the remote machine name
-    $folderName = "$remoteComputer TREX REPORTS"
-    $desktopPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop')
-    $folderPath = Join-Path -Path $desktopPath -ChildPath $folderName
+  # Create folder name with the remote machine name
+  $folderName = "$remoteComputer TREX REPORTS"
+  $desktopPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop')
+  $folderPath = Join-Path -Path $desktopPath -ChildPath $folderName
 
-    # Create folder if it doesn't exist
-    if (-not (Test-Path $folderPath -PathType Container)) {
-        New-Item -ItemType Directory -Path $folderPath -Force | Out-Null
-    }
+  # Create folder if it doesn't exist
+  if (-not (Test-Path $folderPath -PathType Container)) {
+    New-Item -ItemType Directory -Path $folderPath -Force | Out-Null
+  }
 
-    # Create HTML file with computer name, date, and time in the header
-    $htmlFilePath = Join-Path -Path $folderPath -ChildPath "RunningProcessesAndServices.html"
-    $currentDateTime = Get-Date
-    $header = @"
+  # Create HTML file with computer name, date, and time in the header
+  $htmlFilePath = Join-Path -Path $folderPath -ChildPath "RunningProcessesAndServices.html"
+  $currentDateTime = Get-Date
+  $header = @"
 <html>
 <head>
     <title>TREX REPORT</title>
@@ -2070,14 +2092,14 @@ function RUNNINGPROCESS {
     <hr/>
 "@
 
-    # Get running processes and services
-    $processes = Invoke-Command -ComputerName $remoteComputer -ScriptBlock { Get-Process | Select-Object Name, Id }
-    $services = Invoke-Command -ComputerName $remoteComputer -ScriptBlock { Get-Service | Select-Object DisplayName, Status }
+  # Get running processes and services
+  $processes = Invoke-Command -ComputerName $remoteComputer -ScriptBlock { Get-Process | Select-Object Name, Id }
+  $services = Invoke-Command -ComputerName $remoteComputer -ScriptBlock { Get-Service | Select-Object DisplayName, Status }
 
-    $processesTable = $processes | ForEach-Object { "<tr><td>$($_.Name)</td><td>$($_.Id)</td></tr>" }
-    $servicesTable = $services | ForEach-Object { "<tr><td>$($_.DisplayName)</td><td>$($_.Status)</td></tr>" }
+  $processesTable = $processes | ForEach-Object { "<tr><td>$($_.Name)</td><td>$($_.Id)</td></tr>" }
+  $servicesTable = $services | ForEach-Object { "<tr><td>$($_.DisplayName)</td><td>$($_.Status)</td></tr>" }
 
-    $processesSection = @"
+  $processesSection = @"
     <h2>Running Processes</h2>
     <table border='1'>
         <tr><th>Name</th><th>Id</th></tr>
@@ -2091,17 +2113,17 @@ function RUNNINGPROCESS {
     </table>
 "@
 
-    # Closing HTML tags
-    $footer = @"
+  # Closing HTML tags
+  $footer = @"
 </body>
 </html>
 "@
 
-    # Combine and write to HTML file
-    $htmlContent = $header + $processesSection + $footer
-    $htmlContent | Out-File -FilePath $htmlFilePath -Encoding UTF8 -Force
+  # Combine and write to HTML file
+  $htmlContent = $header + $processesSection + $footer
+  $htmlContent | Out-File -FilePath $htmlFilePath -Encoding UTF8 -Force
 
-    $outputBox.AppendText("`n`n`rHTML file created successfully on local machine at: $htmlFilePath`n`n`r" + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`rHTML file created successfully on local machine at: $htmlFilePath`n`n`r" + [Environment]::NewLine)
 
   
 }
@@ -2115,22 +2137,22 @@ function RUNNINGPROCESS {
 ###############################################################################################################################################################################
 
 function MAINPING {
-    param (
+  param (
         
-        [string]$computerName = $global:globalComputerName
-    )
-    $outputBox.AppendText("`n`n`r Checking to see if system is still reachable....`n`n`r" + [Environment]::NewLine)
-    try {
-        $pingResult = Test-Connection -ComputerName $computerName -Count 3 -ErrorAction Stop
+    [string]$computerName = $global:globalComputerName
+  )
+  $outputBox.AppendText("`n`n`r Checking to see if system is still reachable....`n`n`r" + [Environment]::NewLine)
+  try {
+    $pingResult = Test-Connection -ComputerName $computerName -Count 3 -ErrorAction Stop
 
-        if ($pingResult.ResponseTime -eq $null) {
-            $script:outputBox.AppendText("`n`n`r$computerName is unreachable`n`n`r" + [Environment]::NewLine)
-        } else {
-            $script:outputBox.AppendText("$computerName is reachable. Response time: $($pingResult.ResponseTime) ms" + [Environment]::NewLine)
-        }
-    } catch {
-        $script:outputBox.AppendText("Error: $($_.Exception.Message)" + [Environment]::NewLine)
+    if ($pingResult.ResponseTime -eq $null) {
+      $script:outputBox.AppendText("`n`n`r$computerName is unreachable`n`n`r" + [Environment]::NewLine)
+    } else {
+      $script:outputBox.AppendText("$computerName is reachable. Response time: $($pingResult.ResponseTime) ms" + [Environment]::NewLine)
     }
+  } catch {
+    $script:outputBox.AppendText("Error: $($_.Exception.Message)" + [Environment]::NewLine)
+  }
 }
 
 
@@ -2142,119 +2164,119 @@ function MAINPING {
 function DISABLENETWORK {
 
 
-Add-Type -AssemblyName System.Windows.Forms
+  Add-Type -AssemblyName System.Windows.Forms
 
 
 
-# Define the form
-$form = New-Object System.Windows.Forms.Form
-$form.Text = 'DISABLE COMPUTER'
-$form.Size = New-Object System.Drawing.Size(520, 440)
-$form.ForeColor = 'red'
-$form.BackColor = 'black'
-$form.StartPosition = 'CenterScreen'
+  # Define the form
+  $form = New-Object System.Windows.Forms.Form
+  $form.Text = 'DISABLE COMPUTER'
+  $form.Size = New-Object System.Drawing.Size(520, 440)
+  $form.ForeColor = 'red'
+  $form.BackColor = 'black'
+  $form.StartPosition = 'CenterScreen'
 
-# Define the input box
-$inputBox = New-Object System.Windows.Forms.TextBox
-$inputBox.Location = New-Object System.Drawing.Point(10, 10)
-$inputBox.Size = New-Object System.Drawing.Size(200, 40)
-$inputBox.Text = "$script:globalComputerName"  
-$form.Controls.Add($inputBox)
+  # Define the input box
+  $inputBox = New-Object System.Windows.Forms.TextBox
+  $inputBox.Location = New-Object System.Drawing.Point(10, 10)
+  $inputBox.Size = New-Object System.Drawing.Size(200, 40)
+  $inputBox.Text = "$script:globalComputerName"  
+  $form.Controls.Add($inputBox)
 
-# Define the button
-$button = New-Object System.Windows.Forms.Button
-$button.Location = New-Object System.Drawing.Point(220, 5)
-$button.Size = New-Object System.Drawing.Size(240, 30)
-$button.Text = 'Disable Network Adapters'
-$button.ForeColor = 'black'
-$button.BackColor = 'red'
-$form.Controls.Add($button)
+  # Define the button
+  $button = New-Object System.Windows.Forms.Button
+  $button.Location = New-Object System.Drawing.Point(220, 5)
+  $button.Size = New-Object System.Drawing.Size(240, 30)
+  $button.Text = 'Disable Network Adapters'
+  $button.ForeColor = 'black'
+  $button.BackColor = 'red'
+  $form.Controls.Add($button)
 
-# Define the output box
-$outputBox = New-Object System.Windows.Forms.TextBox
-$outputBox.Location = New-Object System.Drawing.Point(10, 40)
-$outputBox.Size = New-Object System.Drawing.Size(370, 220)
-$outputBox.Multiline = $true
-$outputBox.ScrollBars = 'Vertical'
-$outputBox.ReadOnly = $true
-$form.Controls.Add($outputBox)
+  # Define the output box
+  $outputBox = New-Object System.Windows.Forms.TextBox
+  $outputBox.Location = New-Object System.Drawing.Point(10, 40)
+  $outputBox.Size = New-Object System.Drawing.Size(370, 220)
+  $outputBox.Multiline = $true
+  $outputBox.ScrollBars = 'Vertical'
+  $outputBox.ReadOnly = $true
+  $form.Controls.Add($outputBox)
 
-# Define the warning label
-$warningLabel = New-Object System.Windows.Forms.Label
-$warningLabel.Location = New-Object System.Drawing.Point(10, 265)
-$warningLabel.Size = New-Object System.Drawing.Size(400, 200)
-$warningLabel.Text = "WARNING:`r This will disable the computer`nfrom the internet and you will not be able to connect to it. `n`n**You will need to go to the computer.  Go to device manager, and re-enable the network adapters to get it back online.**"
-$warningLabel.ForeColor = [Drawing.Color]::Red
-$form.Controls.Add($warningLabel)
-
-
-# Define the ping button
-$pingButton = New-Object System.Windows.Forms.Button
-$pingButton.Location = New-Object System.Drawing.Point(390, 150)
-$pingButton.Size = New-Object System.Drawing.Size(100, 30)
-$pingButton.Text = 'Ping Computer'
-$pingButton.ForeColor = 'black'
-$pingButton.BackColor = 'orange'
-$form.Controls.Add($pingButton)
+  # Define the warning label
+  $warningLabel = New-Object System.Windows.Forms.Label
+  $warningLabel.Location = New-Object System.Drawing.Point(10, 265)
+  $warningLabel.Size = New-Object System.Drawing.Size(400, 200)
+  $warningLabel.Text = "WARNING:`r This will disable the computer`nfrom the internet and you will not be able to connect to it. `n`n**You will need to go to the computer.  Go to device manager, and re-enable the network adapters to get it back online.**"
+  $warningLabel.ForeColor = [Drawing.Color]::Red
+  $form.Controls.Add($warningLabel)
 
 
-#Startup Text for Output Box
-$outputBox.AppendText("`n`n`r THIS WILL DISABLE THE NETWORK ADAPTERS ON A REMOTE MACHINE.  `r`n`r`n AS A RESULT, IT WILL MOST LIKELY CRASH DUE TO THE ABRUPT CONNECTION LOSS.  `r`n`r`n YOU WILL HAVE TO FORCE CLOSE THE APPLICATION UPON EXIT....`n`n`r" + [Environment]::NewLine)
+  # Define the ping button
+  $pingButton = New-Object System.Windows.Forms.Button
+  $pingButton.Location = New-Object System.Drawing.Point(390, 150)
+  $pingButton.Size = New-Object System.Drawing.Size(100, 30)
+  $pingButton.Text = 'Ping Computer'
+  $pingButton.ForeColor = 'black'
+  $pingButton.BackColor = 'orange'
+  $form.Controls.Add($pingButton)
 
 
-# Define the ping button action
-$pingButton.Add_Click({
-    $computerName = $inputBox.Text
+  #Startup Text for Output Box
+  $outputBox.AppendText("`n`n`r THIS WILL DISABLE THE NETWORK ADAPTERS ON A REMOTE MACHINE.  `r`n`r`n AS A RESULT, IT WILL MOST LIKELY CRASH DUE TO THE ABRUPT CONNECTION LOSS.  `r`n`r`n YOU WILL HAVE TO FORCE CLOSE THE APPLICATION UPON EXIT....`n`n`r" + [Environment]::NewLine)
 
-    # Ping the remote machine
-    $pingResult = Test-Connection -ComputerName $computerName -Count 1
 
-    if ($pingResult) {
+  # Define the ping button action
+  $pingButton.Add_Click({
+      $computerName = $inputBox.Text
+
+      # Ping the remote machine
+      $pingResult = Test-Connection -ComputerName $computerName -Count 1
+
+      if ($pingResult) {
         $outputBox.AppendText("$computerName is reachable.`r`n")
-    }
-    else {
+      }
+      else {
         $outputBox.AppendText("$computerName is not reachable.`r`n")
-    }
-})
+      }
+  })
 
 
 
-# Define the button action
-$button.Add_Click({
-    $computerName = $inputBox.Text
+  # Define the button action
+  $button.Add_Click({
+      $computerName = $inputBox.Text
 
-    # Prompt the user for a username and password
-    $credential = Get-Credential
+      # Prompt the user for a username and password
+      $credential = Get-Credential
 
-    #Disable all network adapters
-    $output = Invoke-Command -ComputerName $computerName -Credential $credential -ScriptBlock {
+      #Disable all network adapters
+      $output = Invoke-Command -ComputerName $computerName -Credential $credential -ScriptBlock {
         Get-NetAdapter | Disable-NetAdapter
-    }
+      }
 
 
-     #Wait for 10 seconds for network adapters to disable
-    Start-Sleep -Seconds 10
+      #Wait for 10 seconds for network adapters to disable
+      Start-Sleep -Seconds 10
 
-    # Terminate the PowerShell session to the remote computer
-    Remove-PSSession $output.PSSession
+      # Terminate the PowerShell session to the remote computer
+      Remove-PSSession $output.PSSession
 
-    #Wait for 10 seconds for network adapters to disable
-    Start-Sleep -Seconds 10
+      #Wait for 10 seconds for network adapters to disable
+      Start-Sleep -Seconds 10
 
     
-    #Ping the remote machine to verify that network adapters are disabled
-    $pingResult = Test-Connection -ComputerName $computerName -Count 1
+      #Ping the remote machine to verify that network adapters are disabled
+      $pingResult = Test-Connection -ComputerName $computerName -Count 1
 
-    if ($pingResult) {
+      if ($pingResult) {
         $outputBox.AppendText("Network adapters on $computerName are still enabled.`r`n")
-    }
-    else {
+      }
+      else {
         $outputBox.AppendText("Network adapters on $computerName have been successfully disabled.`r`n")
-    }
-})
+      }
+  })
 
-# Show the form
-$null = $form.ShowDialog()
+  # Show the form
+  $null = $form.ShowDialog()
 }
 
 
@@ -2262,10 +2284,10 @@ $null = $form.ShowDialog()
 ###############################################################################################################################################################################
 function REMOTEC {
 
-$outputBox.AppendText("`r`n`n`r Accessing C: on  $script:globalComputerName .... `r`n`r`n" + [Environment]::NewLine)
+  $outputBox.AppendText("`r`n`n`r Accessing C: on  $script:globalComputerName .... `r`n`r`n" + [Environment]::NewLine)
 
 
- ii -path \\$script:globalComputerName.<YOUR DOMAIN HERE>.net\c$ 
+  ii -path \\$script:globalComputerName.YOURDOMAIN\c$ 
 
 
 }
@@ -2274,32 +2296,32 @@ $outputBox.AppendText("`r`n`n`r Accessing C: on  $script:globalComputerName ....
 ###############################################################################################################################################################################
 
 function INSTALLEDSOFTWARE {
-    param (
-        [string]$ComputerName = "$script:globalComputerName",
-        [string]$ReportFileName = "InstalledSoftwareReport.html"
-    )
-    $outputBox.AppendText("`r`n`n`r Running Installed Software Report.... `r`n`r`n" + [Environment]::NewLine)
-    try {
-        # Get installed software from remote PC
-        $installedSoftware = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-            Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*,
-                             HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
-            Select-Object DisplayName, DisplayVersion, Publisher, @{
-                Name = 'InstallDate'
-                Expression = {
-                    if ($_.InstallDate -match '^\d+$') {
-                        [DateTime]::ParseExact($_.InstallDate, 'yyyyMMdd', $null)
-                    } else {
-                        $_.InstallDate
-                    }
-                }
-            }
-        } -ErrorAction Stop
+  param (
+    [string]$ComputerName = "$script:globalComputerName",
+    [string]$ReportFileName = "InstalledSoftwareReport.html"
+  )
+  $outputBox.AppendText("`r`n`n`r Running Installed Software Report.... `r`n`r`n" + [Environment]::NewLine)
+  try {
+    # Get installed software from remote PC
+    $installedSoftware = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+      Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*,
+      HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
+      Select-Object DisplayName, DisplayVersion, Publisher, @{
+        Name = 'InstallDate'
+        Expression = {
+          if ($_.InstallDate -match '^\d+$') {
+            [DateTime]::ParseExact($_.InstallDate, 'yyyyMMdd', $null)
+          } else {
+            $_.InstallDate
+          }
+        }
+      }
+    } -ErrorAction Stop
 
-        # Create a report with date and time in HTML format
-        $htmlReport = $installedSoftware | ConvertTo-Html -As Table -Fragment
+    # Create a report with date and time in HTML format
+    $htmlReport = $installedSoftware | ConvertTo-Html -As Table -Fragment
 
-        $reportContent = @"
+    $reportContent = @"
 <html>
 <head>
   <title>Installed Software Report for $ComputerName -  $(Get-Date) </title>
@@ -2311,21 +2333,335 @@ function INSTALLEDSOFTWARE {
 </html>
 "@
 
-        # Save the report to the local PC's desktop in the "TREX REPORTS" subdirectory
-        $reportPath = Join-Path ([System.Environment]::GetFolderPath('Desktop')) "$script:globalComputerName TREX REPORTS\$ReportFileName"
+    # Save the report to the local PC's desktop in the "TREX REPORTS" subdirectory
+    $reportPath = Join-Path ([System.Environment]::GetFolderPath('Desktop')) "$script:globalComputerName TREX REPORTS\$ReportFileName"
 
-        # Create the folder if it doesn't exist
-        $null = New-Item -ItemType Directory -Force -Path (Split-Path $reportPath)
+    # Create the folder if it doesn't exist
+    $null = New-Item -ItemType Directory -Force -Path (Split-Path $reportPath)
 
-        # Save the report as an HTML file
-        $reportContent | Out-File -FilePath $reportPath -Force
+    # Save the report as an HTML file
+    $reportContent | Out-File -FilePath $reportPath -Force
 
-        Write-Host "HTML report generated successfully. Path: $reportPath"
-    } catch {
-        Write-Host "Error: $_"
+    Write-Host "HTML report generated successfully. Path: $reportPath"
+  } catch {
+    Write-Host "Error: $_"
+  }
+
+  $outputBox.AppendText("`r`n`n`r Software report generated and saved to $reportPath `r`n`r`n" + [Environment]::NewLine)
+}
+
+
+##############################################################################################################################################################################
+function EVENTVIEWER {
+  
+  
+  $outputBox.AppendText("`r`n`n`r Preparing to copy event Viewer Files... `r`n`r`n" + [Environment]::NewLine)
+
+  # Define variables
+$remoteServer = "$script:globalComputerName"
+$destinationFolder = Join-Path ([System.Environment]::GetFolderPath('Desktop')) "$script:globalComputerName TREX REPORTS\EventViewerReports\$ReportFileName"
+
+# Create destination folder if it doesn't exist
+if (-not (Test-Path -Path $destinationFolder)) {
+    New-Item -ItemType Directory -Path $destinationFolder | Out-Null
+}
+
+# Copy event viewer files
+Copy-Item -Path "\\$remoteServer\c$\Windows\System32\Winevt\Logs\*" -Destination $destinationFolder -Force
+
+$outputBox.AppendText("`r`n`n`r Event Viewer Files copied and saved to $destinationFolder `r`n`r`n" + [Environment]::NewLine)
+}
+
+
+
+
+###############################################################################################################################################################################
+
+
+function COMPUTERACCOUNTS {
+
+  $msgBox = $wshell.Popup("This will search for user account **FOLDERS** that are present from a specified list of computers.`r`n`n (It will not display a user list.) `r`n`n  If you would like more specific information, select the *User Acccounts* button instead.  `r`n`n CLICK *OK* TO SELECT YOUR LIST NOW!`r`n`n`r`n`n (This button is helpful if you believe someone is logging in with a local account or to see which computers a person has actually logged onto.)")
+
+
+  $outputBox.AppendText("`r`n`n`r Opening Computer Account Tool... `r`n`r`n" + [Environment]::NewLine)
+  Add-Type -AssemblyName System.Windows.Forms
+
+  # Function to select a file using a file dialog
+  function Get-FileDialog {
+    $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+    $openFileDialog.Title = "Select File"
+    $openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+    $openFileDialog.Multiselect = $false
+    $OpenFileDialog.initialDirectory = "Y:\00 Powershell EXE\School Computer Lists"
+
+
+    if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+      return $openFileDialog.FileName
+    } else {
+      return $null
+    }
+  }
+
+  # Function to check if a computer is online by pinging it
+  function Test-ComputerOnline {
+    param (
+      [string]$computer
+    )
+
+    $ping = Test-Connection -ComputerName $computer -Count 1 -Quiet
+    return $ping
+  }
+
+  # Prompt to select a file containing computer names
+  $computersFile = Get-FileDialog
+  if (-not $computersFile) {
+    $outputBox.AppendText("`r`n`n`r No file selected. Exiting. `r`n`r`n" + [Environment]::NewLine)
+    exit
+  }
+
+  # Read computer names from the selected file
+  $computers = Get-Content -Path $computersFile
+
+  # Create a form
+  $form = New-Object System.Windows.Forms.Form
+  $form.Text = "Enter Username"
+  $form.Size = New-Object System.Drawing.Size(300, 150)
+  $form.StartPosition = "CenterScreen"
+
+  # Create a label
+  $label = New-Object System.Windows.Forms.Label
+  $label.Location = New-Object System.Drawing.Point(10, 20)
+  $label.Size = New-Object System.Drawing.Size(280, 30)
+  $label.Text = "Enter the Number/Username to search for:"
+  $form.Controls.Add($label)
+
+  # Create a text box
+  $textbox = New-Object System.Windows.Forms.TextBox
+  $textbox.Location = New-Object System.Drawing.Point(10, 50)
+  $textbox.Size = New-Object System.Drawing.Size(260, 30)
+  $form.Controls.Add($textbox)
+
+  # Create a button
+  $button = New-Object System.Windows.Forms.Button
+  $button.Location = New-Object System.Drawing.Point(90, 80)
+  $button.Size = New-Object System.Drawing.Size(100, 30)
+  $button.Text = "Search"
+  $button.forecolor = "white"
+  $button.backcolor = "darkred"
+  $button.DialogResult = [System.Windows.Forms.DialogResult]::OK
+  $form.Controls.Add($button)
+
+  # Add event handler for button click
+  $button.Add_Click({
+      $global:username = $textbox.Text
+      $form.Close()
+  })
+
+  # Show the form
+  $form.ShowDialog() | Out-Null
+
+  # Use the entered username
+  $username = $global:username
+
+  # Create an empty array to store results
+  $results = @()
+
+  # Script block to check if a user folder exists on a computer
+  $scriptBlock = {
+    param (
+      $Username
+    )
+
+    $userFolderExists = Test-Path -Path "C:\Users\$Username" -PathType Container
+    return $userFolderExists
+  }
+
+  # Loop through each computer and check for the user folder
+  foreach ($computer in $computers) {
+    if (Test-ComputerOnline -computer $computer) {
+      $outputBox.AppendText("Processing $computer..." + [Environment]::NewLine)
+      $userFolderExists = Invoke-Command -ComputerName $computer -ScriptBlock $scriptBlock -ArgumentList $username
+      if ($userFolderExists) {
+        $results += [PSCustomObject]@{
+          ComputerName = $computer
+          UserName = $username
+        }
+      }
+    } else {
+      $outputBox.AppendText("`r`n`n`r Computer $computer is offline." + [Environment]::NewLine)
+    }
+  }
+
+  # Create folder path for the report
+  $desktopPath = [System.Environment]::GetFolderPath('Desktop')
+  $folderPath = Join-Path -Path $desktopPath -ChildPath "TREX REPORTS"
+  if (-not (Test-Path $folderPath)) {
+    New-Item -Path $folderPath -ItemType Directory | Out-Null
+  }
+
+  # Create text file
+  $textFilePath = Join-Path -Path $folderPath -ChildPath "user_accounts_report.txt"
+
+  # Output results to text file
+  if ($results.Count -gt 0) {
+    $results | ForEach-Object {
+      "$($_.ComputerName), $($username), User Profile Folder FOUND!" | Out-File -FilePath $textFilePath -Append
     }
 
-    $outputBox.AppendText("`r`n`n`r Software report generated and saved to $reportPath `r`n`r`n" + [Environment]::NewLine)
+    $outputBox.AppendText("`r`n`n`r Results saved to $textFilePath `r`n`r`n" + [Environment]::NewLine)
+  } else {
+    $outputBox.AppendText("`r`n`n`r No user account found with the username '$username' on any of the specified computers. `r`n`r`n" + [Environment]::NewLine)
+  }
+
+}
+
+
+function SQLVIEWER {
+
+  ii "SQLiteDatabaseBrowserPortable.exe is a great application.  Download it and put the file location in this section to pull it from the UI.  Remove the comment from the button for this to be active."
+
+}
+
+
+###############################################################################################################################################################################
+
+
+#      "$script:globalComputerName"
+
+###############################################################################################################################################################################
+
+
+
+function ImageThumbnails {
+
+$outputBox.AppendText("`r`n`n`r Generating User Image Reports... `r`n`r`n" + [Environment]::NewLine)
+
+    param (
+        [string]$remoteComputerName = "$script:globalComputerName"
+    )
+
+    $networkPath = "\\$remoteComputerName\C$"
+
+    # Define the path for the TREX folder on the local machine
+    $localDesktop = [System.Environment]::GetFolderPath("Desktop")
+    $trexFolder = Join-Path -Path $localDesktop -ChildPath "$remoteComputerName TREX REPORTS"
+
+    # Create the TREX folder if it doesn't exist
+    if (-not (Test-Path $trexFolder)) {
+        New-Item -Path $trexFolder -ItemType Directory | Out-Null
+    }
+
+    Write-Output "Gathering user images in Downloads, Pictures folders, and Recycle Bin on $remoteComputerName"
+
+    # Function to generate HTML for images in a directory
+    function Generate-ImageHTML {
+        param (
+            [string]$directoryPath,
+            [string]$sectionTitle
+        )
+
+        $htmlSectionContent = @"
+<h2>$sectionTitle</h2>
+<div id="thumbnails-container">
+"@
+        if (Test-Path $directoryPath) {
+            $imageFiles = Get-ChildItem -Path $directoryPath -Recurse -File | Where-Object { $_.Extension -match '\.(jpg|jpeg|png|gif|tiff|webp|avif)' }
+            foreach ($image in $imageFiles) {
+                $imageName = $image.Name
+                $imagePath = $image.FullName
+                $imageBytes = [System.IO.File]::ReadAllBytes($imagePath)
+                $base64Image = [System.Convert]::ToBase64String($imageBytes)
+                $imageExtension = $image.Extension.TrimStart('.').ToLower()
+                $imageDataUrl = "data:image/$imageExtension;base64,$base64Image"
+                $thumbnailHtml = @"
+<div class="thumbnail">
+    <img src="$imageDataUrl" alt="$imageName" />
+    <p>$imageName</p>
+</div>
+"@
+                $htmlSectionContent += $thumbnailHtml
+            }
+            $htmlSectionContent += "</div>"
+        }
+        return $htmlSectionContent
+    }
+
+    # Function to get Recycle Bin path
+    function Get-RecycleBinPath {
+        $recycleBinPath = "$networkPath\Recycler" # This might vary, adjust as needed
+        return $recycleBinPath
+    }
+
+    # Iterate through each user profile
+    $userProfiles = Get-ChildItem -Path "$networkPath\Users" -Directory | Where-Object { $_.Name -ne "Default" -and $_.Name -ne "Public" }
+    foreach ($userProfile in $userProfiles) {
+        $username = $userProfile.Name
+
+        $outputBox.AppendText("Generating User Image Report for $username... `r`n" + [Environment]::NewLine)
+
+        # Get the paths to the user's Pictures and Downloads folders
+        $picturesDirectory = Join-Path -Path $networkPath -ChildPath "Users\$username\Pictures"
+        $downloadsDirectory = Join-Path -Path $networkPath -ChildPath "Users\$username\Downloads"
+
+        # Set the filename for the HTML file
+        $outputFileName = "$username IMAGE THUMBNAILS.html"
+        $outputFile = Join-Path -Path $trexFolder -ChildPath $outputFileName
+
+        # Get the current date and time
+        $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+        # Initialize HTML content
+        $htmlContent = @"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TREX REPORT: $username's Image Report - Thumbnail</title>
+<style>
+.thumbnail {
+    display: inline-block;
+    text-align: center;
+    margin: 10px;
+}
+.thumbnail img {
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background-color: #f9f9f9;
+}
+</style>
+</head>
+<body>
+<h1>TREX REPORT: $username's - IMAGE THUMBNAILS</h1>
+<h2>Computer Name: $remoteComputerName</h2>
+<p>Generated on: $currentDateTime</p>
+"@
+
+        # Generate HTML for Pictures and Downloads folders
+        $htmlContent += Generate-ImageHTML -directoryPath $picturesDirectory -sectionTitle "Pictures Folder"
+        $htmlContent += Generate-ImageHTML -directoryPath $downloadsDirectory -sectionTitle "Downloads Folder"
+
+        # Add Recycle Bin to the report
+        $recycleBinPath = Get-RecycleBinPath
+        $htmlContent += Generate-ImageHTML -directoryPath $recycleBinPath -sectionTitle #"Recycle Bin"
+
+        # Close HTML content
+        $htmlContent += @"
+</div>
+</body>
+</html>
+"@
+
+        # Save HTML content to output file in TREX folder
+        $htmlContent | Out-File -FilePath $outputFile -Encoding UTF8
+
+        # Output file location
+        Write-Output "HTML file generated for $($userProfile.Name): $outputFile"
+    }
+
+     $outputBox.AppendText("`r`n`n`r Completed gathering images on $remoteComputerName `r`n`r`n" + [Environment]::NewLine)
+   
 }
 
 
@@ -2333,12 +2669,9 @@ function INSTALLEDSOFTWARE {
 
 
 
-###############################################################################################################################################################################
 
 
 
-
-###############################################################################################################################################################################
 ###############################################################################################################################################################################
 
 ###############################################################################################################################################################################
@@ -2364,9 +2697,48 @@ function VER {
 
 ################## GUI Form BUTTONS ##################################################
 
+
+#SQL VIEWER Button
+$SQLVIEWER = New-Object system.Windows.Forms.Button
+$SQLVIEWER.Text = "SQL VIEW"  
+$SQLVIEWER.ForeColor = "black"
+$SQLVIEWER.Backcolor = "white"   
+$SQLVIEWER.width = 50
+$SQLVIEWER.height = 50
+$SQLVIEWER.location = New-Object System.Drawing.Point(10, 465) #Horizontal, Vertical
+$SQLVIEWER.Font = 'Microsoft Sans Serif,9'
+$SQLVIEWER.Add_Click( { SQLVIEWER })
+#$Form.Controls.Add($SQLVIEWER)
+
+#Event VIEWER Button
+$EVENTVIEWER = New-Object system.Windows.Forms.Button
+$EVENTVIEWER.Text = "EVENT VIEWER REPORT"  
+$EVENTVIEWER.ForeColor = "black"
+$EVENTVIEWER.Backcolor = "white"   
+$EVENTVIEWER.width = 70
+$EVENTVIEWER.height = 50
+$EVENTVIEWER.location = New-Object System.Drawing.Point(490, 650) #Horizontal, Vertical
+$EVENTVIEWER.Font = 'Microsoft Sans Serif,8'
+$EVENTVIEWER.Add_Click( { EVENTVIEWER })
+$Form.Controls.Add($EVENTVIEWER)
+
+
+#PC Images Button
+$ImageThumbnails = New-Object system.Windows.Forms.Button
+$ImageThumbnails.Text = "PC Images"  
+$ImageThumbnails.ForeColor = "black"
+$ImageThumbnails.Backcolor = "white"   
+$ImageThumbnails.width = 70
+$ImageThumbnails.height = 50
+$ImageThumbnails.location = New-Object System.Drawing.Point(570, 650) #Horizontal, Vertical
+$ImageThumbnails.Font = 'Microsoft Sans Serif,9'
+$ImageThumbnails.Add_Click( { ImageThumbnails })
+$Form.Controls.Add($ImageThumbnails)
+
+
 #Machine Report Button
 $MACHINEREPORT = New-Object system.Windows.Forms.Button
-$MACHINEREPORT.Text = "FULL MACHINE REPORT"  
+$MACHINEREPORT.Text = "FULL PC REPORT"  
 $MACHINEREPORT.ForeColor = "black"
 $MACHINEREPORT.Backcolor = "yellow"   
 $MACHINEREPORT.width = 165
@@ -2453,7 +2825,7 @@ $Form.Controls.Add($ANTIVIRUS)
 
 #WEB HISTORY Button
 $WEBHISTORY = New-Object system.Windows.Forms.Button
-$WEBHISTORY.Text = "CHROME WEB HISTORY"  
+$WEBHISTORY.Text = "WEB HISTORY"  
 $WEBHISTORY.ForeColor = "black"
 $WEBHISTORY.Backcolor = "whitesmoke"   
 $WEBHISTORY.width = 165
@@ -2552,7 +2924,7 @@ $REMOTEC.height = 40
 $REMOTEC.location = New-Object System.Drawing.Point(620, 595) #Horizontal, Vertical
 $REMOTEC.Font = 'Microsoft Sans Serif,8'
 $REMOTEC.Add_Click( { REMOTEC })
-$Form.Controls.Add($REMOTEC)
+#$Form.Controls.Add($REMOTEC)
 
 
 #Enable Network Connections Button
@@ -2608,6 +2980,43 @@ $RUNNINGPROCESS.location = New-Object System.Drawing.Point(430, 520) #Horizontal
 $RUNNINGPROCESS.Font = 'Microsoft Sans Serif,8'
 $RUNNINGPROCESS.Add_Click( { RUNNINGPROCESS })
 $Form.Controls.Add($RUNNINGPROCESS)
+
+#RUNNING PROCESSES Button
+$COMPUTERACCOUNTS = New-Object system.Windows.Forms.Button
+$COMPUTERACCOUNTS.Text = "COMPUTER ACCOUNTS"  
+$COMPUTERACCOUNTS.ForeColor = "black"
+$COMPUTERACCOUNTS.Backcolor = "whitesmoke"   
+$COMPUTERACCOUNTS.width = 165
+$COMPUTERACCOUNTS.height = 24
+$COMPUTERACCOUNTS.location = New-Object System.Drawing.Point(430, 560) #Horizontal, Vertical
+$COMPUTERACCOUNTS.Font = 'Microsoft Sans Serif,8'
+$COMPUTERACCOUNTS.Add_Click( { COMPUTERACCOUNTS })
+$Form.Controls.Add($COMPUTERACCOUNTS)
+
+
+
+
+
+
+#############################################################################################
+#                                  RIGHT SIDE BUTTONS                                       #
+#############################################################################################
+
+
+
+#PC INFO Button
+$FileInfo = New-Object system.Windows.Forms.Button
+$FileInfo.Text = "File Info"  
+$FileInfo.ForeColor = "black"
+$FileInfo.Backcolor = "whitesmoke"   
+$FileInfo.width = 165
+$FileInfo.height = 24
+$FileInfo.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
+$FileInfo.Font = 'Microsoft Sans Serif,9'
+$FileInfo.Add_Click( { FileInfo })
+#$Form.Controls.Add($FileInfo)
+
+
 
 #############################################################################################
 #                BOTTOM ROW BUTTONS                                                         #
@@ -2676,56 +3085,56 @@ $Form.Controls.Add($WHOIS)
 
 function SuspectPC {
 
-    Add-Type -AssemblyName System.Windows.Forms
+  Add-Type -AssemblyName System.Windows.Forms
 
-    # Create form
-    $form = New-Object Windows.Forms.Form
-    $form.Text = "SUSPECT"
-    $form.Size = New-Object Drawing.Size(300, 150)
-    $form.StartPosition = "CenterScreen"
+  # Create form
+  $form = New-Object Windows.Forms.Form
+  $form.Text = "SUSPECT"
+  $form.Size = New-Object Drawing.Size(300, 150)
+  $form.StartPosition = "CenterScreen"
 
-    # Create label
-    $label = New-Object Windows.Forms.Label
-    $label.Location = New-Object Drawing.Point(10, 20)
-    $label.Size = New-Object Drawing.Size(280, 20)
-    $label.Text = "Enter Suspect Computer Name:"
-    $form.Controls.Add($label)
+  # Create label
+  $label = New-Object Windows.Forms.Label
+  $label.Location = New-Object Drawing.Point(10, 20)
+  $label.Size = New-Object Drawing.Size(280, 20)
+  $label.Text = "Enter Suspect Computer Name:"
+  $form.Controls.Add($label)
 
-    # Create textbox
-    $textbox = New-Object Windows.Forms.TextBox
-    $textbox.Location = New-Object Drawing.Point(10, 40)
-    $textbox.Size = New-Object Drawing.Size(260, 20)
-    $form.Controls.Add($textbox)
+  # Create textbox
+  $textbox = New-Object Windows.Forms.TextBox
+  $textbox.Location = New-Object Drawing.Point(10, 40)
+  $textbox.Size = New-Object Drawing.Size(260, 20)
+  $form.Controls.Add($textbox)
 
-    # Create OK button
-    $okButton = New-Object Windows.Forms.Button
-    $okButton.Location = New-Object Drawing.Point(10, 70)
-    $okButton.Size = New-Object Drawing.Size(75, 23)
-    $okButton.Text = "OK"
-    $okButton.DialogResult = [Windows.Forms.DialogResult]::OK
-    $form.Controls.Add($okButton)
+  # Create OK button
+  $okButton = New-Object Windows.Forms.Button
+  $okButton.Location = New-Object Drawing.Point(10, 70)
+  $okButton.Size = New-Object Drawing.Size(75, 23)
+  $okButton.Text = "OK"
+  $okButton.DialogResult = [Windows.Forms.DialogResult]::OK
+  $form.Controls.Add($okButton)
 
-    # Show the form
-    $result = $form.ShowDialog()
+  # Show the form
+  $result = $form.ShowDialog()
 
-    # Check if OK button was clicked
-    if ($result -eq [Windows.Forms.DialogResult]::OK) {
-        # Retrieve entered computer name
-        $script:globalComputerName = $textbox.Text
+  # Check if OK button was clicked
+  if ($result -eq [Windows.Forms.DialogResult]::OK) {
+    # Retrieve entered computer name
+    $script:globalComputerName = $textbox.Text
 
-        # Ping the computer
-        $pingResult = Test-Connection -ComputerName $script:globalComputerName -Count 2 -ErrorAction SilentlyContinue
+    # Ping the computer
+    $pingResult = Test-Connection -ComputerName $script:globalComputerName -Count 2 -ErrorAction SilentlyContinue
 
-        # Display the entered computer name and ping result
-        if ($pingResult) {
-            $outputBox.AppendText("`n`n`r Entered Computer Name: $script:globalComputerName `r`n`r`n  The Computer is: ONLINE" + [Environment]::NewLine)
-        } else {
-            $outputBox.AppendText("`n`n`r Entered Computer Name: $script:globalComputerName`r`n`r`n  The Computer is: OFFLINE - Can't Ping the system..." + [Environment]::NewLine)
-        }
+    # Display the entered computer name and ping result
+    if ($pingResult) {
+      $outputBox.AppendText("`n`n`r Entered Computer Name: $script:globalComputerName `r`n`r`n  The Computer is: ONLINE" + [Environment]::NewLine)
+    } else {
+      $outputBox.AppendText("`n`n`r Entered Computer Name: $script:globalComputerName`r`n`r`n  The Computer is: OFFLINE - Can't Ping the system..." + [Environment]::NewLine)
     }
+  }
 
-    # Dispose of the form
-    $form.Dispose()
+  # Dispose of the form
+  $form.Dispose()
 }
 
 # Run SuspectPC Function to get computer name before running any commands against it.
@@ -2741,7 +3150,7 @@ SuspectPC
 #####################################################################
 $formLabel = New-Object System.Windows.Forms.label
 $formLabel.Location = New-Object System.Drawing.Point(250,160)
-$formLabel.Size = New-Object System.Drawing.Size(380,25)
+$formLabel.Size = New-Object System.Drawing.Size(580,25)
 $formLabel.Font = New-Object System.Drawing.Font("arial","14",[System.Drawing.FontStyle]::Regular)
 $formLabel.ForeColor = "RED"
 $formLabel.BackColor = "black"
@@ -2767,12 +3176,12 @@ $form.Controls.Add($formLabel)
 
 ##Version Number Form Space
 $VER = New-Object system.Windows.Forms.Button
-$VER.Text = "v1.0"  
+$VER.Text = "v2.0"  
 $VER.ForeColor = "black"
 $VER.Backcolor = "whitesmoke"   
 $VER.width = 50
 $VER.height = 24
-$VER.location = New-Object System.Drawing.Point(630, 670) #Horizontal, Vertical
+$VER.location = New-Object System.Drawing.Point(650, 670) #Horizontal, Vertical
 $VER.Font = 'Microsoft Sans Serif,9'
 $VER.Add_Click( { VER })
 $Form.Controls.Add($VER)
@@ -2852,3 +3261,4 @@ $outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX RAPID RESPONSE: `r`n`r`
 
 
 [void]$Form.ShowDialog()
+
