@@ -34,7 +34,7 @@ $wshell = New-Object -comObject Wscript.Shell
 #######       FORM SIZE       #######
 
 $Form = New-Object system.Windows.Forms.Form
-$Form.ClientSize = '700,700' #Width,Height
+$Form.ClientSize = '760,720' #Width,Height
 $form.BackColor = ''
 $Form.text = "T-REX RAPID RESPONSE"
 $Form.FormBorderStyle = 'Fixed3D'
@@ -130,67 +130,73 @@ function MACHINEREPORT {
   $outputBox.AppendText("Running All Machine Reports............`n`n`n" + [Environment]::NewLine)
 
 
-  $outputBox.AppendText("`n`n`n Running Report 1 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 1 of 17.....`n`n`n " + [Environment]::NewLine)
  
   pcinfo
 
-  $outputBox.AppendText("`n`n`n Running Report 2 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 2 of 17.....`n`n`n " + [Environment]::NewLine)
 
   LOCALACCOUNTS
 
-  $outputBox.AppendText("`n`n`n Running Report 3 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 3 of 17.....`n`n`n " + [Environment]::NewLine)
 
   FIREWALLRULES
 
-  $outputBox.AppendText("`n`n`n Running Report 4 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 4 of 17.....`n`n`n " + [Environment]::NewLine)
 
   NETSTATCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 5 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 5 of 17.....`n`n`n " + [Environment]::NewLine)
 
   LogonReport
 
-  $outputBox.AppendText("`n`n`n Running Report 6 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 6 of 17.....`n`n`n " + [Environment]::NewLine)
 
   ANTIVIRUS
 
-  $outputBox.AppendText("`n`n`n Running Report 7 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 7 of 17.....`n`n`n " + [Environment]::NewLine)
 
   WEBHISTORY
 
-  $outputBox.AppendText("`n`n`n Running Report 8 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 8 of 17.....`n`n`n " + [Environment]::NewLine)
 
   GPOStatus
 
-  $outputBox.AppendText("`n`n`n Running Report 9 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 9 of 17.....`n`n`n " + [Environment]::NewLine)
 
   SCHEDULEDTASKS
 
-  $outputBox.AppendText("`n`n`n Running Report 10 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 10 of 17.....`n`n`n " + [Environment]::NewLine)
 
   INSTALLEDSOFTWARE
 
-  $outputBox.AppendText("`n`n`n Running Report 11 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 11 of 17.....`n`n`n " + [Environment]::NewLine)
 
   WIFINETWORK
 
-  $outputBox.AppendText("`n`n`n Running Report 12 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 12 of 17.....`n`n`n " + [Environment]::NewLine)
 
   STARTUP
 
-  $outputBox.AppendText("`n`n`n Running Report 13 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 13 of 17.....`n`n`n " + [Environment]::NewLine)
 
   USBDEVICE
 
-  $outputBox.AppendText("`n`n`n Running Report 14 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 14 of 17.....`n`n`n " + [Environment]::NewLine)
 
   RUNNINGPROCESS
 
-  $outputBox.AppendText("`n`n`n Running Report 15 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 15 of 17.....`n`n`n " + [Environment]::NewLine)
 
   RDPCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 16 of 16.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 16 of 17.....`n`n`n " + [Environment]::NewLine)
+
+  EVENTVIEWER
+
+  $outputBox.AppendText("`n`n`n Running Report 17 of 17.....`n`n`n " + [Environment]::NewLine)
+
+  ImageThumbnails
 
 
   $outputBox.AppendText("`n`n`r Reports Completed, and saved to a folder on the desktop." + [Environment]::NewLine)
@@ -2115,8 +2121,7 @@ function RUNNINGPROCESS {
 
 function WEBHISTORY {
 
-  $outputBox.AppendText("`n`n`r Gathering and Parsing Chrome History Report.... `n`n`r" + [Environment]::NewLine)
-
+    $outputBox.AppendText("`n`n`r Gathering and Parsing Web History Reports.... `n`n`r" + [Environment]::NewLine)
 
     param (
         [string]$destinationFolder = "$env:USERPROFILE\Desktop\$env:COMPUTERNAME TREX REPORTS"
@@ -2142,7 +2147,6 @@ function WEBHISTORY {
 
         $HistoryEntries -join "`n" -replace '(https?://)', "`n`$1" | Out-File -FilePath $OutputTxtFile -Force
 
-        
         $outputBox.AppendText("`n`n`r Chrome History for user $UserName has been saved to $OutputTxtFile `n`n`r" + [Environment]::NewLine)
     }
 
@@ -2153,7 +2157,7 @@ function WEBHISTORY {
         }
 
         # Create the subfolder for Chrome Web History Database Files
-        $webHistoryFolder = Join-Path $destinationFolder "Chrome Web History Database Files"
+        $webHistoryFolder = Join-Path $destinationFolder "Web History Database Files"
         if (-not (Test-Path -Path $webHistoryFolder)) {
             New-Item -ItemType Directory -Path $webHistoryFolder | Out-Null
         }
@@ -2164,29 +2168,66 @@ function WEBHISTORY {
         # Loop through each user profile
         foreach ($profile in $userProfiles) {
             $userName = $profile.LocalPath.Split('\')[-1]
-            $historyFilePath = Join-Path $profile.LocalPath "AppData\Local\Google\Chrome\User Data\Default\History"
-            
-            # Check if the history file exists
-            if (Test-Path -Path $historyFilePath) {
-                $destinationFileName = "$userName Chrome History"
-                $destinationPath = Join-Path $webHistoryFolder $destinationFileName
-                Copy-Item -Path $historyFilePath -Destination $destinationPath -Force
-               
-                
 
-                # Call Get-ChromeHistory function for each user
-                Get-ChromeHistory -UserName $userName -OutputTxtFile "$destinationPath.txt"
+            # Chrome History
+            $chromeHistoryFilePath = Join-Path $profile.LocalPath "AppData\Local\Google\Chrome\User Data\Default\History"
+            if (Test-Path -Path $chromeHistoryFilePath) {
+                $chromeDestinationFileName = "$userName Chrome History"
+                $chromeDestinationPath = Join-Path $webHistoryFolder $chromeDestinationFileName
+                Copy-Item -Path $chromeHistoryFilePath -Destination $chromeDestinationPath -Force
+                Get-ChromeHistory -UserName $userName -OutputTxtFile "$chromeDestinationPath.txt"
             } else {
-               
-                $outputBox.AppendText("`n`n`r History file not found for user $userName `n`n`r" + [Environment]::NewLine)
+                $outputBox.AppendText("`n`n`r Chrome history file not found for user $userName `n`n`r" + [Environment]::NewLine)
+            }
+
+            # Edge History
+            $edgeHistoryFilePath = Join-Path $profile.LocalPath "AppData\Local\Microsoft\Edge\User Data\Default\History"
+            if (Test-Path -Path $edgeHistoryFilePath) {
+                $edgeDestinationFileName = "$userName Edge History"
+                $edgeDestinationPath = Join-Path $webHistoryFolder $edgeDestinationFileName
+                Copy-Item -Path $edgeHistoryFilePath -Destination $edgeDestinationPath -Force
+                $outputBox.AppendText("`n`n`r Edge history copied for user $userName `n`n`r" + [Environment]::NewLine)
+            } else {
+                $outputBox.AppendText("`n`n`r Edge history file not found for user $userName `n`n`r" + [Environment]::NewLine)
+            }
+
+            # Firefox History
+            $firefoxHistoryFilePath = Join-Path $profile.LocalPath "AppData\Roaming\Mozilla\Firefox\Profiles\*.default-release\places.sqlite"
+            if (Test-Path -Path $firefoxHistoryFilePath) {
+                $firefoxDestinationFileName = "$userName Firefox History"
+                $firefoxDestinationPath = Join-Path $webHistoryFolder $firefoxDestinationFileName
+                Copy-Item -Path $firefoxHistoryFilePath -Destination $firefoxDestinationPath -Force
+                $outputBox.AppendText("`n`n`r Firefox history copied for user $userName `n`n`r" + [Environment]::NewLine)
+            } else {
+                $outputBox.AppendText("`n`n`r Firefox history file not found for user $userName `n`n`r" + [Environment]::NewLine)
+            }
+
+            # Opera History
+            $operaHistoryFilePath = Join-Path $profile.LocalPath "AppData\Roaming\Opera Software\Opera Stable\History"
+            if (Test-Path -Path $operaHistoryFilePath) {
+                $operaDestinationFileName = "$userName Opera History"
+                $operaDestinationPath = Join-Path $webHistoryFolder $operaDestinationFileName
+                Copy-Item -Path $operaHistoryFilePath -Destination $operaDestinationPath -Force
+                $outputBox.AppendText("`n`n`r Opera history copied for user $userName `n`n`r" + [Environment]::NewLine)
+            } else {
+                $outputBox.AppendText("`n`n`r Opera history file not found for user $userName `n`n`r" + [Environment]::NewLine)
+            }
+
+            # Brave History
+            $braveHistoryFilePath = Join-Path $profile.LocalPath "AppData\Local\BraveSoftware\Brave-Browser\User Data\Default\History"
+            if (Test-Path -Path $braveHistoryFilePath) {
+                $braveDestinationFileName = "$userName Brave History"
+                $braveDestinationPath = Join-Path $webHistoryFolder $braveDestinationFileName
+                Copy-Item -Path $braveHistoryFilePath -Destination $braveDestinationPath -Force
+                $outputBox.AppendText("`n`n`r Brave history copied for user $userName `n`n`r" + [Environment]::NewLine)
+            } else {
+                $outputBox.AppendText("`n`n`r Brave history file not found for user $userName `n`n`r" + [Environment]::NewLine)
             }
         }
     } catch {
-       
         $outputBox.AppendText("`n`n`r Error: $_`n`n`r" + [Environment]::NewLine)
     }
 }
-
 
 ###############################################################################################################################################################################
 
@@ -2424,7 +2465,358 @@ function INSTALLEDSOFTWARE {
 
 ###############################################################################################################################################################################
 
+function QUICKIOC {
+$outputBox.AppendText("`n`n`r INDICATOR OF COMPROMISE REPORT IS BEING GENERATED AND WILL OPEN WHEN COMPLETED......PLEASE WAIT..." + [Environment]::NewLine)
 
+
+# Define the file path for the report on the desktop
+$reportPath = "$env:USERPROFILE\Desktop\IOC_Report.txt"
+
+# Function to write data to the report file
+function WriteToReport {
+    param (
+        [string]$data
+    )
+    Add-content -Path $reportPath -Value $data
+}
+
+# Function to check for IOCs and write them to the report
+function CheckIOC {
+    param (
+        [string]$description,   # Description of the IOC category
+        [scriptblock]$script    # Script to execute for IOC detection
+    )
+    WriteToReport "`n$description`n"   # Write category header to the report
+    $result = & $script   # Execute the script block
+    if ($result) {
+        $result | ForEach-Object {   # Format each IOC item for readability
+            $output = "Name: $($_.Name)"
+            if ($_.Path) {
+                $output += "`nPath: $($_.Path)"
+            }
+            if ($_.MainWindowTitle) {
+                $output += "`nWindow Title: $($_.MainWindowTitle)"
+            }
+            WriteToReport $output   # Write formatted IOC details to the report
+        }
+    } else {
+        WriteToReport "No IOCs found."   # Write a message if no IOCs found
+    }
+}
+
+# Start scanning for IOCs
+WriteToReport "IOC Scan Report`n`n"   # Write header to the report
+
+# Check for suspicious processes
+CheckIOC -description "Suspicious Processes" -script {
+    Get-Process | Where-Object { $_.Path -eq $null -and $_.MainWindowTitle -ne $null } | Select-Object Name, Path, MainWindowTitle
+}
+
+# Check for unusual network connections
+CheckIOC -description "Unusual Network Connections" -script {
+    Get-NetTCPConnection | Where-Object { $_.State -eq 'Established' -and $_.RemoteAddress -notin @('127.0.0.1', '::1') } | Select-Object LocalAddress, LocalPort, RemoteAddress, RemotePort, State
+}
+
+# Check for suspicious startup programs
+CheckIOC -description "Suspicious Startup Programs" -script {
+    Get-CimInstance Win32_StartupCommand | ForEach-Object {
+        $output = "Name: $($_.Command)"
+        if ($_.Location) {
+            $output += "`nLocation: $($_.Location)"
+        }
+        $output
+    }
+}
+
+# Check for modified files in common system directories
+CheckIOC -description "Modified Files in System Directories" -script {
+    Get-ChildItem -Path "C:\Windows\System32" | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) }
+}
+
+# Check for signs of ransomware
+CheckIOC -description "Signs of Ransomware" -script {
+    Get-ChildItem -Path "C:\Users" -Recurse -Include *.encrypted, *.locked | Select-Object FullName
+}
+
+# Display completion message
+WriteToReport "`nIOC scan completed. Report saved to $reportPath"
+
+II "$env:USERPROFILE\Desktop\IOC_Report.txt"
+
+}
+
+
+function SQLVIEWER {
+
+#ii "SQLiteDatabaseBrowserPortable.exe is a great application to parse web history data.  Put the file location here and remove the comment for the button and you will have a shortcut from the application."
+
+}
+
+
+###############################################################################################################################################################################
+function EVENTVIEWER {
+    $outputBox.AppendText("`r`n`n`r Preparing to copy Event Viewer Files... `r`n`r`n" + [Environment]::NewLine)
+
+    # Define variables
+    $ComputerName = $env:COMPUTERNAME
+    $ReportFileName = "EventViewerReports"  # Adjust as needed
+    $OutputFolderPath = Join-Path -Path "$env:USERPROFILE\Desktop" -ChildPath "$ComputerName TREX REPORTS\$ReportFileName"
+
+    # Create the output folder if it doesn't exist
+    if (-not (Test-Path -Path $OutputFolderPath)) {
+        New-Item -ItemType Directory -Path $OutputFolderPath | Out-Null
+    }
+
+    # Assuming the Event Viewer logs are located at the local path
+    $LocalLogsPath = "C:\Windows\System32\Winevt\Logs\*"
+
+    # Copy event viewer files locally
+    Copy-Item -Path $LocalLogsPath -Destination $OutputFolderPath -Force
+
+    $outputBox.AppendText("`r`n`n`r Event Viewer Files copied and saved to $OutputFolderPath `r`n`r`n" + [Environment]::NewLine)
+}
+
+
+###############################################################################################################################################################################
+
+
+function ImageThumbnails {
+
+$outputBox.AppendText("`r`n`n`r Gathering User images in Downloads and Picture Folder `r`n`r`n" + [Environment]::NewLine)
+
+# Get all user profiles on the machine
+$userProfiles = Get-ChildItem -Path "C:\Users" -Directory | Where-Object { $_.Name -ne "Default" -and $_.Name -ne "Public" }
+
+# Iterate through each user profile
+foreach ($userProfile in $userProfiles) {
+    # Get the username
+    $username = $userProfile.Name
+
+    # Get the paths to the user's Pictures and Downloads folders
+    $picturesDirectory = Join-Path -Path $userProfile.FullName -ChildPath "Pictures"
+    $downloadsDirectory = Join-Path -Path $userProfile.FullName -ChildPath "Downloads"
+
+    # Check if the Pictures or Downloads folders exist for the user
+    $picturesExists = Test-Path $picturesDirectory
+    $downloadsExists = Test-Path $downloadsDirectory
+
+    if ($picturesExists -or $downloadsExists) {
+        # Set the path for the TREX folder on the desktop
+        $ComputerName = $env:COMPUTERNAME
+        $trexFolder = Join-Path -Path "$env:USERPROFILE\Desktop" -ChildPath "$ComputerName TREX REPORTS\$ReportFileName"
+
+        # Create the TREX folder if it doesn't exist
+        if (-not (Test-Path $trexFolder)) {
+            New-Item -Path $trexFolder -ItemType Directory | Out-Null
+        }
+
+        # Set the filename for the HTML file
+        $outputFileName = "$username My Pictures Thumbnails.html"
+        $outputFile = Join-Path -Path $trexFolder -ChildPath $outputFileName
+
+        # Get the current date and time
+        $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+        # Initialize HTML content
+        $htmlContent = @"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TREX REPORT: $username's Pictures/Downloads Thumbnails</title>
+<style>
+.thumbnail {
+    display: inline-block;
+    text-align: center;
+    margin: 10px;
+}
+.thumbnail img {
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background-color: #f9f9f9;
+}
+</style>
+</head>
+<body>
+<h1>TREX REPORT: $username's My Pictures Thumbnails</h1>
+<h2>Computer Name: $ComputerName</h2>
+<p>Generated on: $currentDateTime</p>
+"@
+
+        # Function to generate HTML for images in a directory
+        function Generate-ImageHTML {
+            param (
+                [string]$directoryPath,
+                [string]$sectionTitle
+            )
+
+            if (Test-Path $directoryPath) {
+                $htmlSectionContent = @"
+<h2>$sectionTitle</h2>
+<div id="thumbnails-container">
+"@
+                $imageFiles = Get-ChildItem -Path $directoryPath -File | Where-Object { $_.Extension -match '\.(jpg|jpeg|png|gif)' }
+                foreach ($image in $imageFiles) {
+                    $imageName = $image.Name
+                    $imagePath = $image.FullName
+                    $imageBytes = [System.IO.File]::ReadAllBytes($imagePath)
+                    $base64Image = [System.Convert]::ToBase64String($imageBytes)
+                    $imageExtension = $image.Extension.TrimStart('.').ToLower()
+                    $imageDataUrl = "data:image/$imageExtension;base64,$base64Image"
+                    $thumbnailHtml = @"
+<div class="thumbnail">
+    <img src="$imageDataUrl" alt="$imageName" />
+    <p>$imageName</p>
+</div>
+"@
+                    $htmlSectionContent += $thumbnailHtml
+                }
+                $htmlSectionContent += "</div>"
+                return $htmlSectionContent
+            } else {
+                return ""
+            }
+        }
+
+        # Generate HTML for Pictures and Downloads folders
+        $htmlContent += Generate-ImageHTML -directoryPath $picturesDirectory -sectionTitle "Pictures Folder"
+        $htmlContent += Generate-ImageHTML -directoryPath $downloadsDirectory -sectionTitle "Downloads Folder"
+
+        # Close HTML content
+        $htmlContent += @"
+</div>
+</body>
+</html>
+"@
+
+        # Save HTML content to output file in TREX folder
+        $htmlContent | Out-File -FilePath $outputFile -Encoding UTF8
+
+        # Output file location
+        Write-Host "HTML file generated for $($userProfile.Name): $outputFile"
+    }
+    else {
+        Write-Warning "Pictures or Downloads folder not found for $($userProfile.Name)"
+    }
+}
+$outputBox.AppendText("`r`n`n`r Completed Gathering Images `r`n`r`n" + [Environment]::NewLine)
+}
+
+
+###############################################################################################################################################################################
+
+function fileinfo {
+    $outputBox.AppendText("`r`n`n`r Gathering Users File Information..... `r`n`r`n" + [Environment]::NewLine)
+
+    # Define the path where the HTML file will be saved
+    $computerName = $env:COMPUTERNAME
+    $outputDir = Join-Path -Path "$env:USERPROFILE\Desktop" -ChildPath "$ComputerName TREX REPORTS"
+    $outputFile = "$outputDir\UserFilesList.html"
+
+    # Create the output directory if it does not exist
+    if (-not (Test-Path $outputDir)) {
+        New-Item -Path $outputDir -ItemType Directory | Out-Null
+    }
+
+    # Add HTML header to the file with timestamp and notice
+    $currentDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $htmlHeader = @"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TREX User Files Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        h2 { color: #333; }
+        .notice { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>User Files Report for $computerName</h1>
+    <p>Report generated on: $currentDate</p>
+    <p class="notice">Note: Only the first 100 files of each folder are included in this report.</p>
+"@
+    $htmlHeader | Set-Content -Path $outputFile -Force
+
+    # Define the list of special folders to search
+    $folders = @("Documents", "Music", "Pictures", "Videos", "Downloads", "Desktop")
+
+    # Get all user profiles
+    $users = Get-WmiObject Win32_UserProfile | Where-Object { $_.Special -eq $false }
+
+    foreach ($user in $users) {
+        $userName = [System.IO.Path]::GetFileName($user.LocalPath)
+        $outputBox.AppendText("Getting file info for $userName... `r`n`r`n" + [Environment]::NewLine)
+        $userHtml = "<h2>User: $userName</h2>"
+        $userHtml += "<table><thead><tr><th>Folder</th><th>Item Name</th><th>Type</th><th>Size (Bytes)</th><th>Last Modified</th></tr></thead><tbody>"
+
+        foreach ($folder in $folders) {
+            $folderPath = [System.IO.Path]::Combine($user.LocalPath, $folder)
+
+            if (Test-Path $folderPath) {
+                $items = Get-ChildItem -Path $folderPath -Recurse -ErrorAction SilentlyContinue
+                $fileCount = 0
+                foreach ($item in $items) {
+                    if ($fileCount -ge 100) {
+                        $userHtml += "<tr><td colspan='5'>More than 100 files in $folder. Skipping remaining files.</td></tr>"
+                        break
+                    }
+                    $userHtml += "<tr>"
+                    $userHtml += "<td>$folder</td>"
+                    $userHtml += "<td>$($item.FullName)</td>"
+                    $userHtml += "<td>" + (if ($item.PSIsContainer) { "Folder" } else { "File" }) + "</td>"
+                    $userHtml += "<td>" + (if (-not $item.PSIsContainer) { $item.Length } else { $null }) + "</td>"
+                    $userHtml += "<td>$($item.LastWriteTime)</td>"
+                    $userHtml += "</tr>"
+                    $fileCount++
+                }
+            }
+        }
+
+        $userHtml += "</tbody></table>"
+
+        # Append the user-specific HTML to the file
+        $userHtml | Add-Content -Path $outputFile
+    }
+
+    # Add Recycle Bin Information
+    $recycleBinHtml = "<h2>Recycle Bin</h2>"
+    $recycleBinHtml += "<table><thead><tr><th>Item Name</th><th>Type</th><th>Size (Bytes)</th><th>Deletion Date</th></tr></thead><tbody>"
+
+    $shell = New-Object -ComObject Shell.Application
+    $recycleBin = $shell.Namespace(0xA)
+    $recycleItems = $recycleBin.Items()
+    foreach ($item in $recycleItems) {
+        $recycleBinHtml += "<tr>"
+        $recycleBinHtml += "<td>$($item.Name)</td>"
+        $recycleBinHtml += "<td>" + (if ($item.IsFolder) { "Folder" } else { "File" }) + "</td>"
+        $recycleBinHtml += "<td>" + (if (-not $item.IsFolder) { $item.Size } else { $null }) + "</td>"
+        $recycleBinHtml += "<td>$($item.ModifyDate)</td>"
+        $recycleBinHtml += "</tr>"
+    }
+
+    $recycleBinHtml += "</tbody></table>"
+    $recycleBinHtml | Add-Content -Path $outputFile
+
+    # Add HTML footer to the file
+    $htmlFooter = @"
+</body>
+</html>
+"@
+    $htmlFooter | Add-Content -Path $outputFile
+    $outputBox.AppendText("`r`n`n`r HTML report has been saved to $outputFile `r`n`r`n" + [Environment]::NewLine)
+}
+
+
+
+
+
+###############################################################################################################################################################################
 
 
 ###############################################################################################################################################################################
@@ -2433,6 +2825,8 @@ function INSTALLEDSOFTWARE {
 ###############################################################################################################################################################################
 ###############################################################################################################################################################################
 
+###############################################################################################################################################################################
+###############################################################################################################################################################################
 ###############################################################################################################################################################################
 
 
@@ -2455,7 +2849,7 @@ function VER {
 
 #Machine Report Button
 $MACHINEREPORT = New-Object system.Windows.Forms.Button
-$MACHINEREPORT.Text = "FULL MACHINE REPORT"  
+$MACHINEREPORT.Text = "FULL PC REPORT"  
 $MACHINEREPORT.ForeColor = "black"
 $MACHINEREPORT.Backcolor = "lightgreen"   
 $MACHINEREPORT.width = 165
@@ -2464,6 +2858,31 @@ $MACHINEREPORT.location = New-Object System.Drawing.Point(70, 200) #Horizontal, 
 $MACHINEREPORT.Font = 'Microsoft Sans Serif,9'
 $MACHINEREPORT.Add_Click( { MACHINEREPORT })
 $Form.Controls.Add($MACHINEREPORT)
+
+
+#Machine Report Button
+$QUICKIOC = New-Object system.Windows.Forms.Button
+$QUICKIOC.Text = "Quick IOC Report"  
+$QUICKIOC.ForeColor = "black"
+$QUICKIOC.Backcolor = "red"   
+$QUICKIOC.width = 50
+$QUICKIOC.height = 70
+$QUICKIOC.location = New-Object System.Drawing.Point(10, 200) #Horizontal, Vertical
+$QUICKIOC.Font = 'Microsoft Sans Serif,8'
+$QUICKIOC.Add_Click( { QUICKIOC })
+$Form.Controls.Add($QUICKIOC)
+
+#Machine Report Button
+$SQLVIEWER = New-Object system.Windows.Forms.Button
+$SQLVIEWER.Text = "SQL VIEW"  
+$SQLVIEWER.ForeColor = "black"
+$SQLVIEWER.Backcolor = "white"   
+$SQLVIEWER.width = 50
+$SQLVIEWER.height = 50
+$SQLVIEWER.location = New-Object System.Drawing.Point(10, 280) #Horizontal, Vertical
+$SQLVIEWER.Font = 'Microsoft Sans Serif,8'
+$SQLVIEWER.Add_Click( { SQLVIEWER })
+#$Form.Controls.Add($SQLVIEWER)
 
 #PC INFO Button
 $PCINFO = New-Object system.Windows.Forms.Button
@@ -2542,7 +2961,7 @@ $Form.Controls.Add($ANTIVIRUS)
 
 #WEB HISTORY Button
 $WEBHISTORY = New-Object system.Windows.Forms.Button
-$WEBHISTORY.Text = "CHROME WEB HISTORY"  
+$WEBHISTORY.Text = "WEB HISTORY"  
 $WEBHISTORY.ForeColor = "black"
 $WEBHISTORY.Backcolor = "whitesmoke"   
 $WEBHISTORY.width = 165
@@ -2680,6 +3099,56 @@ $RUNNINGPROCESS.Font = 'Microsoft Sans Serif,8'
 $RUNNINGPROCESS.Add_Click( { RUNNINGPROCESS })
 $Form.Controls.Add($RUNNINGPROCESS)
 
+
+#Event VIEWER Button
+$EVENTVIEWER = New-Object system.Windows.Forms.Button
+$EVENTVIEWER.Text = "EVENT VIEWER REPORT"  
+$EVENTVIEWER.ForeColor = "black"
+$EVENTVIEWER.Backcolor = "white"   
+$EVENTVIEWER.width = 70
+$EVENTVIEWER.height = 50
+$EVENTVIEWER.location = New-Object System.Drawing.Point(490, 650) #Horizontal, Vertical
+$EVENTVIEWER.Font = 'Microsoft Sans Serif,8'
+$EVENTVIEWER.Add_Click( { EVENTVIEWER })
+$Form.Controls.Add($EVENTVIEWER)
+
+
+
+
+
+#############################################################################################
+#                                  RIGHT SIDE BUTTONS                                       #
+#############################################################################################
+
+
+#PC INFO Button
+$ImageThumbnails = New-Object system.Windows.Forms.Button
+$ImageThumbnails.Text = "PC Images"  
+$ImageThumbnails.ForeColor = "black"
+$ImageThumbnails.Backcolor = "whitesmoke"   
+$ImageThumbnails.width = 70
+$ImageThumbnails.height = 50
+$ImageThumbnails.location = New-Object System.Drawing.Point(570, 650) #Horizontal, Vertical
+$ImageThumbnails.Font = 'Microsoft Sans Serif,9'
+$ImageThumbnails.Add_Click( { ImageThumbnails })
+$Form.Controls.Add($ImageThumbnails)
+
+#PC INFO Button
+#$FileInfo = New-Object system.Windows.Forms.Button
+#$FileInfo.Text = "File Info"  
+#$FileInfo.ForeColor = "black"
+#$FileInfo.Backcolor = "whitesmoke"   
+#$FileInfo.width = 165
+#$FileInfo.height = 24
+#$FileInfo.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
+#$FileInfo.Font = 'Microsoft Sans Serif,9'
+#$FileInfo.Add_Click( { FileInfo })
+#$Form.Controls.Add($FileInfo)
+
+
+
+
+
 #############################################################################################
 #                BOTTOM ROW BUTTONS                                                         #
 #############################################################################################
@@ -2769,7 +3238,7 @@ $VER.ForeColor = "black"
 $VER.Backcolor = "whitesmoke"   
 $VER.width = 50
 $VER.height = 24
-$VER.location = New-Object System.Drawing.Point(630, 670) #Horizontal, Vertical
+$VER.location = New-Object System.Drawing.Point(650, 670) #Horizontal, Vertical
 $VER.Font = 'Microsoft Sans Serif,9'
 $VER.Add_Click( { VER })
 $Form.Controls.Add($VER)
@@ -2849,5 +3318,4 @@ $outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX RAPID RESPONSE: `r`n`r`
 
 
 [void]$Form.ShowDialog()
-
 
