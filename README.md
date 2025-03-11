@@ -10,7 +10,9 @@ I wanted it portable and be able to be ran both locally and remotely.  After all
 
 This does it all.  Starting with the Local Version upload.  Update 02/12/2024 This is now fully functioning.
 
-Remote Version Uploaded 02/12/2024.  The only thing that needs changed in this script is the addition of your domain for remote C: Access.   Ive included the tag in the code "< YOUR DOMAIN HERE >"  To easily identify where this needs to be added.
+Remote Version Uploaded 02/12/2024.  
+
+Remote Version Updated 03/11/2025. - For remote functions that require a domain name, the domain name is now retreived from the computer you are currently using so no changing of the file is needed.
 
 Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.
 
