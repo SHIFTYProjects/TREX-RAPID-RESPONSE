@@ -24,7 +24,8 @@ Just download the script.  Rename it to a .ps1 file and run as an admin with pow
 
 
 (REMOTE VERSION)
+![{D4900641-CE7E-4AEF-804E-6934DD06517D}](https://github.com/user-attachments/assets/492a293b-81ee-4ecc-808d-e8524982748e)
 
-![image](https://github.com/SHIFTYProjects/TREX-RAPID-RESPONSE/assets/115837132/a23ab3df-d29f-407c-890d-c0d0fa28ab40)
+
 
 
