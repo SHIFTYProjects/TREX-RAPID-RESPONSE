@@ -2912,91 +2912,60 @@ function ImageThumbnails {
 
 
 ###############################################################################################################################################################################
-#Generates a quick report of the computer for a faster run time.
-function QUICKREPORT {
+function REMOVEPIN {
 
+    $RemotePC = "$script:globalComputerName"
+    
+    if (-not $RemotePC) {
+        [System.Windows.Forms.MessageBox]::Show("Please enter a valid computer name.", "Error", "OK", "Error")
+        return
+    }
 
-  $outputBox.AppendText("Running Quick Report - (FIREWALLRULES, ANTIVIRUS, GPOStatus, SCHEDULED TASKS, PCIMAGES will be skipped.............`n`r`r`n`n" + [Environment]::NewLine)
+    $confirm = [System.Windows.Forms.MessageBox]::Show("WARNING: This will remove the Windows PIN and Biometrics on $RemotePC! `r`n`n This action CANNOT be undone.  Removing the pin this way can cause errors when trying to set up a new pin. Continue?`r`n`n (This will also RESTART the machine.)" , "Confirm Action", "YesNo", "Warning")
 
+    if ($confirm -eq "Yes") {
+        $OutputBox.AppendText("Removing PIN on $RemotePC..." + [Environment]::NewLine)
 
-  $outputBox.AppendText("`n`n`n Running Report 1 of 16.....`n`n`n " + [Environment]::NewLine)
- 
-  pcinfo
+        try {
+            $cmds = @(
+                "cmd.exe /c takeown /F C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /R /D Y",
+                "cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /grant administrators:F /T",
+                "cmd.exe /c rmdir /s /q C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC",
+                "cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /reset /T /C /L",
+                "cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /setowner SYSTEM /T /C /L",
+                "cmd.exe /c secedit /configure /cfg %windir%\inf\defltbase.inf /db defltbase.sdb /verbose",
 
-  $outputBox.AppendText("`n`n`n Running Report 2 of 16.....`n`n`n " + [Environment]::NewLine)
+                 $OutputBox.AppendText("Removing BIOMETRICS on $RemotePC..." + [Environment]::NewLine)
+                
+                #Removing biometrics
+              
+                "cmd.exe /c net stop WbioSrvc /y",
+                "cmd.exe /c takeown /F C:\Windows\System32\WinBioDatabase /R /D Y",
+                "cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /grant administrators:F /T",
+                "cmd.exe /c rmdir /s /q C:\Windows\System32\WinBioDatabase",
+                "cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /reset /T /C /L",
+                "cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /setowner SYSTEM /T /C /L",
+                "cmd.exe /c net start WbioSrvc"
 
-  LOCALACCOUNTS
+                 $OutputBox.AppendText("Removal Attempt completed on $RemotePC..." + [Environment]::NewLine)
 
-  #$outputBox.AppendText("`n`n`n Running Report 3 of 16.....`n`n`n " + [Environment]::NewLine)
+                "shutdown /r /t 10 /f"
+            )
 
-  #FIREWALLRULES
+            foreach ($cmd in $cmds) {
+                wmic /node:$RemotePC process call create $cmd | Out-Null
+            }
 
-  $outputBox.AppendText("`n`n`n Running Report 4 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  NETSTATCONNECTIONS
-
-  $outputBox.AppendText("`n`n`n Running Report 5 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  LogonReport
-
-  
-  #$outputBox.AppendText("`n`n`n Running Report 6 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  #ANTIVIRUS
-
-  $outputBox.AppendText("`n`n`n Running Report 7 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  WEBHISTORY
-
-  #$outputBox.AppendText("`n`n`n Running Report 8 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  #GPOStatus
-
-  #$outputBox.AppendText("`n`n`n Running Report 9 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  #SCHEDULEDTASKS
-
-  $outputBox.AppendText("`n`n`n Running Report 10 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  INSTALLEDSOFTWARE
-
-  $outputBox.AppendText("`n`n`n Running Report 11 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  WIFINETWORK
-
-  $outputBox.AppendText("`n`n`n Running Report 12 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  STARTUP
-
-  $outputBox.AppendText("`n`n`n Running Report 13 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  USBDEVICE
-
-  $outputBox.AppendText("`n`n`n Running Report 14 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  RUNNINGPROCESS
-
-  $outputBox.AppendText("`n`n`n Running Report 15 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  RDPCONNECTIONS
-
-  $outputBox.AppendText("`n`n`n Running Report 16 of 16.....`n`n`n " + [Environment]::NewLine)
-
-  EVENTVIEWER
-
-
-  $outputBox.AppendText("`n`n`r Reports Completed, and saved to a folder on the desktop." + [Environment]::NewLine)
-  
-  
-  #get the computername
-  $ComputerName = $env:COMPUTERNAME
- 
-  #define the folderpath
-  $folderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
-  
-  #open the folder path
-  ii $folderPath
+            $OutputBox.AppendText("PIN removal process started on $RemotePC. `r`n`n Restarting system in 10 seconds..." + [Environment]::NewLine)
+        } catch {
+            $OutputBox.AppendText("Error executing commands: $_" + [Environment]::NewLine)
+        }
+    } else {
+        $OutputBox.AppendText("Operation cancelled." + [Environment]::NewLine)
+    }
 }
+
+
 
 ###############################################################################################################################################################################
 ###############################################################################################################################################################################
@@ -3240,7 +3209,7 @@ $DISABLENETWORK.Add_Click( { DISABLENETWORK })
 $Form.Controls.Add($DISABLENETWORK)
 
 
-#Enable Network Connections Button
+#Enable Remote C Button
 $REMOTEC = New-Object system.Windows.Forms.Button
 $REMOTEC.Text = "Remote C:"  
 $REMOTEC.ForeColor = "black"
@@ -3253,7 +3222,7 @@ $REMOTEC.Add_Click( { REMOTEC })
 $Form.Controls.Add($REMOTEC)
 
 
-#Enable Network Connections Button
+#Enable Shutdown PC Button
 $SHUTDOWNPC = New-Object system.Windows.Forms.Button
 $SHUTDOWNPC.Text = "SHUTDOWN PC"  
 $SHUTDOWNPC.ForeColor = "black"
@@ -3266,7 +3235,7 @@ $SHUTDOWNPC.Add_Click( { SHUTDOWNPC })
 $Form.Controls.Add($SHUTDOWNPC)
 
 
-#Enable Network Connections Button
+#Enable Ping Button
 $MAINPING = New-Object system.Windows.Forms.Button
 $MAINPING.Text = "PING"  
 $MAINPING.ForeColor = "white"
@@ -3279,7 +3248,7 @@ $MAINPING.Add_Click( { MAINPING })
 $Form.Controls.Add($MAINPING)
 
 
-#Enable Network Connections Button
+#Enable Chrome Extension Button
 $Browserext = New-Object system.Windows.Forms.Button
 $Browserext.Text = "Chrome Extension"  
 $Browserext.ForeColor = ""
@@ -3290,6 +3259,20 @@ $Browserext.location = New-Object System.Drawing.Point(660, 220) #Horizontal, Ve
 $Browserext.Font = 'Microsoft Sans Serif,8'
 $Browserext.Add_Click( { Browserext })
 $Form.Controls.Add($Browserext)
+
+
+
+#Enable Remove Windows Pin/Biometrics Button
+$REMOVEPIN = New-Object system.Windows.Forms.Button
+$REMOVEPIN.Text = "Remove Windows Pin/Biometrics"  
+$REMOVEPIN.ForeColor = ""
+$REMOVEPIN.Backcolor = ""   
+$REMOVEPIN.width = 125
+$REMOVEPIN.height = 40
+$REMOVEPIN.location = New-Object System.Drawing.Point(660, 430) #Horizontal, Vertical
+$REMOVEPIN.Font = 'Microsoft Sans Serif,8'
+$REMOVEPIN.Add_Click( { REMOVEPIN })
+$Form.Controls.Add($REMOVEPIN)
 
 
 
@@ -3446,14 +3429,11 @@ $SQLVIEWER.height = 35
 $SQLVIEWER.location = New-Object System.Drawing.Point(250, 750) #Horizontal, Vertical
 $SQLVIEWER.Font = 'Microsoft Sans Serif,8'
 $SQLVIEWER.Add_Click( { SQLVIEWER })
-#$Form.Controls.Add($SQLVIEWER)
+$Form.Controls.Add($SQLVIEWER)
 
-
-
-#If you want to add a shortcut to your SQL viewer once you have downloaded it, add it here. Also remove the # from the button above.
 function SQLVIEWER {
 
-  ii "LocationToYourViewer"
+  ii "Y:\00 Powershell EXE\Misc Powershell EXE\SQLiteDatabaseBrowserPortable\SQLiteDatabaseBrowserPortable.exe"
 
 }
 
@@ -3640,7 +3620,7 @@ $form.Controls.Add($formLabel)
 
 ##Version Number Form Space
 $VER = New-Object system.Windows.Forms.Button
-$VER.Text = "v4.0"  
+$VER.Text = "v3.2"  
 $VER.ForeColor = "black"
 $VER.Backcolor = "whitesmoke"   
 $VER.width = 50
