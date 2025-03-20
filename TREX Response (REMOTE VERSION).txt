@@ -2630,7 +2630,7 @@ function COMPUTERACCOUNTS {
     $openFileDialog.Title = "Select File"
     $openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
     $openFileDialog.Multiselect = $false
-    $OpenFileDialog.initialDirectory = "Y:\00 Powershell EXE\School Computer Lists"
+    $OpenFileDialog.initialDirectory = "COMPUTER LIST DIRECTORY"
 
 
     if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -3314,7 +3314,7 @@ $COMPUTERACCOUNTS.height = 24
 $COMPUTERACCOUNTS.location = New-Object System.Drawing.Point(430, 560) #Horizontal, Vertical
 $COMPUTERACCOUNTS.Font = 'Microsoft Sans Serif,8'
 $COMPUTERACCOUNTS.Add_Click( { COMPUTERACCOUNTS })
-$Form.Controls.Add($COMPUTERACCOUNTS)
+#$Form.Controls.Add($COMPUTERACCOUNTS)
 
 
 
