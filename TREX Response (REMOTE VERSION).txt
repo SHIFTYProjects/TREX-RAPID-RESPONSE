@@ -2017,6 +2017,8 @@ function SHUTDOWNPC {
 
 ###############################################################################################################################################################################
 
+
+
 function USBDEVICE {
     param (
         [string]$remoteComputerName = $global:globalComputerName,
@@ -2025,124 +2027,140 @@ function USBDEVICE {
 
     $outputBox.AppendText("`n`n`r Getting USB Drive Report from $remoteComputerName....`r`n`n" + [Environment]::NewLine)
 
-    # Specify the folder name
+    # Folder configuration
     $folderName = "$remoteComputerName TREX REPORTS"
-
-    # Create a folder on the local machine if it doesn't exist
     $localFolderFullPath = Join-Path $localFolderPath $folderName
+    $regSubfolder = Join-Path $localFolderFullPath "RegistryExports"
+
+    # Create output directories
     if (-not (Test-Path -Path $localFolderFullPath -PathType Container)) {
         New-Item -Path $localFolderFullPath -ItemType Directory | Out-Null
     }
-
-    # Create a subfolder for registry exports
-    $regSubfolder = Join-Path $localFolderFullPath "RegistryExports"
     if (-not (Test-Path -Path $regSubfolder -PathType Container)) {
         New-Item -Path $regSubfolder -ItemType Directory | Out-Null
     }
 
-    # Copy the SetupAPI log from the remote machine
+    try {
+        # Get currently connected USB devices with detailed information
+        $currentDevices = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
+            $pnpDevices = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' } | 
+                Select-Object Status, Class, FriendlyName, Description, Manufacturer, InstanceId
+
+            $wmiDevices = Get-WmiObject Win32_PnPEntity | Where-Object { $_.PNPClass -eq "USB" } | 
+                Select-Object Name, Description, Manufacturer, PNPClass, Status
+
+            # Combine and deduplicate the results
+            $combinedDevices = @()
+            foreach ($device in $pnpDevices) {
+                $wmiDevice = $wmiDevices | Where-Object { $_.Name -eq $device.FriendlyName }
+                if ($wmiDevice) {
+                    $combinedDevices += [PSCustomObject]@{
+                        FriendlyName = $device.FriendlyName
+                        Description = $wmiDevice.Description
+                        Manufacturer = $wmiDevice.Manufacturer
+                        Class = $device.Class
+                        Status = $device.Status
+                        InstanceId = $device.InstanceId
+                    }
+                } else {
+                    $combinedDevices += $device
+                }
+            }
+            $combinedDevices
+        }
+
+        # Get historical USB devices from registry
+        $historicalDevices = Invoke-Command -ComputerName $remoteComputerName -ScriptBlock {
+            Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Enum\USB" -Recurse |
+            Get-ItemProperty |
+            Where-Object { $_.FriendlyName } |
+            Select-Object FriendlyName, @{Name="InstanceId"; Expression={$_.PSParentPath -replace ".*\\USB\\",""}}
+        }
+
+        # Generate HTML report
+        $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $htmlContent = @"
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h2 { color: #2c3e50; margin-top: 30px; }
+        .note { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>TREX - USB Device Report</h1>
+    <p><strong>Computer Name:</strong> $remoteComputerName</p>
+    <p><strong>Report Generated:</strong> $currentDateTime</p>
+
+    <h2>Currently Connected USB Devices</h2>
+    $(if ($currentDevices) {
+        @"
+        <table>
+            <tr>
+                <th>Friendly Name</th>
+                <th>Description</th>
+                <th>Manufacturer</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Instance ID</th>
+            </tr>
+            $(foreach ($device in $currentDevices) {
+                "<tr>
+                    <td>$($device.FriendlyName)</td>
+                    <td>$($device.Description)</td>
+                    <td>$($device.Manufacturer)</td>
+                    <td>$($device.Class)</td>
+                    <td>$($device.Status)</td>
+                    <td>$($device.InstanceId)</td>
+                </tr>"
+            })
+        </table>
+"@
+    } else {
+        "<p class='note'>No currently connected USB devices found.</p>"
+    })
+
+    <h2>Previously Connected USB Devices</h2>
+    $(if ($historicalDevices) {
+        @"
+        <table>
+            <tr><th>Friendly Name</th><th>Instance ID</th></tr>
+            $(foreach ($device in $historicalDevices) {
+                "<tr><td>$($device.FriendlyName)</td><td>$($device.InstanceId)</td></tr>"
+            })
+        </table>
+"@
+    } else {
+        "<p class='note'>No historical USB devices found.</p>"
+    })
+</body>
+</html>
+"@
+
+
+# Copy the SetupAPI log from the remote machine
     $remoteLogPath = "\\$remoteComputerName\C$\Windows\INF\setupapi.dev.log"
     $localLogPath = Join-Path $regSubfolder "setupapi.dev.log"
     Copy-Item -Path $remoteLogPath -Destination $localLogPath -Force
 
     Start-Sleep -Seconds 5  # Wait to ensure the file is copied
 
-    if (-not (Test-Path $localLogPath)) {
-        $outputBox.AppendText("`nSetupAPI log not found at $remoteLogPath.`n")
-        return
+
+
+        # Save report
+        $reportFilePath = Join-Path $localFolderFullPath "USB Devices.html"
+        $htmlContent | Out-File -FilePath $reportFilePath -Encoding UTF8
+        $outputBox.AppendText("`nHTML report generated at: $reportFilePath`n")
+
     }
-
-    try {
-        # Parse the SetupAPI log file for USB device information
-        $usbEntries = Select-String -Path $localLogPath -Pattern "USBSTOR" -Context 0,10
-
-        if ($usbEntries) {
-            $outputBox.AppendText("`nUSB Entries Found in SetupAPI log:`n")
-
-            $entryList = @()
-            foreach ($entry in $usbEntries) {
-                if ($entry.Line -match "(\d{2}:\d{2}:\d{2}\.\d{3})") {
-                    $timestamp = $matches[1]
-                    $formattedTimestamp = [DateTime]::ParseExact($timestamp, "HH:mm:ss.fff", $null).ToString("yyyy-MM-dd HH:mm:ss")
-                    $lineWithoutTimestamp = $entry.Line -replace "\s+\d{2}:\d{2}:\d{2}\.\d{3}$", ""
-                } else {
-                    $formattedTimestamp = "Unknown"
-                    $lineWithoutTimestamp = $entry.Line
-                }
-
-                $context = $entry.Context.PostContext
-                $status = "Unknown"
-                if ($context -match "Device install completed") {
-                    $status = "Currently Connected"
-                } elseif ($context -match "Device Removal") {
-                    $status = "Previously Connected"
-                }
-
-                $entryList += [PSCustomObject]@{
-                    DeviceID = $lineWithoutTimestamp
-                    Status = $status
-                    Timestamp = $formattedTimestamp
-                }
-            }
-
-            # Sort entries by Timestamp
-            $sortedEntries = $entryList | Sort-Object -Property Timestamp
-
-            $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            $htmlContent = @"
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .highlight { background-color: #ffff99; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #dddddd; padding: 8px; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
-    <h1>TREX - USB Device Report</h1>
-    <p>Computer Name: $remoteComputerName</p>
-    <p>Date and Time: $currentDateTime</p>
-    <p>Date and Time May be incorrect due to the data parsing from the setupapi.log file.</p>
-    <table>
-        <thead>
-            <tr>
-                <th>Device ID</th>
-                <th>Status</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody>
-"@
-
-            foreach ($entry in $sortedEntries) {
-                $highlight = if ($entry.DeviceID -match "USBSTOR") { "highlight" } else { "" }
-                $htmlContent += "<tr class='$highlight'><td>$($entry.DeviceID)</td><td>$($entry.Status)</td><td>$($entry.Timestamp)</td></tr>`r`n"
-            }
-
-            $htmlContent += @"
-        </tbody>
-    </table>
-</body>
-</html>
-"@
-
-            # Save the HTML report to the TREX folder
-            $reportFilePath = Join-Path $localFolderFullPath "USB Devices.html"
-            $htmlContent | Out-File -FilePath $reportFilePath -Encoding UTF8
-            $outputBox.AppendText("HTML report generated at: $reportFilePath`n")
-        } else {
-            $outputBox.AppendText("`nNo USB entries found in SetupAPI log.`n")
-        }
-    } catch {
-        $outputBox.AppendText("`nFailed to parse SetupAPI log. Error: $_`n")
+    catch {
+        $outputBox.AppendText("`nError processing USB data: $_`n")
     }
 }
-
-
-
-
 
 
 
@@ -2630,7 +2648,7 @@ function COMPUTERACCOUNTS {
     $openFileDialog.Title = "Select File"
     $openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
     $openFileDialog.Multiselect = $false
-    $OpenFileDialog.initialDirectory = "COMPUTER LIST DIRECTORY"
+    $OpenFileDialog.initialDirectory = "Y:\00 Powershell EXE\School Computer Lists"
 
 
     if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -3314,7 +3332,7 @@ $COMPUTERACCOUNTS.height = 24
 $COMPUTERACCOUNTS.location = New-Object System.Drawing.Point(430, 560) #Horizontal, Vertical
 $COMPUTERACCOUNTS.Font = 'Microsoft Sans Serif,8'
 $COMPUTERACCOUNTS.Add_Click( { COMPUTERACCOUNTS })
-#$Form.Controls.Add($COMPUTERACCOUNTS)
+$Form.Controls.Add($COMPUTERACCOUNTS)
 
 
 
