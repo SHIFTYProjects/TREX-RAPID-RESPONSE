@@ -130,78 +130,82 @@ function MACHINEREPORT {
   $outputBox.AppendText("Running All Machine Reports.......`n`n`n" + [Environment]::NewLine)
 
 
-  $outputBox.AppendText("`n`n`n Running Report 1 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 1 of 18.....`n`n`n " + [Environment]::NewLine)
  
   pcinfo
 
-  $outputBox.AppendText("`n`n`n Running Report 2 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 2 of 18.....`n`n`n " + [Environment]::NewLine)
 
   LOCALACCOUNTS
 
-  $outputBox.AppendText("`n`n`n Running Report 3 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 3 of 18.....`n`n`n " + [Environment]::NewLine)
 
   FIREWALLRULES
 
-  $outputBox.AppendText("`n`n`n Running Report 4 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 4 of 18.....`n`n`n " + [Environment]::NewLine)
 
   NETSTATCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 5 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 5 of 18.....`n`n`n " + [Environment]::NewLine)
 
   LogonReport
 
-  $outputBox.AppendText("`n`n`n Running Report 6 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 6 of 18.....`n`n`n " + [Environment]::NewLine)
 
   ANTIVIRUS
 
-  $outputBox.AppendText("`n`n`n Running Report 7 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 7 of 18.....`n`n`n " + [Environment]::NewLine)
 
   WEBHISTORY
 
-  $outputBox.AppendText("`n`n`n Running Report 8 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 8 of 18.....`n`n`n " + [Environment]::NewLine)
 
   CheckMaliciousScripts
 
-  $outputBox.AppendText("`n`n`n Running Report 9 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 9 of 18.....`n`n`n " + [Environment]::NewLine)
 
   SCHEDULEDTASKS
 
-  $outputBox.AppendText("`n`n`n Running Report 10 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 10 of 18.....`n`n`n " + [Environment]::NewLine)
 
   INSTALLEDSOFTWARE
 
-  $outputBox.AppendText("`n`n`n Running Report 11 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 11 of 18.....`n`n`n " + [Environment]::NewLine)
 
   WIFINETWORK
 
-  $outputBox.AppendText("`n`n`n Running Report 12 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 12 of 18.....`n`n`n " + [Environment]::NewLine)
 
   STARTUP
 
-  $outputBox.AppendText("`n`n`n Running Report 13 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 13 of 18.....`n`n`n " + [Environment]::NewLine)
 
   USBDEVICE
 
-  $outputBox.AppendText("`n`n`n Running Report 14 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 14 of 18.....`n`n`n " + [Environment]::NewLine)
 
   RUNNINGPROCESS
 
-  $outputBox.AppendText("`n`n`n Running Report 15 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 15 of 18.....`n`n`n " + [Environment]::NewLine)
 
   EVENTVIEWER
 
-  $outputBox.AppendText("`n`n`n Running Report 16 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 16 of 18.....`n`n`n " + [Environment]::NewLine)
 
   ImageThumbnails
   
   
-  $outputBox.AppendText("`n`n`n Running Report 17 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 17 of 18.....`n`n`n " + [Environment]::NewLine)
 
   Browserext
 
+   $outputBox.AppendText("`n`n`n Running Report 18 of 18.....`n`n`n " + [Environment]::NewLine)
+
+  UserDownloads
 
 
-  $outputBox.AppendText("`n`n`r Reports Completed." + [Environment]::NewLine)
+
+  $outputBox.AppendText("`r`n`n`r All Reports Completed." + [Environment]::NewLine)
 
 
   #get the computername
@@ -211,7 +215,7 @@ function MACHINEREPORT {
   $folderPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$ComputerName TREX REPORTS")
   
   #open the folder path
-  ii $folderPath
+  start $folderPath
 }
 
 ###############################################################################################################################################################################
@@ -1280,11 +1284,53 @@ function Copy-BrowserHistory {
   }
 }
 
+function UserDownloads {
+$outputBox.AppendText("`n`n`r Copying USER Downloads to local Desktop.... `r`n`n" + [Environment]::NewLine)
 
+    param (
+        [string]$destinationFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS", 'Downloads')
+    )
+    
+    # Define the remote PC's hostname or IP address
+    $remotePC = $script:globalComputerName
+    
+    # Get a list of user profiles on the remote PC
+    $userProfiles = Get-ChildItem "\\$remotePC\C$\Users" | Where-Object { $_.PSIsContainer }
+    
+    foreach ($profile in $userProfiles) {
+        $username = $profile.Name
+        $downloadsFolder = "\\$remotePC\C$\Users\$username\Downloads"
+        
+        if (Test-Path $downloadsFolder) {
+            $files = Get-ChildItem -Path $downloadsFolder | Select-Object Name, Length, LastWriteTime
+            
+            if ($files) {
+                # Create the destination folder if it doesn't exist
+                if (-not (Test-Path $destinationFolder -PathType Container)) {
+                    New-Item -ItemType Directory -Path $destinationFolder | Out-Null
+                }
+                
+                # Create HTML report
+                $htmlFilePath = [System.IO.Path]::Combine($destinationFolder, "Download_History_$username.html")
+                $htmlHeader = "<html><head><title>Downloads - $username</title></head><body>"
+                $htmlHeader += "<h2>Downloads for $username</h2><h3>Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</h3><table border='1'><tr><th>File Name</th><th>Size (KB)</th><th>Last Modified</th></tr>"
+                
+                $htmlBody = ""
+                foreach ($file in $files) {
+                    $sizeKB = [math]::Round($file.Length / 1KB, 2)
+                    $htmlBody += "<tr><td>$($file.Name)</td><td>$sizeKB</td><td>$($file.LastWriteTime)</td></tr>"
+                }
+                
+                $htmlFooter = "</table></body></html>"
+                
+                # Save the HTML report
+                ($htmlHeader + $htmlBody + $htmlFooter) | Out-File -FilePath $htmlFilePath -Encoding UTF8
+            }
+        }
+    }
+    $outputBox.AppendText("`n`n`r USER Download Report Completed........ `r`n`n" + [Environment]::NewLine)
 
-
-
-
+}
 
 
 
@@ -3278,6 +3324,17 @@ $Browserext.Font = 'Microsoft Sans Serif,8'
 $Browserext.Add_Click( { Browserext })
 $Form.Controls.Add($Browserext)
 
+#Enable Downloaded files Button
+$UserDownloads = New-Object system.Windows.Forms.Button
+$UserDownloads.Text = "User Downloads"  
+$UserDownloads.ForeColor = ""
+$UserDownloads.Backcolor = ""   
+$UserDownloads.width = 125
+$UserDownloads.height = 40
+$UserDownloads.location = New-Object System.Drawing.Point(660, 270) #Horizontal, Vertical
+$UserDownloads.Font = 'Microsoft Sans Serif,8'
+$UserDownloads.Add_Click( { UserDownloads })
+$Form.Controls.Add($UserDownloads)
 
 
 #Enable Remove Windows Pin/Biometrics Button
