@@ -34,7 +34,7 @@ $wshell = New-Object -comObject Wscript.Shell
 #######       FORM SIZE       #######
 
 $Form = New-Object system.Windows.Forms.Form
-$Form.ClientSize = '760,720' #Width,Height
+$Form.ClientSize = '850,700' #Width,Height
 $form.BackColor = ''
 $Form.text = "T-REX RAPID RESPONSE"
 $Form.FormBorderStyle = 'Fixed3D'
@@ -130,76 +130,82 @@ function MACHINEREPORT {
   $outputBox.AppendText("Running All Machine Reports............`n`n`n" + [Environment]::NewLine)
 
 
-  $outputBox.AppendText("`n`n`n Running Report 1 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 1 of 18.....`n`n`n " + [Environment]::NewLine)
  
   pcinfo
 
-  $outputBox.AppendText("`n`n`n Running Report 2 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 2 of 18.....`n`n`n " + [Environment]::NewLine)
 
   LOCALACCOUNTS
 
-  $outputBox.AppendText("`n`n`n Running Report 3 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 3 of 18.....`n`n`n " + [Environment]::NewLine)
 
   FIREWALLRULES
 
-  $outputBox.AppendText("`n`n`n Running Report 4 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 4 of 18.....`n`n`n " + [Environment]::NewLine)
 
   NETSTATCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 5 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 5 of 18.....`n`n`n " + [Environment]::NewLine)
 
   LogonReport
 
-  $outputBox.AppendText("`n`n`n Running Report 6 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 6 of 18.....`n`n`n " + [Environment]::NewLine)
 
   ANTIVIRUS
 
-  $outputBox.AppendText("`n`n`n Running Report 7 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 7 of 18.....`n`n`n " + [Environment]::NewLine)
 
   WEBHISTORY
 
-  $outputBox.AppendText("`n`n`n Running Report 8 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 8 of 18.....`n`n`n " + [Environment]::NewLine)
 
-  GPOStatus
-
-  $outputBox.AppendText("`n`n`n Running Report 9 of 17.....`n`n`n " + [Environment]::NewLine)
-
+  
   SCHEDULEDTASKS
 
-  $outputBox.AppendText("`n`n`n Running Report 10 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 9 of 18.....`n`n`n " + [Environment]::NewLine)
 
   INSTALLEDSOFTWARE
 
-  $outputBox.AppendText("`n`n`n Running Report 11 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 10 of 18.....`n`n`n " + [Environment]::NewLine)
 
   WIFINETWORK
 
-  $outputBox.AppendText("`n`n`n Running Report 12 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 11 of 18.....`n`n`n " + [Environment]::NewLine)
 
   STARTUP
 
-  $outputBox.AppendText("`n`n`n Running Report 13 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 12 of 18.....`n`n`n " + [Environment]::NewLine)
 
   USBDEVICE
 
-  $outputBox.AppendText("`n`n`n Running Report 14 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 13 of 18.....`n`n`n " + [Environment]::NewLine)
 
   RUNNINGPROCESS
 
-  $outputBox.AppendText("`n`n`n Running Report 15 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 14 of 18.....`n`n`n " + [Environment]::NewLine)
 
   RDPCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 16 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 15 of 18.....`n`n`n " + [Environment]::NewLine)
 
   EVENTVIEWER
 
-  $outputBox.AppendText("`n`n`n Running Report 17 of 17.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 16 of 18.....`n`n`n " + [Environment]::NewLine)
 
   ImageThumbnails
 
+  $outputBox.AppendText("`n`n`n Running Report 17 of 18.....`n`n`n " + [Environment]::NewLine)
+  
+  Browserext
 
-  $outputBox.AppendText("`n`n`r Reports Completed, and saved to a folder on the desktop." + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 18 of 18.....`n`n`n " + [Environment]::NewLine)
+
+  DOWNLOADHISTORY
+
+  
+
+  $outputBox.AppendText("`r`n`n`r Reports Completed, and saved to a folder on the desktop." + [Environment]::NewLine)
   
   
    #get the computername
@@ -2548,7 +2554,7 @@ II "$env:USERPROFILE\Desktop\IOC_Report.txt"
 
 function SQLVIEWER {
 
-#ii "SQLiteDatabaseBrowserPortable.exe is a great application to parse web history data.  Put the file location here and remove the comment for the button and you will have a shortcut from the application."
+ii "Location of your sql viewer"
 
 }
 
@@ -2705,6 +2711,115 @@ $outputBox.AppendText("`r`n`n`r Completed Gathering Images `r`n`r`n" + [Environm
 }
 
 
+
+#########################################################################################################################################################
+
+
+function Browserext {
+
+# Define variables
+$ComputerName = $env:COMPUTERNAME
+$CurrentDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$ReportTitle = "Extension Report"
+$OutputFolderPath = Join-Path -Path "$env:USERPROFILE\Desktop" -ChildPath "$ComputerName TREX REPORTS"
+$ReportFilePath = Join-Path -Path $OutputFolderPath -ChildPath "ChromeExtensionsReport.html"
+
+# Ensure the output folder exists
+if (!(Test-Path -Path $OutputFolderPath)) {
+    New-Item -ItemType Directory -Path $OutputFolderPath -Force | Out-Null
+}
+
+# Path to the Default profile's Extensions folder
+$ExtensionsPath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Extensions"
+
+# Initialize output box
+$outputBox.AppendText("`r`n`n`r Preparing to copy Event Viewer Files... `r`n`r`n" + [Environment]::NewLine)
+
+# Check if the folder exists
+if (Test-Path $ExtensionsPath) {
+    $outputBox.AppendText("`r`n Found Extensions Folder... Searching for Extensions `r`n" + [Environment]::NewLine)
+
+    # Recursively find manifest.json files
+    $manifestFiles = Get-ChildItem -Path $ExtensionsPath -Recurse -Filter "manifest.json"
+
+    if ($manifestFiles.Count -gt 0) {
+        # Collect extension details
+        $extensions = $manifestFiles | ForEach-Object {
+            try {
+                # Parse the manifest.json file
+                $manifest = Get-Content -Path $_.FullName -Raw | ConvertFrom-Json
+                [PSCustomObject]@{
+                    Name        = $manifest.name
+                    Version     = $manifest.version
+                    Description = $manifest.description
+                    ID          = $_.Directory.Name  # Use the immediate parent folder as the ID
+                }
+            } catch {
+                Write-Output "Error parsing manifest.json in $($_.FullName)"
+            }
+        }
+
+        # Generate HTML report
+        $htmlContent = @"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>$ReportTitle</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>$ReportTitle</h1>
+    <p><strong>Computer Name:</strong> $ComputerName</p>
+    <p><strong>Date/Time:</strong> $CurrentDate</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Description</th>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+"@
+
+        # Add extension details to the HTML report
+        foreach ($ext in $extensions) {
+            $htmlContent += @"
+            <tr>
+                <td>$($ext.Name)</td>
+                <td>$($ext.Version)</td>
+                <td>$($ext.Description)</td>
+                <td>$($ext.ID)</td>
+            </tr>
+"@
+        }
+
+        # Close HTML tags
+        $htmlContent += @"
+        </tbody>
+    </table>
+</body>
+</html>
+"@
+
+        # Save the HTML content to a file
+        $htmlContent | Out-File -FilePath $ReportFilePath -Encoding UTF8
+        $outputBox.AppendText("`r`n Report generated successfully: $ReportFilePath `r`n" + [Environment]::NewLine)
+    } else {
+        $outputBox.AppendText("`r`n No extensions found in the Extensions folder. `r`n" + [Environment]::NewLine)
+    }
+} else {
+    $outputBox.AppendText("`r`n Extensions folder not found at: $ExtensionsPath `r`n" + [Environment]::NewLine)
+}
+}
+
 ###############################################################################################################################################################################
 
 function fileinfo {
@@ -2816,10 +2931,109 @@ function fileinfo {
 
 
 
+
+
+
+###############################################################################################################################################################################
+function DOWNLOADHISTORY {
+    param (
+        [string]$destinationFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$env:COMPUTERNAME TREX REPORTS", 'Download History')
+    )
+    
+    # Get a list of user profiles on the local machine
+    $userProfiles = Get-ChildItem "C:\Users" | Where-Object { $_.PSIsContainer }
+    
+    foreach ($profile in $userProfiles) {
+        $username = $profile.Name
+        $downloadsFolder = "C:\Users\$username\Downloads"
+        
+        if (Test-Path $downloadsFolder) {
+            $files = Get-ChildItem -Path $downloadsFolder | Select-Object Name, Length, LastWriteTime
+            
+            if ($files) {
+                # Create the destination folder if it doesn't exist
+                if (-not (Test-Path $destinationFolder -PathType Container)) {
+                    New-Item -ItemType Directory -Path $destinationFolder | Out-Null
+                }
+                
+                # Create HTML report
+                $htmlFilePath = [System.IO.Path]::Combine($destinationFolder, "Download_History_$username.html")
+                $htmlHeader = "<html><head><title>Download History - $username</title></head><body>"
+                $htmlHeader += "<h2>Download History for $username</h2><h3>Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</h3><table border='1'><tr><th>File Name</th><th>Size (KB)</th><th>Last Modified</th></tr>"
+                
+                $htmlBody = ""
+                foreach ($file in $files) {
+                    $sizeKB = [math]::Round($file.Length / 1KB, 2)
+                    $htmlBody += "<tr><td>$($file.Name)</td><td>$sizeKB</td><td>$($file.LastWriteTime)</td></tr>"
+                }
+                
+                $htmlFooter = "</table></body></html>"
+                
+                # Save the HTML report
+                ($htmlHeader + $htmlBody + $htmlFooter) | Out-File -FilePath $htmlFilePath -Encoding UTF8
+            }
+        }
+    }
+}
+
+
+
 ###############################################################################################################################################################################
 
 
-###############################################################################################################################################################################
+
+
+
+function REMOVEPIN {
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "WARNING: This will remove the Windows PIN and Biometrics on this computer! `r`n`nThis action CANNOT be undone. Removing the PIN this way can cause errors when trying to set up a new PIN. Continue?`r`n`n(This will also RESTART the machine.)",
+        "Confirm Action", "YesNo", "Warning"
+    )
+
+    if ($confirm -eq "Yes") {
+        $OutputBox.AppendText("Removing PIN..." + [Environment]::NewLine)
+
+        try {
+            $cmds = @(
+                "cmd.exe /c takeown /F C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /R /D Y",
+                "cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /grant administrators:F /T",
+                "cmd.exe /c rmdir /s /q C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC",
+                "cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /reset /T /C /L",
+                "cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /setowner SYSTEM /T /C /L",
+                "cmd.exe /c secedit /configure /cfg %windir%\inf\defltbase.inf /db defltbase.sdb /verbose"
+            )
+
+            $OutputBox.AppendText("Removing BIOMETRICS..." + [Environment]::NewLine)
+
+            # Removing biometrics
+            $cmds += @(
+                "cmd.exe /c net stop WbioSrvc /y",
+                "cmd.exe /c takeown /F C:\Windows\System32\WinBioDatabase /R /D Y",
+                "cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /grant administrators:F /T",
+                "cmd.exe /c rmdir /s /q C:\Windows\System32\WinBioDatabase",
+                "cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /reset /T /C /L",
+                "cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /setowner SYSTEM /T /C /L",
+                "cmd.exe /c net start WbioSrvc"
+            )
+
+            foreach ($cmd in $cmds) {
+                Start-Process -NoNewWindow -Wait -FilePath "cmd.exe" -ArgumentList "/c $cmd"
+            }
+
+            $OutputBox.AppendText("Removal Attempt completed. Restarting system in 10 seconds..." + [Environment]::NewLine)
+            Start-Process -NoNewWindow -FilePath "shutdown.exe" -ArgumentList "/r /t 10 /f"
+
+        } catch {
+            $OutputBox.AppendText("Error executing commands: $_" + [Environment]::NewLine)
+        }
+    } else {
+        $OutputBox.AppendText("Operation cancelled." + [Environment]::NewLine)
+    }
+}
+
+
+
+
 ###############################################################################################################################################################################
 
 ###############################################################################################################################################################################
@@ -2849,7 +3063,7 @@ function VER {
 
 #Machine Report Button
 $MACHINEREPORT = New-Object system.Windows.Forms.Button
-$MACHINEREPORT.Text = "FULL PC REPORT"  
+$MACHINEREPORT.Text = "FULL MACHINE REPORT"  
 $MACHINEREPORT.ForeColor = "black"
 $MACHINEREPORT.Backcolor = "lightgreen"   
 $MACHINEREPORT.width = 165
@@ -2865,10 +3079,10 @@ $QUICKIOC = New-Object system.Windows.Forms.Button
 $QUICKIOC.Text = "Quick IOC Report"  
 $QUICKIOC.ForeColor = "black"
 $QUICKIOC.Backcolor = "red"   
-$QUICKIOC.width = 50
+$QUICKIOC.width = 55
 $QUICKIOC.height = 70
 $QUICKIOC.location = New-Object System.Drawing.Point(10, 200) #Horizontal, Vertical
-$QUICKIOC.Font = 'Microsoft Sans Serif,8'
+$QUICKIOC.Font = 'Microsoft Sans Serif,7'
 $QUICKIOC.Add_Click( { QUICKIOC })
 $Form.Controls.Add($QUICKIOC)
 
@@ -2877,12 +3091,14 @@ $SQLVIEWER = New-Object system.Windows.Forms.Button
 $SQLVIEWER.Text = "SQL VIEW"  
 $SQLVIEWER.ForeColor = "black"
 $SQLVIEWER.Backcolor = "white"   
-$SQLVIEWER.width = 50
+$SQLVIEWER.width = 55
 $SQLVIEWER.height = 50
 $SQLVIEWER.location = New-Object System.Drawing.Point(10, 280) #Horizontal, Vertical
 $SQLVIEWER.Font = 'Microsoft Sans Serif,8'
 $SQLVIEWER.Add_Click( { SQLVIEWER })
 #$Form.Controls.Add($SQLVIEWER)
+
+
 
 #PC INFO Button
 $PCINFO = New-Object system.Windows.Forms.Button
@@ -3123,26 +3339,66 @@ $Form.Controls.Add($EVENTVIEWER)
 
 #PC INFO Button
 $ImageThumbnails = New-Object system.Windows.Forms.Button
-$ImageThumbnails.Text = "PC Images"  
+$ImageThumbnails.Text = "PC IMAGES"  
 $ImageThumbnails.ForeColor = "black"
 $ImageThumbnails.Backcolor = "whitesmoke"   
-$ImageThumbnails.width = 70
-$ImageThumbnails.height = 50
-$ImageThumbnails.location = New-Object System.Drawing.Point(570, 650) #Horizontal, Vertical
+$ImageThumbnails.width = 165
+$ImageThumbnails.height = 24
+$ImageThumbnails.location = New-Object System.Drawing.Point(660, 240) #Horizontal, Vertical
 $ImageThumbnails.Font = 'Microsoft Sans Serif,9'
 $ImageThumbnails.Add_Click( { ImageThumbnails })
 $Form.Controls.Add($ImageThumbnails)
 
+
+#Browser Extension Button
+$Browserext = New-Object system.Windows.Forms.Button
+$Browserext.Text = "EXTENSIONS"  
+$Browserext.ForeColor = "black"
+$Browserext.Backcolor = "whitesmoke"   
+$Browserext.width = 165
+$Browserext.height = 24
+$Browserext.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
+$Browserext.Font = 'Microsoft Sans Serif,9'
+$Browserext.Add_Click( { Browserext })
+$Form.Controls.Add($Browserext)
+
+#Browser Extension Button
+$DOWNLOADHISTORY = New-Object system.Windows.Forms.Button
+$DOWNLOADHISTORY.Text = "USER DOWNLOADS"  
+$DOWNLOADHISTORY.ForeColor = "black"
+$DOWNLOADHISTORY.Backcolor = "whitesmoke"   
+$DOWNLOADHISTORY.width = 165
+$DOWNLOADHISTORY.height = 24
+$DOWNLOADHISTORY.location = New-Object System.Drawing.Point(660, 320) #Horizontal, Vertical
+$DOWNLOADHISTORY.Font = 'Microsoft Sans Serif,9'
+$DOWNLOADHISTORY.Add_Click( { DOWNLOADHISTORY })
+$Form.Controls.Add($DOWNLOADHISTORY)
+
+
+#Browser Extension Button
+$REMOVEPIN = New-Object system.Windows.Forms.Button
+$REMOVEPIN.Text = "RESET WINDOWS PIN"  
+$REMOVEPIN.ForeColor = "black"
+$REMOVEPIN.Backcolor = "whitesmoke"   
+$REMOVEPIN.width = 165
+$REMOVEPIN.height = 24
+$REMOVEPIN.location = New-Object System.Drawing.Point(660, 400) #Horizontal, Vertical
+$REMOVEPIN.Font = 'Microsoft Sans Serif,7'
+$REMOVEPIN.Add_Click( { REMOVEPIN })
+$Form.Controls.Add($REMOVEPIN)
+
+
+
 #PC INFO Button
-#$FileInfo = New-Object system.Windows.Forms.Button
-#$FileInfo.Text = "File Info"  
-#$FileInfo.ForeColor = "black"
-#$FileInfo.Backcolor = "whitesmoke"   
-#$FileInfo.width = 165
-#$FileInfo.height = 24
-#$FileInfo.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
-#$FileInfo.Font = 'Microsoft Sans Serif,9'
-#$FileInfo.Add_Click( { FileInfo })
+$FileInfo = New-Object system.Windows.Forms.Button
+$FileInfo.Text = "File Info"  
+$FileInfo.ForeColor = "black"
+$FileInfo.Backcolor = "whitesmoke"   
+$FileInfo.width = 165
+$FileInfo.height = 24
+$FileInfo.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
+$FileInfo.Font = 'Microsoft Sans Serif,9'
+$FileInfo.Add_Click( { FileInfo })
 #$Form.Controls.Add($FileInfo)
 
 
@@ -3238,7 +3494,7 @@ $VER.ForeColor = "black"
 $VER.Backcolor = "whitesmoke"   
 $VER.width = 50
 $VER.height = 24
-$VER.location = New-Object System.Drawing.Point(650, 670) #Horizontal, Vertical
+$VER.location = New-Object System.Drawing.Point(630, 670) #Horizontal, Vertical
 $VER.Font = 'Microsoft Sans Serif,9'
 $VER.Add_Click( { VER })
 $Form.Controls.Add($VER)
@@ -3318,4 +3574,6 @@ $outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX RAPID RESPONSE: `r`n`r`
 
 
 [void]$Form.ShowDialog()
+
+
 
