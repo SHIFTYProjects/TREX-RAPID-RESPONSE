@@ -8,11 +8,9 @@ There are a bunch of tools from systeminternals that do an excellent job of prov
 
 I wanted it portable and be able to be ran both locally and remotely.  After all scripts are ran, I wanted to be able to disable the machine from the network.
 
-This does it all.  Starting with the Local Version upload.  Update 02/12/2024 This is now fully functioning.
 
-Remote Version Uploaded 02/12/2024.  
 
-Remote Version Updated 03/11/2025. - For remote functions that require a domain name, the domain name is now retreived from the computer you are currently using so no changing of the file is needed.
+
 
 Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.
 
