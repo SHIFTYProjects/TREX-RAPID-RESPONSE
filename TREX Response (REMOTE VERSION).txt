@@ -1312,8 +1312,8 @@ $outputBox.AppendText("`n`n`r Copying USER Downloads to local Desktop.... `r`n`n
                 
                 # Create HTML report
                 $htmlFilePath = [System.IO.Path]::Combine($destinationFolder, "Download_History_$username.html")
-                $htmlHeader = "<html><head><title>Downloads - $username</title></head><body>"
-                $htmlHeader += "<h2>Downloads for $username</h2><h3>Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</h3><table border='1'><tr><th>File Name</th><th>Size (KB)</th><th>Last Modified</th></tr>"
+                $htmlHeader = "<html><head><title>USER Downloads - $username on $remotePC</title></head><body>"
+                $htmlHeader += "<h2>Downloads for $username on $remotePC</h2><h3>Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</h3><table border='1'><tr><th>File Name</th><th>Size (KB)</th><th>Last Modified</th></tr>"
                 
                 $htmlBody = ""
                 foreach ($file in $files) {
@@ -3498,11 +3498,11 @@ $SQLVIEWER.height = 35
 $SQLVIEWER.location = New-Object System.Drawing.Point(250, 750) #Horizontal, Vertical
 $SQLVIEWER.Font = 'Microsoft Sans Serif,8'
 $SQLVIEWER.Add_Click( { SQLVIEWER })
-$Form.Controls.Add($SQLVIEWER)
+#$Form.Controls.Add($SQLVIEWER)
 
 function SQLVIEWER {
 
-  ii "Y:\00 Powershell EXE\Misc Powershell EXE\SQLiteDatabaseBrowserPortable\SQLiteDatabaseBrowserPortable.exe"
+  ii "LocationOfSQLViewer"
 
 }
 
