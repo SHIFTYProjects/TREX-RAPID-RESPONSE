@@ -2854,9 +2854,14 @@ function ImageThumbnails {
     New-Item -Path $trexFolder -ItemType Directory | Out-Null
   }
 
-  Write-Output "Gathering user images in Downloads, Pictures folders, and Recycle Bin on $remoteComputerName"
+  # Define the Images subfolder inside TREX folder
+  $imagesFolder = Join-Path -Path $trexFolder -ChildPath "Images"
 
-  # Function to generate HTML for images in a directory
+  # Create the Images subfolder if it doesn't exist
+  if (-not (Test-Path $imagesFolder)) {
+    New-Item -Path $imagesFolder -ItemType Directory | Out-Null
+  }
+
   function Generate-ImageHTML {
     param (
       [string]$directoryPath,
@@ -2889,31 +2894,26 @@ function ImageThumbnails {
     return $htmlSectionContent
   }
 
-  # Function to get Recycle Bin path
   function Get-RecycleBinPath {
-    $recycleBinPath = "$networkPath\Recycler" # This might vary, adjust as needed
+    $recycleBinPath = "$networkPath\Recycler"
     return $recycleBinPath
   }
 
-  # Iterate through each user profile
   $userProfiles = Get-ChildItem -Path "$networkPath\Users" -Directory | Where-Object { $_.Name -ne "Default" -and $_.Name -ne "Public" }
   foreach ($userProfile in $userProfiles) {
     $username = $userProfile.Name
 
     $outputBox.AppendText("Generating User Image Report for $username... `r`n" + [Environment]::NewLine)
 
-    # Get the paths to the user's Pictures and Downloads folders
     $picturesDirectory = Join-Path -Path $networkPath -ChildPath "Users\$username\Pictures"
     $downloadsDirectory = Join-Path -Path $networkPath -ChildPath "Users\$username\Downloads"
 
-    # Set the filename for the HTML file
+    # Set the filename for the HTML file in the Images folder
     $outputFileName = "$username IMAGE THUMBNAILS.html"
-    $outputFile = Join-Path -Path $trexFolder -ChildPath $outputFileName
+    $outputFile = Join-Path -Path $imagesFolder -ChildPath $outputFileName
 
-    # Get the current date and time
     $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Initialize HTML content
     $htmlContent = @"
 <!DOCTYPE html>
 <html lang="en">
@@ -2941,30 +2941,24 @@ function ImageThumbnails {
 <p>Generated on: $currentDateTime</p>
 "@
 
-    # Generate HTML for Pictures and Downloads folders
     $htmlContent += Generate-ImageHTML -directoryPath $picturesDirectory -sectionTitle "Pictures Folder"
     $htmlContent += Generate-ImageHTML -directoryPath $downloadsDirectory -sectionTitle "Downloads Folder"
 
-    # Add Recycle Bin to the report
     $recycleBinPath = Get-RecycleBinPath
-    $htmlContent += Generate-ImageHTML -directoryPath $recycleBinPath -sectionTitle #"Recycle Bin"
+    $htmlContent += Generate-ImageHTML -directoryPath $recycleBinPath -sectionTitle "Recycle Bin"
 
-    # Close HTML content
     $htmlContent += @"
 </div>
 </body>
 </html>
 "@
 
-    # Save HTML content to output file in TREX folder
     $htmlContent | Out-File -FilePath $outputFile -Encoding UTF8
 
-    # Output file location
     Write-Output "HTML file generated for $($userProfile.Name): $outputFile"
   }
 
   $outputBox.AppendText("`r`n`n`r Completed gathering images on $remoteComputerName `r`n`r`n" + [Environment]::NewLine)
-   
 }
 
 
