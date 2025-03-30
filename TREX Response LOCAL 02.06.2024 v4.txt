@@ -2079,11 +2079,19 @@ $computerName = $env:COMPUTERNAME
 </html>
 "@
 
+
         # Save report
         $reportFilePath = Join-Path $localFolderFullPath "USB Devices.html"
         $htmlContent | Out-File -FilePath $reportFilePath -Encoding UTF8
         $outputBox.AppendText("`nHTML report generated at: $reportFilePath`n")
 
+
+# Copy the SetupAPI log from the remote machine
+    $remoteLogPath = "C:\Windows\INF\setupapi.dev.log"
+    $localLogPath = Join-Path $regSubfolder "setupapi.dev.log"
+    Copy-Item -Path $remoteLogPath -Destination $regSubfolder -Force
+
+    Start-Sleep -Seconds 5  # Wait to ensure the file is copied
     }
     catch {
         $outputBox.AppendText("`nError processing USB data: $_`n")
