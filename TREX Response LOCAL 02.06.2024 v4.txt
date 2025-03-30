@@ -578,6 +578,7 @@ function WHOIS{
 
       $ipLabel = New-Object System.Windows.Forms.Label
       $ipLabel.Location = New-Object System.Drawing.Point(20, 20)
+      $ipLabel.Size = New-Object System.Drawing.Size(300, 20)
       $ipLabel.Text = "Enter IP Address or URL:"
 
       $ipTextBox = New-Object System.Windows.Forms.TextBox
@@ -1961,100 +1962,134 @@ function RDPCONNECTIONS {
 
 function USBDEVICE {
 
-  $outputBox.AppendText("`n`n`r Getting USB Drive Report....`n`n`n`n" + [Environment]::NewLine)
+$computerName = $env:COMPUTERNAME
 
     param (
-        [string]$FolderPath = "$env:USERPROFILE\Desktop"
+        [string]$localFolderPath = "$env:USERPROFILE\Desktop"
     )
 
-    # Get computer hostname
-    $hostname = $env:COMPUTERNAME
+    $outputBox.AppendText("`n`n`r Getting USB Drive Report from Local Machine....`r`n`n" + [Environment]::NewLine)
 
-    # Specify the folder name
-    $folderName = "$hostname TREX REPORTS"
+    # Folder configuration
+    $folderName = "$computerName TREX REPORTS"
+    $localFolderFullPath = Join-Path $localFolderPath $folderName
+    $regSubfolder = Join-Path $localFolderFullPath "RegistryExports"
 
-    # Create a folder on the desktop
-    $folderPath = [System.IO.Path]::Combine($FolderPath, $folderName)
-    New-Item -ItemType Directory -Path $folderPath -ErrorAction SilentlyContinue
-
-    # Get current date and time
-    $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-
-    # Run the command to get USB storage information
-    $usbInfo = Get-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Enum\USBSTOR\*\* | Select FriendlyName, Service
-
-    # Get information about each USB storage device
-    $allDevices = foreach ($device in $usbInfo) {
-        [PSCustomObject]@{
-            FriendlyName = $device.FriendlyName
-            Service = $device.Service
-            IsConnectedDisk = $false
-        }
+    # Create output directories
+    if (-not (Test-Path -Path $localFolderFullPath -PathType Container)) {
+        New-Item -Path $localFolderFullPath -ItemType Directory | Out-Null
+    }
+    if (-not (Test-Path -Path $regSubfolder -PathType Container)) {
+        New-Item -Path $regSubfolder -ItemType Directory | Out-Null
     }
 
-    # Get information about currently connected USB storage devices with service "Disk"
-    $connectedDiskDevices = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' -and $_.Service -eq 'Disk' } | ForEach-Object {
-        [PSCustomObject]@{
-            FriendlyName = $_.FriendlyName
-            Service = $_.Service
-            IsConnectedDisk = $true
-        }
-    }
+    try {
+        # Get currently connected USB devices with detailed information
+        $pnpDevices = Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' } |
+            Select-Object Status, Class, FriendlyName, Description, Manufacturer, InstanceId
 
-    # Convert the information to HTML format
-    $htmlContent = @"
+        $wmiDevices = Get-WmiObject Win32_PnPEntity | Where-Object { $_.PNPClass -eq "USB" } |
+            Select-Object Name, Description, Manufacturer, PNPClass, Status
+
+        # Combine and deduplicate the results
+        $combinedDevices = @()
+        foreach ($device in $pnpDevices) {
+            $wmiDevice = $wmiDevices | Where-Object { $_.Name -eq $device.FriendlyName }
+            if ($wmiDevice) {
+                $combinedDevices += [PSCustomObject]@{
+                    FriendlyName = $device.FriendlyName
+                    Description = $wmiDevice.Description
+                    Manufacturer = $wmiDevice.Manufacturer
+                    Class = $device.Class
+                    Status = $device.Status
+                    InstanceId = $device.InstanceId
+                }
+            } else {
+                $combinedDevices += $device
+            }
+        }
+
+        # Get historical USB devices from registry
+        $historicalDevices = Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Enum\USB" -Recurse |
+            Get-ItemProperty |
+            Where-Object { $_.FriendlyName } |
+            Select-Object FriendlyName, @{Name="InstanceId"; Expression={$_.PSParentPath -replace ".*\\USB\\",""}}
+
+        # Generate HTML report
+        $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $htmlContent = @"
 <html>
 <head>
-    <title>USB Storage Information</title>
     <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        .connected-disk {
-            background-color: lightgreen;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h2 { color: #2c3e50; margin-top: 30px; }
+        .note { color: #666; font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <h2>Host: $hostname</h2>
-    <h2>Date and Time: $currentDateTime</h2>
-    
-    <h3>All USB Drives</h3>
-    <table>
-        <tr><th>Friendly Name</th><th>Service</th></tr>
-        $($allDevices | ForEach-Object {
-            $highlightClass = if ($_.IsConnectedDisk) { 'connected-disk' } else { '' }
-            "<tr class='$highlightClass'><td>$($_.FriendlyName)</td><td>$($_.Service)</td></tr>"
-        })
-    </table>
+    <h1>TREX - USB Device Report</h1>
+    <p><strong>Computer Name:</strong> $env:COMPUTERNAME</p>
+    <p><strong>Report Generated:</strong> $currentDateTime</p>
 
-    <h3>Currently Connected USB Drives (Service: Disk)</h3>
-    <table>
-        <tr><th>Friendly Name</th><th>Service</th></tr>
-        $($connectedDiskDevices | ForEach-Object { "<tr class='connected-disk'><td>$($_.FriendlyName)</td><td>$($_.Service)</td></tr>" })
-    </table>
+    <h2>Currently Connected USB Devices</h2>
+    $(if ($combinedDevices) {
+        @"
+        <table>
+            <tr>
+                <th>Friendly Name</th>
+                <th>Description</th>
+                <th>Manufacturer</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Instance ID</th>
+            </tr>
+            $(foreach ($device in $combinedDevices) {
+                "<tr>
+                    <td>$($device.FriendlyName)</td>
+                    <td>$($device.Description)</td>
+                    <td>$($device.Manufacturer)</td>
+                    <td>$($device.Class)</td>
+                    <td>$($device.Status)</td>
+                    <td>$($device.InstanceId)</td>
+                </tr>"
+            })
+        </table>
+"@
+    } else {
+        "<p class='note'>No currently connected USB devices found.</p>"
+    })
+
+    <h2>Previously Connected USB Devices</h2>
+    $(if ($historicalDevices) {
+        @"
+        <table>
+            <tr><th>Friendly Name</th><th>Instance ID</th></tr>
+            $(foreach ($device in $historicalDevices) {
+                "<tr><td>$($device.FriendlyName)</td><td>$($device.InstanceId)</td></tr>"
+            })
+        </table>
+"@
+    } else {
+        "<p class='note'>No historical USB devices found.</p>"
+    })
 </body>
 </html>
 "@
 
-    # Specify the path for the HTML file inside the folder
-    $htmlFilePath = [System.IO.Path]::Combine($folderPath, 'USBStorageInfo.html')
+        # Save report
+        $reportFilePath = Join-Path $localFolderFullPath "USB Devices.html"
+        $htmlContent | Out-File -FilePath $reportFilePath -Encoding UTF8
+        $outputBox.AppendText("`nHTML report generated at: $reportFilePath`n")
 
-    # Save the HTML content to the file
-    $htmlContent | Out-File -FilePath $htmlFilePath
-
-    # Open the HTML file with the default web browser
-   # ii $htmlFilePath
-
-    # Display a message indicating the file has been created and opened
-    $outputBox.AppendText("`n`n`r HTML file created and opened successfully at: $htmlFilePath`n`n`r" + [Environment]::NewLine)
+    }
+    catch {
+        $outputBox.AppendText("`nError processing USB data: $_`n")
+    }
 }
+
 
 
 
@@ -3063,7 +3098,7 @@ function VER {
 
 #Machine Report Button
 $MACHINEREPORT = New-Object system.Windows.Forms.Button
-$MACHINEREPORT.Text = "FULL MACHINE REPORT"  
+$MACHINEREPORT.Text = "FULL REPORT"  
 $MACHINEREPORT.ForeColor = "black"
 $MACHINEREPORT.Backcolor = "lightgreen"   
 $MACHINEREPORT.width = 165
@@ -3094,7 +3129,7 @@ $SQLVIEWER.Backcolor = "white"
 $SQLVIEWER.width = 55
 $SQLVIEWER.height = 50
 $SQLVIEWER.location = New-Object System.Drawing.Point(10, 280) #Horizontal, Vertical
-$SQLVIEWER.Font = 'Microsoft Sans Serif,8'
+$SQLVIEWER.Font = 'Microsoft Sans Serif,7'
 $SQLVIEWER.Add_Click( { SQLVIEWER })
 #$Form.Controls.Add($SQLVIEWER)
 
@@ -3108,7 +3143,7 @@ $PCINFO.Backcolor = "whitesmoke"
 $PCINFO.width = 165
 $PCINFO.height = 24
 $PCINFO.location = New-Object System.Drawing.Point(70, 240) #Horizontal, Vertical
-$PCINFO.Font = 'Microsoft Sans Serif,9'
+$PCINFO.Font = 'Microsoft Sans Serif,7'
 $PCINFO.Add_Click( { PCINFO })
 $Form.Controls.Add($PCINFO)
 
@@ -3120,7 +3155,7 @@ $LOCALACCOUNTS.Backcolor = "whitesmoke"
 $LOCALACCOUNTS.width = 165
 $LOCALACCOUNTS.height = 24
 $LOCALACCOUNTS.location = New-Object System.Drawing.Point(70, 280) #Horizontal, Vertical
-$LOCALACCOUNTS.Font = 'Microsoft Sans Serif,9'
+$LOCALACCOUNTS.Font = 'Microsoft Sans Serif,7'
 $LOCALACCOUNTS.Add_Click( { LOCALACCOUNTS })
 $Form.Controls.Add($LOCALACCOUNTS)
 
@@ -3133,7 +3168,7 @@ $FIREWALLRULES.Backcolor = "whitesmoke"
 $FIREWALLRULES.width = 165
 $FIREWALLRULES.height = 24
 $FIREWALLRULES.location = New-Object System.Drawing.Point(70, 320) #Horizontal, Vertical
-$FIREWALLRULES.Font = 'Microsoft Sans Serif,9'
+$FIREWALLRULES.Font = 'Microsoft Sans Serif,7'
 $FIREWALLRULES.Add_Click( { FIREWALLRULES })
 $Form.Controls.Add($FIREWALLRULES)
 
@@ -3145,7 +3180,7 @@ $NETSTATCONNECTIONS.Backcolor = "whitesmoke"
 $NETSTATCONNECTIONS.width = 165
 $NETSTATCONNECTIONS.height = 24
 $NETSTATCONNECTIONS.location = New-Object System.Drawing.Point(70, 360) #Horizontal, Vertical
-$NETSTATCONNECTIONS.Font = 'Microsoft Sans Serif,8'
+$NETSTATCONNECTIONS.Font = 'Microsoft Sans Serif,7'
 $NETSTATCONNECTIONS.Add_Click( { NETSTATCONNECTIONS })
 $Form.Controls.Add($NETSTATCONNECTIONS)
 
@@ -3157,7 +3192,7 @@ $LogonReport.Backcolor = "whitesmoke"
 $LogonReport.width = 165
 $LogonReport.height = 24
 $LogonReport.location = New-Object System.Drawing.Point(70, 400) #Horizontal, Vertical
-$LogonReport.Font = 'Microsoft Sans Serif,8'
+$LogonReport.Font = 'Microsoft Sans Serif,7'
 $LogonReport.Add_Click( { LogonReport })
 $Form.Controls.Add($LogonReport)
 
@@ -3170,7 +3205,7 @@ $ANTIVIRUS.Backcolor = "whitesmoke"
 $ANTIVIRUS.width = 165
 $ANTIVIRUS.height = 24
 $ANTIVIRUS.location = New-Object System.Drawing.Point(70, 440) #Horizontal, Vertical
-$ANTIVIRUS.Font = 'Microsoft Sans Serif,8'
+$ANTIVIRUS.Font = 'Microsoft Sans Serif,7'
 $ANTIVIRUS.Add_Click( { ANTIVIRUS })
 $Form.Controls.Add($ANTIVIRUS)
 
@@ -3183,19 +3218,19 @@ $WEBHISTORY.Backcolor = "whitesmoke"
 $WEBHISTORY.width = 165
 $WEBHISTORY.height = 24
 $WEBHISTORY.location = New-Object System.Drawing.Point(70, 480) #Horizontal, Vertical
-$WEBHISTORY.Font = 'Microsoft Sans Serif,8'
+$WEBHISTORY.Font = 'Microsoft Sans Serif,7'
 $WEBHISTORY.Add_Click( { WEBHISTORY })
 $Form.Controls.Add($WEBHISTORY)
 
 #GPRESULT Button
 $GPOStatus = New-Object system.Windows.Forms.Button
-$GPOStatus.Text = "GROUP POLICY CHECK"  
+$GPOStatus.Text = "GROUP POLICY"  
 $GPOStatus.ForeColor = "black"
 $GPOStatus.Backcolor = "whitesmoke"   
 $GPOStatus.width = 165
 $GPOStatus.height = 24
 $GPOStatus.location = New-Object System.Drawing.Point(70, 520) #Horizontal, Vertical
-$GPOStatus.Font = 'Microsoft Sans Serif,8'
+$GPOStatus.Font = 'Microsoft Sans Serif,7'
 $GPOStatus.Add_Click( { GPOStatus })
 $Form.Controls.Add($GPOStatus)
 
@@ -3208,7 +3243,7 @@ $SCHEDULEDTASKS.Backcolor = "whitesmoke"
 $SCHEDULEDTASKS.width = 165
 $SCHEDULEDTASKS.height = 24
 $SCHEDULEDTASKS.location = New-Object System.Drawing.Point(70, 560) #Horizontal, Vertical
-$SCHEDULEDTASKS.Font = 'Microsoft Sans Serif,8'
+$SCHEDULEDTASKS.Font = 'Microsoft Sans Serif,7'
 $SCHEDULEDTASKS.Add_Click( { SCHEDULEDTASKS })
 $Form.Controls.Add($SCHEDULEDTASKS)
 
@@ -3221,7 +3256,7 @@ $INSTALLEDSOFTWARE.Backcolor = "whitesmoke"
 $INSTALLEDSOFTWARE.width = 165
 $INSTALLEDSOFTWARE.height = 24
 $INSTALLEDSOFTWARE.location = New-Object System.Drawing.Point(70, 600) #Horizontal, Vertical
-$INSTALLEDSOFTWARE.Font = 'Microsoft Sans Serif,8'
+$INSTALLEDSOFTWARE.Font = 'Microsoft Sans Serif,7'
 $INSTALLEDSOFTWARE.Add_Click( { INSTALLEDSOFTWARE })
 $Form.Controls.Add($INSTALLEDSOFTWARE)
 
@@ -3233,7 +3268,7 @@ $USBDEVICE.Backcolor = "whitesmoke"
 $USBDEVICE.width = 165
 $USBDEVICE.height = 24
 $USBDEVICE.location = New-Object System.Drawing.Point(250, 600) #Horizontal, Vertical
-$USBDEVICE.Font = 'Microsoft Sans Serif,8'
+$USBDEVICE.Font = 'Microsoft Sans Serif,7'
 $USBDEVICE.Add_Click( { USBDEVICE })
 $Form.Controls.Add($USBDEVICE)
 
@@ -3246,7 +3281,7 @@ $STARTUP.Backcolor = "whitesmoke"
 $STARTUP.width = 165
 $STARTUP.height = 24
 $STARTUP.location = New-Object System.Drawing.Point(250, 560) #Horizontal, Vertical
-$STARTUP.Font = 'Microsoft Sans Serif,8'
+$STARTUP.Font = 'Microsoft Sans Serif,7'
 $STARTUP.Add_Click( { STARTUP })
 $Form.Controls.Add($STARTUP)
 
@@ -3258,7 +3293,7 @@ $RDPCONNECTIONS.Backcolor = "whitesmoke"
 $RDPCONNECTIONS.width = 165
 $RDPCONNECTIONS.height = 24
 $RDPCONNECTIONS.location = New-Object System.Drawing.Point(430, 560) #Horizontal, Vertical
-$RDPCONNECTIONS.Font = 'Microsoft Sans Serif,8'
+$RDPCONNECTIONS.Font = 'Microsoft Sans Serif,7'
 $RDPCONNECTIONS.Add_Click( { RDPCONNECTIONS })
 $Form.Controls.Add($RDPCONNECTIONS)
 
@@ -3271,7 +3306,7 @@ $DISABLENETWORK.Backcolor = "RED"
 $DISABLENETWORK.width = 165
 $DISABLENETWORK.height = 24
 $DISABLENETWORK.location = New-Object System.Drawing.Point(430, 600) #Horizontal, Vertical
-$DISABLENETWORK.Font = 'Microsoft Sans Serif,8'
+$DISABLENETWORK.Font = 'Microsoft Sans Serif,7'
 $DISABLENETWORK.Add_Click( { DISABLENETWORK })
 $Form.Controls.Add($DISABLENETWORK)
 
@@ -3281,10 +3316,10 @@ $ENABLENETWORK = New-Object system.Windows.Forms.Button
 $ENABLENETWORK.Text = "ENABLE NETWORK"  
 $ENABLENETWORK.ForeColor = "black"
 $ENABLENETWORK.Backcolor = "LimeGreen"   
-$ENABLENETWORK.width = 70
+$ENABLENETWORK.width = 90
 $ENABLENETWORK.height = 40
 $ENABLENETWORK.location = New-Object System.Drawing.Point(610, 595) #Horizontal, Vertical
-$ENABLENETWORK.Font = 'Microsoft Sans Serif,8'
+$ENABLENETWORK.Font = 'Microsoft Sans Serif,7'
 $ENABLENETWORK.Add_Click( { ENABLENETWORK })
 $Form.Controls.Add($ENABLENETWORK)
 
@@ -3297,7 +3332,7 @@ $WIFINETWORK.Backcolor = "whitesmoke"
 $WIFINETWORK.width = 165
 $WIFINETWORK.height = 24
 $WIFINETWORK.location = New-Object System.Drawing.Point(250, 520) #Horizontal, Vertical
-$WIFINETWORK.Font = 'Microsoft Sans Serif,8'
+$WIFINETWORK.Font = 'Microsoft Sans Serif,7'
 $WIFINETWORK.Add_Click( { WIFINETWORK })
 $Form.Controls.Add($WIFINETWORK)
 
@@ -3311,7 +3346,7 @@ $RUNNINGPROCESS.Backcolor = "whitesmoke"
 $RUNNINGPROCESS.width = 165
 $RUNNINGPROCESS.height = 24
 $RUNNINGPROCESS.location = New-Object System.Drawing.Point(430, 520) #Horizontal, Vertical
-$RUNNINGPROCESS.Font = 'Microsoft Sans Serif,8'
+$RUNNINGPROCESS.Font = 'Microsoft Sans Serif,7'
 $RUNNINGPROCESS.Add_Click( { RUNNINGPROCESS })
 $Form.Controls.Add($RUNNINGPROCESS)
 
@@ -3324,7 +3359,7 @@ $EVENTVIEWER.Backcolor = "white"
 $EVENTVIEWER.width = 70
 $EVENTVIEWER.height = 50
 $EVENTVIEWER.location = New-Object System.Drawing.Point(490, 650) #Horizontal, Vertical
-$EVENTVIEWER.Font = 'Microsoft Sans Serif,8'
+$EVENTVIEWER.Font = 'Microsoft Sans Serif,7'
 $EVENTVIEWER.Add_Click( { EVENTVIEWER })
 $Form.Controls.Add($EVENTVIEWER)
 
@@ -3345,7 +3380,7 @@ $ImageThumbnails.Backcolor = "whitesmoke"
 $ImageThumbnails.width = 165
 $ImageThumbnails.height = 24
 $ImageThumbnails.location = New-Object System.Drawing.Point(660, 240) #Horizontal, Vertical
-$ImageThumbnails.Font = 'Microsoft Sans Serif,9'
+$ImageThumbnails.Font = 'Microsoft Sans Serif,7'
 $ImageThumbnails.Add_Click( { ImageThumbnails })
 $Form.Controls.Add($ImageThumbnails)
 
@@ -3358,7 +3393,7 @@ $Browserext.Backcolor = "whitesmoke"
 $Browserext.width = 165
 $Browserext.height = 24
 $Browserext.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
-$Browserext.Font = 'Microsoft Sans Serif,9'
+$Browserext.Font = 'Microsoft Sans Serif,7'
 $Browserext.Add_Click( { Browserext })
 $Form.Controls.Add($Browserext)
 
@@ -3370,7 +3405,7 @@ $DOWNLOADHISTORY.Backcolor = "whitesmoke"
 $DOWNLOADHISTORY.width = 165
 $DOWNLOADHISTORY.height = 24
 $DOWNLOADHISTORY.location = New-Object System.Drawing.Point(660, 320) #Horizontal, Vertical
-$DOWNLOADHISTORY.Font = 'Microsoft Sans Serif,9'
+$DOWNLOADHISTORY.Font = 'Microsoft Sans Serif,7'
 $DOWNLOADHISTORY.Add_Click( { DOWNLOADHISTORY })
 $Form.Controls.Add($DOWNLOADHISTORY)
 
@@ -3397,7 +3432,7 @@ $FileInfo.Backcolor = "whitesmoke"
 $FileInfo.width = 165
 $FileInfo.height = 24
 $FileInfo.location = New-Object System.Drawing.Point(660, 280) #Horizontal, Vertical
-$FileInfo.Font = 'Microsoft Sans Serif,9'
+$FileInfo.Font = 'Microsoft Sans Serif,7'
 $FileInfo.Add_Click( { FileInfo })
 #$Form.Controls.Add($FileInfo)
 
@@ -3418,7 +3453,7 @@ $MACINFO.BackColor = "lightblue"
 $MACINFO.width = 110
 $MACINFO.height = 24
 $MACINFO.location = New-Object System.Drawing.Point(10, 650) #horizontal, vertical
-$MACINFO.Font = 'Microsoft Sans Serif,10'
+$MACINFO.Font = 'Microsoft Sans Serif,7'
 $MACINFO.Add_Click( { MACINFO })
 $Form.Controls.Add($MACINFO)
 
@@ -3430,7 +3465,7 @@ $TINYURL.BackColor = "lightgreen"
 $TINYURL.width = 110
 $TINYURL.height = 24
 $TINYURL.location = New-Object System.Drawing.Point(130, 650) #horizontal, vertical
-$TINYURL.Font = 'Microsoft Sans Serif,10'
+$TINYURL.Font = 'Microsoft Sans Serif,7'
 $TINYURL.Add_Click( { TINYURL })
 $Form.Controls.Add($TINYURL)
 
@@ -3442,7 +3477,7 @@ $HASH.BackColor = "darkorchid"
 $HASH.width = 110
 $HASH.height = 24
 $HASH.location = New-Object System.Drawing.Point(250, 650) #horizontal, vertical
-$HASH.Font = 'Microsoft Sans Serif,10'
+$HASH.Font = 'Microsoft Sans Serif,7'
 $HASH.Add_Click( { HASH })
 $Form.Controls.Add($HASH)
 
@@ -3453,7 +3488,7 @@ $WHOIS.BackColor = "forestgreen"
 $WHOIS.width = 110
 $WHOIS.height = 24
 $WHOIS.location = New-Object System.Drawing.Point(370, 650) #horizontal, vertical
-$WHOIS.Font = 'Microsoft Sans Serif,10'
+$WHOIS.Font = 'Microsoft Sans Serif,7'
 $WHOIS.Add_Click( { WHOIS })
 $Form.Controls.Add($WHOIS)
 
@@ -3574,6 +3609,5 @@ $outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX RAPID RESPONSE: `r`n`r`
 
 
 [void]$Form.ShowDialog()
-
 
 
