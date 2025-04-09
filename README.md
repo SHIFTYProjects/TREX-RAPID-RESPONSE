@@ -12,14 +12,7 @@ I wanted it portable and be able to be ran both locally and remotely.  After all
 
 
 
-Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.
-
-
-  (LOCAL VERSION)
-
-  
-![image](https://github.com/SHIFTYProjects/TREX-RAPID-RESPONSE/assets/115837132/bbac4fe9-1788-4e25-ab5d-a8de4b875a1b)
-
+Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.  Put in the suspect computer name into the box.  Now works for remote as well as local machine.
 
 (REMOTE VERSION)
 
