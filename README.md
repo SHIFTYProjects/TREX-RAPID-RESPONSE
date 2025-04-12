@@ -15,6 +15,8 @@ I wanted it portable and be able to be ran both locally and remotely.  After all
 Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.  Put in the suspect computer name into the box.  Now works for remote as well as local machine.
 
 (REMOTE VERSION)
+
+
 ![image](https://github.com/user-attachments/assets/f4d2e2b4-7df6-40b8-a39f-87c555b21f7b)
 
 
