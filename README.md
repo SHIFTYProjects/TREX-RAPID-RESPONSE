@@ -12,7 +12,10 @@ I wanted it portable and be able to be ran both locally and remotely.  After all
 
 
 
-Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.  Put in the suspect computer name into the box.  Now works for remote as well as local machine.
+Just download the script.  Rename it to a .ps1 file and run as an admin with powershell.  
+
+
+For the remote Version - Put in the suspect computer name into the box.
 
 (REMOTE VERSION)
 
