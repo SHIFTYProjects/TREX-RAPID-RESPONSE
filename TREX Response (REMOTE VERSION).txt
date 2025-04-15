@@ -1182,112 +1182,144 @@ function LogonReport {
 ##############################################################################################################################################################################
 
 
-
 function WEBHISTORY {
 
-  Copy-BrowserHistory -Browser 'Chrome'
-  Copy-BrowserHistory -Browser 'Brave'
-  Copy-BrowserHistory -Browser 'Opera'
-  Copy-BrowserHistory -Browser 'Firefox'
-  Copy-BrowserHistory -Browser 'Edge'
+    Copy-BrowserHistory -Browser 'Chrome'
+    Copy-BrowserHistory -Browser 'Brave'
+    Copy-BrowserHistory -Browser 'Opera'
+    Copy-BrowserHistory -Browser 'Firefox'
+    Copy-BrowserHistory -Browser 'Edge'
 
-  $destinationFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS", 'Browser Histories')
+    $destinationFolder = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$script:globalComputerName TREX REPORTS", 'Browser Histories')
 
-  param (
-    [string]$destinationFolder
-  )
+    param (
+        [string]$destinationFolder
+    )
 
-  $Regex = '\b(?:https?|www|\w{2,}\.\w{2,}|\.com|\.org|\.gov)\S*\b'
+    $Regex = '\b(?:https?|www|\w{2,}\.\w{2,}|\.com|\.org|\.gov)\S*\b'
 
-  try {
-    # Get all browser history files in the specified folder
-    $historyFiles = Get-ChildItem -Path $destinationFolder -Include "ChromeHistory_*.db", "BraveHistory_*.db", "OperaHistory_*.db", "FirefoxHistory_*.sqlite", "EdgeHistory_*.db"
+    try {
+        # Get all browser history files in the specified folder
+        $historyFiles = Get-ChildItem -Path $destinationFolder -Include "ChromeHistory_*.db", "BraveHistory_*.db", "OperaHistory_*.db", "FirefoxHistory_*.sqlite", "EdgeHistory_*.db"
 
-    # Loop through each history file
-    foreach ($historyFile in $historyFiles) {
-      $outputTxtFile = [System.IO.Path]::ChangeExtension($historyFile.FullName, 'txt')
+        # Loop through each history file
+        foreach ($historyFile in $historyFiles) {
+            $outputTxtFile = [System.IO.Path]::ChangeExtension($historyFile.FullName, 'txt')
 
-      # For Firefox, read SQLite database directly
-      if ($historyFile.Name -like "FirefoxHistory_*.sqlite") {
-        $firefoxProfile = [System.IO.Path]::GetDirectoryName($historyFile.FullName)
-        $firefoxHistoryFile = Get-ChildItem -Path $firefoxProfile -Filter "places.sqlite"
-        Copy-Item -Path $firefoxHistoryFile.FullName -Destination $destinationFolder -Force
-      }
+            # For Firefox, read SQLite database directly
+            if ($historyFile.Name -like "FirefoxHistory_*.sqlite") {
+                $firefoxProfile = [System.IO.Path]::GetDirectoryName($historyFile.FullName)
+                $firefoxHistoryFile = Get-ChildItem -Path $firefoxProfile -Filter "places.sqlite"
+                Copy-Item -Path $firefoxHistoryFile.FullName -Destination $destinationFolder -Force
+            }
 
-      $outputBox.AppendText("`n`n`r Browser History Database File Found.... copied and parsed to local desktop `r`n`n" + [Environment]::NewLine)
+            $outputBox.AppendText("`n`n`r Browser History Database File Found.... copied and parsed to local desktop `r`n`n" + [Environment]::NewLine)
 
-      #Write-Host "Parsed Browser history from $historyFile to $outputTxtFile"
+            #Write-Host "Parsed Browser history from $historyFile to $outputTxtFile"
+        }
+
+        #Write-Host "Parsing completed for all Browser history files in $destinationFolder"
+
+    } catch {
+        #Write-Host "Error: $_"
     }
-
-    #Write-Host "Parsing completed for all Browser history files in $destinationFolder"
-
-  } catch {
-    #Write-Host "Error: $_"
-  }
 }
 
 function Copy-BrowserHistory {
 
-  param (
-    [string]$Browser
-  )
+    param (
+        [string]$Browser
+    )
 
-  $outputBox.AppendText("`n`n`r Copying $Browser History Database files to local Desktop.... `r`n`n" + [Environment]::NewLine)
+    $outputBox.AppendText("`n`n`r Copying $Browser History Database files to local Desktop.... `r`n`n" + [Environment]::NewLine)
 
-  # Define the remote PC's hostname or IP address
-  $remotePC = $script:globalComputerName
+    # Define the remote PC's hostname or IP address
+    $remotePC = $script:globalComputerName
 
-  # Define the destination path on the local desktop
-  $destinationPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$remotepc TREX REPORTS", 'Browser Histories')
+    # Define the destination path on the local desktop
+    $destinationPath = [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', "$remotePC TREX REPORTS", 'Browser Histories')
 
-  # Get a list of user profiles on the remote PC
-  $userProfiles = Get-ChildItem "\\$remotePC\C$\Users" | Where-Object { $_.PSIsContainer }
+    # Get a list of user profiles on the remote PC
+    $userProfiles = Get-ChildItem "\\$remotePC\C$\Users" | Where-Object { $_.PSIsContainer }
 
-  # Loop through each user profile and copy the browser history file
-  foreach ($profile in $userProfiles) {
-    $username = $profile.Name
-    $browserHistoryFolder = switch ($Browser) {
-      'Chrome' { "\\$remotePC\C$\Users\$username\AppData\Local\Google\Chrome\User Data\Default" }
-      'Brave' { "\\$remotePC\C$\Users\$username\AppData\Local\BraveSoftware\Brave-Browser\User Data\Default" }
-      'Opera' { "\\$remotePC\C$\Users\$username\AppData\Roaming\Opera Software\Opera Stable" }
-      'Firefox' { "\\$remotePC\C$\Users\$username\AppData\Roaming\Mozilla\Firefox\Profiles" }
-      'Edge' { "\\$remotePC\C$\Users\$username\AppData\Local\Microsoft\Edge\User Data\Default" }
+    # Loop through each user profile and copy the browser history file
+    foreach ($profile in $userProfiles) {
+        $username = $profile.Name
+
+        # Base folder for browser history
+        $browserHistoryBaseFolder = "\\$remotePC\C$\Users\$username\AppData"
+
+        # Define the browser-specific history folders for all profiles
+        $browserHistoryFolder = switch ($Browser) {
+            'Chrome' { 
+                Get-ChildItem -Path "$browserHistoryBaseFolder\Local\Google\Chrome\User Data" -Directory | Where-Object { $_.Name -like "Profile*" } 
+            }
+            'Brave' { 
+                Get-ChildItem -Path "$browserHistoryBaseFolder\Local\BraveSoftware\Brave-Browser\User Data" -Directory | Where-Object { $_.Name -like "Profile*" }
+            }
+            'Opera' { 
+                Get-ChildItem -Path "$browserHistoryBaseFolder\Roaming\Opera Software\Opera Stable" -Directory 
+            }
+            'Firefox' { 
+                Get-ChildItem -Path "$browserHistoryBaseFolder\Roaming\Mozilla\Firefox\Profiles" -Directory 
+            }
+            'Edge' { 
+                Get-ChildItem -Path "$browserHistoryBaseFolder\Local\Microsoft\Edge\User Data" -Directory | Where-Object { $_.Name -like "Profile*" }
+            }
+        }
+
+        # Loop through each browser profile folder
+        foreach ($profileFolder in $browserHistoryFolder) {
+            # Get the history file path for each browser profile
+            $historyFilePath = switch ($Browser) {
+                'Chrome' { Get-ChildItem -Path $profileFolder.FullName -Filter "History" -Recurse | Select-Object -First 1 }
+                'Brave' { Get-ChildItem -Path $profileFolder.FullName -Filter "History" -Recurse | Select-Object -First 1 }
+                'Opera' { Get-ChildItem -Path $profileFolder.FullName -Filter "History" -Recurse | Select-Object -First 1 }
+                'Firefox' { Get-ChildItem -Path $profileFolder.FullName -Filter "places.sqlite" -Recurse | Select-Object -First 1 }
+                'Edge' { Get-ChildItem -Path $profileFolder.FullName -Filter "History" -Recurse | Select-Object -First 1 }
+            }
+
+            if ($historyFilePath) {
+                # Create the destination folder if it doesn't exist
+                if (-not (Test-Path $destinationPath -PathType Container)) {
+                    New-Item -ItemType Directory -Path $destinationPath | Out-Null
+                }
+
+                # Construct the destination filename with the username and profile name
+                $destinationFileName = switch ($Browser) {
+                    'Chrome' { "ChromeHistory_${username}_${profileFolder.Name}.db" }
+                    'Brave' { "BraveHistory_${username}_${profileFolder.Name}.db" }
+                    'Opera' { "OperaHistory_${username}_${profileFolder.Name}.db" }
+                    'Firefox' { "FirefoxHistory_${username}_${profileFolder.Name}.sqlite" }
+                    'Edge' { "EdgeHistory_${username}_${profileFolder.Name}.db" }
+                }
+                $destinationFilePath = Join-Path $destinationPath -ChildPath $destinationFileName
+
+                # Copy the browser history file to the destination folder with a unique filename
+                Copy-Item -Path $historyFilePath.FullName -Destination $destinationFilePath -Force
+
+                #Write-Host "$Browser history file copied for $username to $destinationFilePath"
+            } else {
+                #Write-Host "$Browser history file not found for $username in profile $($profileFolder.Name)"
+            }
+        }
     }
 
-    # Search for the browser history file within the user's profile folder
-    $historyFilePath = switch ($Browser) {
-      'Chrome' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
-      'Brave' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
-      'Opera' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
-      'Firefox' { Get-ChildItem -Path $browserHistoryFolder -Filter "places.sqlite" -Recurse | Select-Object -First 1 }
-      'Edge' { Get-ChildItem -Path $browserHistoryFolder -Filter "History" -Recurse | Select-Object -First 1 }
-    }
 
-    if ($historyFilePath) {
-      # Create the destination folder if it doesn't exist
-      if (-not (Test-Path $destinationPath -PathType Container)) {
-        New-Item -ItemType Directory -Path $destinationPath | Out-Null
-      }
-
-      # Construct the destination filename with the username
-      $destinationFileName = switch ($Browser) {
-        'Chrome' { "ChromeHistory_$username.db" }
-        'Brave' { "BraveHistory_$username.db" }
-        'Opera' { "OperaHistory_$username.db" }
-        'Firefox' { "FirefoxHistory_$username.sqlite" }
-        'Edge' { "EdgeHistory_$username.db" }
-      }
-      $destinationFilePath = Join-Path $destinationPath -ChildPath $destinationFileName
-
-      # Copy the browser history file to the destination folder with a unique filename
-      Copy-Item -Path $historyFilePath.FullName -Destination $destinationFilePath -Force
-
-      #Write-Host "$Browser history file copied for $username to $destinationFilePath"
-    } else {
-      #Write-Host "$Browser history file not found for $username"
-    }
-  }
+    $outputBox.AppendText("`n`n`r Browser Histories copied to $destinationFolder.... `r`n`n" + [Environment]::NewLine)
 }
+
+
+
+
+
+
+
+
+
+
+
+#############################################################################################################################################################################
 
 function UserDownloads {
 $outputBox.AppendText("`n`n`r Copying USER Downloads to local Desktop.... `r`n`n" + [Environment]::NewLine)
