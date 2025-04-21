@@ -130,78 +130,83 @@ function MACHINEREPORT {
   $outputBox.AppendText("Running All Machine Reports............`n`n`n" + [Environment]::NewLine)
 
 
-  $outputBox.AppendText("`n`n`n Running Report 1 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 1 of 19.....`n`n`n " + [Environment]::NewLine)
  
   pcinfo
 
-  $outputBox.AppendText("`n`n`n Running Report 2 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 2 of 19.....`n`n`n " + [Environment]::NewLine)
 
   LOCALACCOUNTS
 
-  $outputBox.AppendText("`n`n`n Running Report 3 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 3 of 19.....`n`n`n " + [Environment]::NewLine)
 
   FIREWALLRULES
 
-  $outputBox.AppendText("`n`n`n Running Report 4 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 4 of 19.....`n`n`n " + [Environment]::NewLine)
 
   NETSTATCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 5 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 5 of 19.....`n`n`n " + [Environment]::NewLine)
 
   LogonReport
 
-  $outputBox.AppendText("`n`n`n Running Report 6 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 6 of 19.....`n`n`n " + [Environment]::NewLine)
 
   ANTIVIRUS
 
-  $outputBox.AppendText("`n`n`n Running Report 7 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 7 of 19.....`n`n`n " + [Environment]::NewLine)
 
   WEBHISTORY
 
-  $outputBox.AppendText("`n`n`n Running Report 8 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 8 of 19.....`n`n`n " + [Environment]::NewLine)
 
   
   SCHEDULEDTASKS
 
-  $outputBox.AppendText("`n`n`n Running Report 9 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 9 of 19.....`n`n`n " + [Environment]::NewLine)
 
   INSTALLEDSOFTWARE
 
-  $outputBox.AppendText("`n`n`n Running Report 10 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 10 of 19.....`n`n`n " + [Environment]::NewLine)
 
   WIFINETWORK
 
-  $outputBox.AppendText("`n`n`n Running Report 11 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 11 of 19.....`n`n`n " + [Environment]::NewLine)
 
   STARTUP
 
-  $outputBox.AppendText("`n`n`n Running Report 12 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 12 of 19.....`n`n`n " + [Environment]::NewLine)
 
   USBDEVICE
 
-  $outputBox.AppendText("`n`n`n Running Report 13 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 13 of 19.....`n`n`n " + [Environment]::NewLine)
 
   RUNNINGPROCESS
 
-  $outputBox.AppendText("`n`n`n Running Report 14 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 14 of 19.....`n`n`n " + [Environment]::NewLine)
 
   RDPCONNECTIONS
 
-  $outputBox.AppendText("`n`n`n Running Report 15 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 15 of 19.....`n`n`n " + [Environment]::NewLine)
 
   EVENTVIEWER
 
-  $outputBox.AppendText("`n`n`n Running Report 16 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 16 of 19.....`n`n`n " + [Environment]::NewLine)
 
   ImageThumbnails
 
-  $outputBox.AppendText("`n`n`n Running Report 17 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 17 of 19.....`n`n`n " + [Environment]::NewLine)
   
   Browserext
 
-  $outputBox.AppendText("`n`n`n Running Report 18 of 18.....`n`n`n " + [Environment]::NewLine)
+  $outputBox.AppendText("`n`n`n Running Report 18 of 19.....`n`n`n " + [Environment]::NewLine)
 
   DOWNLOADHISTORY
+
+  $outputBox.AppendText("`n`n`n Running Report 19 of 19.....`n`n`n " + [Environment]::NewLine)
+
+  BrowserArtifacts
+
 
   $outputBox.AppendText("`n`n`n Generating Printable Report of Collected Files......`n`n`n " + [Environment]::NewLine)
 
@@ -3146,6 +3151,183 @@ function REMOVEPIN {
 }
 
 
+###############################################################################################################################################################################
+
+function BrowserArtifacts {
+
+$OutputBox.AppendText("Running Browser artifact report..." + [Environment]::NewLine)
+    $computerName = $env:COMPUTERNAME
+    $desktopPath = [Environment]::GetFolderPath("Desktop")
+    $outputDir = Join-Path $desktopPath "$computerName TREX REPORTS"
+    $reportPath = Join-Path $outputDir "Browser_Artifacts.html"
+
+    if (-not (Test-Path $outputDir)) {
+        Write-Host "Creating output folder: $outputDir"
+        New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+    }
+
+    $html = @"
+<html><head><style>
+body { font-family: Arial; font-size: 12px; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+th { background-color: #f2f2f2; }
+</style></head><body>
+<h2>Browser Artifacts Report - $computerName - MAY NOT INCLUDE BOOKMARKS IN FOLDERS!</h2>
+<p><b>Date:</b> $(Get-Date)</p>
+"@
+
+    $browserPaths = @{
+        "Chrome"  = "AppData\Local\Google\Chrome\User Data"
+        "Edge"    = "AppData\Local\Microsoft\Edge\User Data"
+        "Brave"   = "AppData\Local\BraveSoftware\Brave-Browser\User Data"
+        "Opera"   = "AppData\Roaming\Opera Software\Opera Stable"
+        "Firefox" = "AppData\Roaming\Mozilla\Firefox\Profiles"
+    }
+
+    $users = Get-ChildItem "C:\Users" -Directory | Where-Object {
+    $_.Name -notin @('Public', 'Default', 'Default User', 'All Users') -and
+    (Test-Path "$($_.FullName)\NTUSER.DAT")
+}
+
+
+    foreach ($user in $users) {
+        $userName = $user.Name
+        $OutputBox.AppendText("Processing user: $userName" + [Environment]::NewLine)
+        $html += "<h3>User: $userName</h3>"
+
+        foreach ($browser in $browserPaths.Keys) {
+            $browserRoot = Join-Path $user.FullName $browserPaths[$browser]
+            if (-not (Test-Path $browserRoot)) { continue }
+
+            if ($browser -eq "Firefox") {
+                $profiles = Get-ChildItem -Path $browserRoot -Directory -ErrorAction SilentlyContinue
+            } else {
+                $profiles = Get-ChildItem -Path $browserRoot -Directory -Filter "Profile*" -ErrorAction SilentlyContinue
+            }
+
+            foreach ($profile in $profiles) {
+                $profileName = $profile.Name
+                $OutputBox.AppendText("$browser - $profileName" + [Environment]::NewLine)
+              
+                $html += "<h4>$browser - $profileName</h4>"
+
+                # Bookmarks
+                $bookmarkPath = if ($browser -eq "Firefox") {
+                    Join-Path $profile.FullName "places.sqlite"
+                } else {
+                    Join-Path $profile.FullName "Bookmarks"
+                }
+
+                if (Test-Path $bookmarkPath) {
+                    try {
+                        if ($browser -eq "Firefox") {
+                            $tempCopy = Join-Path $env:TEMP "$($computerName)_$($userName)_$($profileName)_places.sqlite"
+                            Copy-Item $bookmarkPath $tempCopy -Force
+
+                            Add-Type -AssemblyName System.Data.SQLite -ErrorAction SilentlyContinue
+                            $conn = New-Object System.Data.SQLite.SQLiteConnection("Data Source=$tempCopy;Version=3;")
+                            $conn.Open()
+                            $cmd = $conn.CreateCommand()
+                            $cmd.CommandText = "SELECT moz_bookmarks.title, moz_places.url FROM moz_bookmarks JOIN moz_places ON moz_bookmarks.fk = moz_places.id WHERE moz_places.url IS NOT NULL"
+                            $reader = $cmd.ExecuteReader()
+
+                            $html += "<b>Bookmarks:</b><table><tr><th>Name</th><th>URL</th></tr>"
+                            while ($reader.Read()) {
+                                $title = $reader["title"] -replace '<', '&lt;' -replace '>', '&gt;'
+                                $url = $reader["url"] -replace '<', '&lt;' -replace '>', '&gt;'
+                                $html += "<tr><td>$title</td><td><a href='$url'>$url</a></td></tr>"
+                            }
+                            $html += "</table>"
+                            $reader.Close()
+                            $conn.Close()
+                            Remove-Item $tempCopy -Force -ErrorAction SilentlyContinue
+                        } else {
+                            $json = Get-Content $bookmarkPath -Raw | ConvertFrom-Json
+                            $children = @()
+                            if ($json.roots.bookmark_bar.children) { $children += $json.roots.bookmark_bar.children }
+                            if ($json.roots.other.children)       { $children += $json.roots.other.children }
+                            if ($json.roots.synced.children)      { $children += $json.roots.synced.children }
+
+                            $html += "<b>Bookmarks:</b><table><tr><th>Name</th><th>URL</th></tr>"
+                            foreach ($b in $children) {
+                                if ($b.url) {
+                                    $name = $b.name -replace '<', '&lt;' -replace '>', '&gt;'
+                                    $url = $b.url -replace '<', '&lt;' -replace '>', '&gt;'
+                                    $html += "<tr><td>$name</td><td><a href='$url'>$url</a></td></tr>"
+                                }
+                            }
+                            $html += "</table>"
+                        }
+                    } catch {
+                        $html += "<p style='color:red;'>Error reading bookmarks for $browser - $profileName</p>"
+                    }
+                } else {
+                    $html += "<p style='color:gray;'>No bookmarks found.</p>"
+                }
+
+                # Cookies
+                $cookiePath = if ($browser -eq "Firefox") {
+                    Join-Path $profile.FullName "cookies.sqlite"
+                } else {
+                    Join-Path $profile.FullName "Network\Cookies"
+                }
+
+                if (Test-Path $cookiePath) {
+                    $cookieTemp = Join-Path $env:TEMP "$($computerName)_$($userName)_$($profileName)_cookies.sqlite"
+                    Copy-Item $cookiePath $cookieTemp -Force -ErrorAction SilentlyContinue
+
+                    try {
+                        Add-Type -AssemblyName System.Data.SQLite -ErrorAction SilentlyContinue
+                        $conn = New-Object System.Data.SQLite.SQLiteConnection("Data Source=$cookieTemp;Version=3;")
+                        $conn.Open()
+                        $cmd = $conn.CreateCommand()
+
+                        $cmd.CommandText = if ($browser -eq "Firefox") {
+                            "SELECT name, value, host, path FROM moz_cookies"
+                        } else {
+                            "SELECT name, value, host_key, path FROM cookies"
+                        }
+
+                        $reader = $cmd.ExecuteReader()
+                        $cookieTable = @()
+                        while ($reader.Read()) {
+                            $cookieName = $reader["name"]
+                            $cookieValue = $reader["value"].ToString()
+                            $domain = if ($browser -eq "Firefox") { $reader["host"] } else { $reader["host_key"] }
+                            $path = $reader["path"]
+                            $shortValue = if ($cookieValue.Length -gt 50) { $cookieValue.Substring(0, 50) + "..." } else { $cookieValue }
+
+                            $cookieTable += "<tr><td>$cookieName</td><td>$domain</td><td>$path</td><td>$shortValue</td></tr>"
+                        }
+
+                        if ($cookieTable.Count -gt 0) {
+                            $html += "<b>Cookies:</b><table><tr><th>Name</th><th>Domain</th><th>Path</th><th>Value (truncated)</th></tr>"
+                            $html += $cookieTable
+                            $html += "</table>"
+                        } else {
+                            $html += "<p style='color:gray;'>No cookies found in DB.</p>"
+                        }
+
+                        $reader.Close()
+                        $conn.Close()
+                    } catch {
+                        $html += "<p style='color:red;'>Could not read cookies DB for $browser - $profileName.</p>"
+                    }
+
+                    Remove-Item $cookieTemp -Force -ErrorAction SilentlyContinue
+                } else {
+                    $html += "<p style='color:gray;'>No cookie file found.</p>"
+                }
+            }
+        }
+    }
+
+    $html += "</body></html>"
+    $html | Set-Content -Path $reportPath -Encoding UTF8
+
+    $outputBox.AppendText("`n`n`r Browser artifacts report generated:`n $outputDir `r`n`n" + [Environment]::NewLine)
+}
 
 
 ###############################################################################################################################################################################
@@ -3626,6 +3808,18 @@ $DOWNLOADHISTORY.Font = 'Microsoft Sans Serif,7'
 $DOWNLOADHISTORY.Add_Click( { DOWNLOADHISTORY })
 $Form.Controls.Add($DOWNLOADHISTORY)
 
+#Enable Browser Artifacts Button
+$BrowserArtifacts = New-Object system.Windows.Forms.Button
+$BrowserArtifacts.Text = "BROWSER ARTIFACTS"  
+$BrowserArtifacts.ForeColor = ""
+$BrowserArtifacts.Backcolor = ""   
+$BrowserArtifacts.width = 165
+$BrowserArtifacts.height = 24
+$BrowserArtifacts.location = New-Object System.Drawing.Point(660, 360) #Horizontal, Vertical
+$BrowserArtifacts.Font = 'Microsoft Sans Serif,8'
+$BrowserArtifacts.Add_Click( { BrowserArtifacts })
+$Form.Controls.Add($BrowserArtifacts)
+
 
 #Browser Extension Button
 $REMOVEPIN = New-Object system.Windows.Forms.Button
@@ -3634,7 +3828,7 @@ $REMOVEPIN.ForeColor = "black"
 $REMOVEPIN.Backcolor = "whitesmoke"   
 $REMOVEPIN.width = 165
 $REMOVEPIN.height = 24
-$REMOVEPIN.location = New-Object System.Drawing.Point(660, 400) #Horizontal, Vertical
+$REMOVEPIN.location = New-Object System.Drawing.Point(660, 440) #Horizontal, Vertical
 $REMOVEPIN.Font = 'Microsoft Sans Serif,7'
 $REMOVEPIN.Add_Click( { REMOVEPIN })
 $Form.Controls.Add($REMOVEPIN)
@@ -3826,5 +4020,4 @@ $outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX RAPID RESPONSE: `r`n`r`
 
 
 [void]$Form.ShowDialog()
-
 
