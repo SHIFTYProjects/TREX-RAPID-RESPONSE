@@ -3089,7 +3089,7 @@ table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
 th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
 th { background-color: #f2f2f2; }
 </style></head><body>
-<h2>Browser Artifacts Report - $remoteComputer</h2>
+<h2>Browser Artifacts Report - $remoteComputer - MAY NOT CONTAIN BOOKMARKS IN FOLDERS!</h2>
 <p><b>Date:</b> $(Get-Date)</p>
 "@
 
