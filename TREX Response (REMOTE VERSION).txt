@@ -743,7 +743,7 @@ function LOCALACCOUNTS {
     $htmlContent += "</style></head><body>"
     $htmlContent += "<h2>User Profiles and Local Admins Report - $env:COMPUTERNAME</h2>"
     $htmlContent += "<p>Report generated on: $using:currentDateTime</p>"
-    $htmlContent += "<h3>Local Admin Accounts:</h3>"
+    $htmlContent += "<h3>Local Admin Accounts - These may NOT report some accounts as admin depending on how your workspace is configured:</h3>"
     $htmlContent += "<table><tr><th>Account Name</th><th>Account SID</th><th>Is Admin Account</th></tr>"
 
     # Output local user information
@@ -1309,7 +1309,7 @@ function Copy-BrowserHistory {
     }
 
 
-    $outputBox.AppendText("`n`n`r Browser Histories copied to $destinationFolder.... `r`n`n" + [Environment]::NewLine)
+    $outputBox.AppendText("`n`n`r Browser Histories copied to $destinationPath.... `r`n`n" + [Environment]::NewLine)
 }
 
 
@@ -3722,11 +3722,13 @@ $SQLVIEWER.height = 35
 $SQLVIEWER.location = New-Object System.Drawing.Point(250, 750) #Horizontal, Vertical
 $SQLVIEWER.Font = 'Microsoft Sans Serif,8'
 $SQLVIEWER.Add_Click( { SQLVIEWER })
-$Form.Controls.Add($SQLVIEWER)
+#$Form.Controls.Add($SQLVIEWER)
 
+
+#location to SQLViewer Portable
 function SQLVIEWER {
 
-  ii "Y:\00 Powershell EXE\Misc Powershell EXE\SQLiteDatabaseBrowserPortable\SQLiteDatabaseBrowserPortable.exe"
+  ii "LOCATION"
 
 }
 
