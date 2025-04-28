@@ -762,7 +762,7 @@ function LOCALACCOUNTS {
     $htmlContent += "</style></head><body>"
     $htmlContent += "<h2>User Profiles and Local Admins Report - $computerName</h2>"
     $htmlContent += "<p>Report generated on: $currentDateTime</p>"
-    $htmlContent += "<h3>Local Admin Accounts:</h3>"
+    $htmlContent += "<h3>Local Admin Accounts - Some Admin accounts may not report correctly depending on your configuration:</h3>"
     $htmlContent += "<table><tr><th>Account Name</th><th>Account SID</th><th>Is Admin Account</th></tr>"
 
     # Output local user information
@@ -923,7 +923,7 @@ function FIREWALLRULES {
     $htmlContent | Out-File -FilePath $reportPath
 
     # Output the file path
-    $outputBox.AppendText("`n`n`r Local Account Check completed. `n`n`r`n`n The Report is saved to:`r`n`n $reportPath`n`n" + [Environment]::NewLine)
+    $outputBox.AppendText("`n`n`r Firewall Rule Check completed. `n`n`r`n`n The Report is saved to:`r`n`n $reportPath`n`n" + [Environment]::NewLine)
 
     # Open the HTML report in the default web browser
     # ii $reportPath
@@ -2309,13 +2309,14 @@ function WEBHISTORY {
     } catch {
         $outputBox.AppendText("`n`n`r Error: $_`n`n`r" + [Environment]::NewLine)
     }
+    $outputBox.AppendText("`r`n`n`r Web History Reports Generated to $destinationFolder .... `r`n`n`r" + [Environment]::NewLine)
 }
 
 
 
 
 
-$outputBox.AppendText("`r`n`n`r Web History Reports Generated to $destinationFolder .... `r`n`n`r" + [Environment]::NewLine)
+
 
 ###############################################################################################################################################################################
 
