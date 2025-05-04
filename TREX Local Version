@@ -3924,7 +3924,8 @@ $Form.Controls.Add($SQLVIEWDOWNLOAD)
 
 
 function SQLVIEWDOWNLOAD {
-  Start-Process "chrome.exe" -ArgumentList "https://sqlitebrowser.org/"
+  Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "https://sqlitebrowser.org/"
+
 
 
 }
