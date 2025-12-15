@@ -34,7 +34,7 @@ $wshell = New-Object -comObject Wscript.Shell
 #######       FORM SIZE       #######
 
 $Form = New-Object system.Windows.Forms.Form
-$Form.ClientSize = '810,810' #Width,Height
+$Form.ClientSize = '820,820' #Width,Height
 $form.BackColor = ''
 $Form.text = "T-REX RAPID RESPONSE (REMOTE PC VERSION)"
 $Form.FormBorderStyle = 'Fixed3D'
@@ -3239,8 +3239,157 @@ th { background-color: #f2f2f2; }
 
 
 ###############################################################################################################################################################################
+function BrowserImages {
+    Add-Type -AssemblyName System.Windows.Forms
+
+    $RemoteComputer = $script:globalComputerName
+    $ReportBase = Join-Path "$env:USERPROFILE\Desktop" "$RemoteComputer TREX REPORTS\Browser Images"
+
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "This will close Chrome on $RemoteComputer and scan all Chrome cached images. Continue?",
+        "Confirm Scan",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if ($confirm -ne [System.Windows.Forms.DialogResult]::Yes) {
+        $outputBox.AppendText("[!] Scan canceled by user.`r`n")
+        return
+    }
+
+    try {
+        $outputBox.AppendText("`r`n[~] Attempting to close Chrome on $RemoteComputer...`r`n")
+        Get-WmiObject -ComputerName $RemoteComputer -Class Win32_Process -Filter "Name = 'chrome.exe'" |
+            ForEach-Object { $_.Terminate() } | Out-Null
+        $outputBox.AppendText("[+] Chrome terminated on $RemoteComputer.`r`n")
+    } catch {
+        $outputBox.AppendText("[!] Failed to terminate Chrome on $RemoteComputer $_`r`n")
+    }
+
+    if (-not (Test-Path $ReportBase)) {
+        New-Item -ItemType Directory -Path $ReportBase -Force | Out-Null
+    }
+
+    $UserFolders = Get-ChildItem -Path "\\$RemoteComputer\C$\Users" -Directory |
+                   Where-Object { $_.Name -notin @('Public', 'Default', 'All Users', 'Default User') }
+
+    foreach ($user in $UserFolders) {
+        $UserName = $user.Name
+        $outputBox.AppendText("[~] Scanning cache for $UserName...`r`n")
+
+        $ChromeBase = "\\$RemoteComputer\C$\Users\$UserName\AppData\Local\Google\Chrome\User Data"
+        if (-not (Test-Path $ChromeBase)) {
+            $outputBox.AppendText("[-] Skipping $UserName - Chrome data not found.`r`n")
+            continue
+        }
+
+        $Profiles = Get-ChildItem -Path $ChromeBase -Directory | Where-Object {
+            $_.Name -eq "Default" -or $_.Name -like "Profile *"
+        }
+
+        $ImgChunks = @()
+        $ImgCount = 0
+
+        foreach ($profile in $Profiles) {
+            $CachePath = Join-Path $profile.FullName "Cache\Cache_Data"
+            if (-not (Test-Path $CachePath)) { continue }
+
+            $DataFiles = Get-ChildItem -Path $CachePath -File -Filter "data_*" -ErrorAction SilentlyContinue |
+                         Where-Object { $_.Length -gt 4096 }
+
+            foreach ($file in $DataFiles) {
+                try {
+                    $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+                    $scanLimit = [Math]::Min(131072, $bytes.Length)
+
+                    for ($i = 0; $i -lt $scanLimit - 12; $i++) {
+                        $type = $null; $end = $null
+
+                        if ($bytes[$i] -eq 0x89 -and $bytes[$i+1] -eq 0x50) {
+                            $type = "png"; $end = [Math]::Min($i + 500000, $bytes.Length - 1)
+                        } elseif ($bytes[$i] -eq 0xFF -and $bytes[$i+1] -eq 0xD8) {
+                            $end = ($i+2)..($bytes.Length-2) | Where-Object {
+                                $bytes[$_] -eq 0xFF -and $bytes[$_+1] -eq 0xD9
+                            } | Select-Object -First 1
+                            if ($end) { $type = "jpg" }
+                        } elseif ($bytes[$i] -eq 0x47 -and $bytes[$i+1] -eq 0x49) {
+                            $type = "gif"; $end = [Math]::Min($i + 100000, $bytes.Length - 1)
+                        } elseif ($bytes[$i] -eq 0x52 -and $bytes[$i+1] -eq 0x49 -and $bytes[$i+8] -eq 0x57) {
+                            $type = "webp"; $end = [Math]::Min($i + 500000, $bytes.Length - 1)
+                        }
+
+                        if ($type -and $end) {
+                            $imgBytes = $bytes[$i..$end]
+                            $b64 = [Convert]::ToBase64String($imgBytes)
+                            $ImgChunks += "<div class='img'><img src='data:image/$type;base64,$b64'></div>"
+                            $ImgCount++
+                            $i += 100000
+                        }
+                    }
+                } catch {
+                    $outputBox.AppendText("[!] Failed to parse $($file.FullName): $_`r`n")
+                }
+            }
+        }
+
+        if ($ImgCount -gt 0) {
+            $HTML = @"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chrome Cached Images - $UserName</title>
+    <style>
+        body { font-family: Arial; }
+        .img { display:inline-block; margin:10px; }
+        .img img { max-width:200px; max-height:200px; border:1px solid #aaa; }
+    </style>
+</head>
+<body>
+<h2>Cached Images for $UserName</h2>
+<p><strong>Computer:</strong> $RemoteComputer<br>
+<strong>Date:</strong> $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")</p>
+<div>
+$($ImgChunks -join "`n")
+</div>
+</body>
+</html>
+"@
+
+            $FileName = "Browser Cached Images - $UserName.html"
+            $OutFile = Join-Path $ReportBase $FileName
+            $HTML | Out-File -FilePath $OutFile -Encoding UTF8
+            $outputBox.AppendText("[+] $UserName Saved $ImgCount images -> $OutFile`r`n")
+        } else {
+            $outputBox.AppendText("[-] No images found for $UserName.`r`n")
+        }
+    }
+
+    $outputBox.AppendText("[✓] BrowserImages scan complete.`r`n")
+}
+
+
+
+
+
+
 
 ###############################################################################################################################################################################
+
+
+###############################################################################################################################################################################
+
+###############################################################################################################################################################################
+
+###############################################################################################################################################################################
+
+###############################################################################################################################################################################
+
+
+
+
+
+
+
 
 
 
@@ -3278,12 +3427,12 @@ $QUICKREPORT.Add_Click( { QUICKREPORT })
 #Event VIEWER Button
 $EVENTVIEWER = New-Object system.Windows.Forms.Button
 $EVENTVIEWER.Text = "EVENT VIEWER REPORT"  
-$EVENTVIEWER.ForeColor = "black"
-$EVENTVIEWER.Backcolor = "white"   
+$EVENTVIEWER.ForeColor = "white"
+$EVENTVIEWER.Backcolor = "darkblue"   
 $EVENTVIEWER.width = 70
 $EVENTVIEWER.height = 50
 $EVENTVIEWER.location = New-Object System.Drawing.Point(490, 650) #Horizontal, Vertical
-$EVENTVIEWER.Font = 'Microsoft Sans Serif,8'
+$EVENTVIEWER.Font = 'Microsoft Sans Serif,7'
 $EVENTVIEWER.Add_Click( { EVENTVIEWER })
 $Form.Controls.Add($EVENTVIEWER)
 
@@ -3291,8 +3440,8 @@ $Form.Controls.Add($EVENTVIEWER)
 #PC Images Button
 $ImageThumbnails = New-Object system.Windows.Forms.Button
 $ImageThumbnails.Text = "PC Images"  
-$ImageThumbnails.ForeColor = "black"
-$ImageThumbnails.Backcolor = "white"   
+$ImageThumbnails.ForeColor = "white"
+$ImageThumbnails.Backcolor = "darkblue"   
 $ImageThumbnails.width = 70
 $ImageThumbnails.height = 50
 $ImageThumbnails.location = New-Object System.Drawing.Point(570, 650) #Horizontal, Vertical
@@ -3391,8 +3540,8 @@ $Form.Controls.Add($ANTIVIRUS)
 #WEB HISTORY Button
 $WEBHISTORY = New-Object system.Windows.Forms.Button
 $WEBHISTORY.Text = "WEB HISTORY"  
-$WEBHISTORY.ForeColor = "black"
-$WEBHISTORY.Backcolor = "whitesmoke"   
+$WEBHISTORY.ForeColor = "white"
+$WEBHISTORY.Backcolor = "darkblue"   
 $WEBHISTORY.width = 165
 $WEBHISTORY.height = 24
 $WEBHISTORY.location = New-Object System.Drawing.Point(70, 480) #Horizontal, Vertical
@@ -3403,8 +3552,8 @@ $Form.Controls.Add($WEBHISTORY)
 #GPRESULT Button
 $CheckMaliciousScripts = New-Object system.Windows.Forms.Button
 $CheckMaliciousScripts.Text = "SCRIPT CHECK"  
-$CheckMaliciousScripts.ForeColor = "black"
-$CheckMaliciousScripts.Backcolor = "whitesmoke"   
+$CheckMaliciousScripts.ForeColor = "white"
+$CheckMaliciousScripts.Backcolor = "darkblue"   
 $CheckMaliciousScripts.width = 165
 $CheckMaliciousScripts.height = 24
 $CheckMaliciousScripts.location = New-Object System.Drawing.Point(70, 520) #Horizontal, Vertical
@@ -3441,8 +3590,8 @@ $Form.Controls.Add($INSTALLEDSOFTWARE)
 #USB DEVICE Button
 $USBDEVICE = New-Object system.Windows.Forms.Button
 $USBDEVICE.Text = "USB DEVICE REPORT"  
-$USBDEVICE.ForeColor = "black"
-$USBDEVICE.Backcolor = "whitesmoke"   
+$USBDEVICE.ForeColor = "white"
+$USBDEVICE.Backcolor = "darkblue"   
 $USBDEVICE.width = 165
 $USBDEVICE.height = 24
 $USBDEVICE.location = New-Object System.Drawing.Point(250, 600) #Horizontal, Vertical
@@ -3482,8 +3631,8 @@ $Form.Controls.Add($DISABLENETWORK)
 #Enable Remote C Button
 $REMOTEC = New-Object system.Windows.Forms.Button
 $REMOTEC.Text = "Remote C:"  
-$REMOTEC.ForeColor = "black"
-$REMOTEC.Backcolor = "whitesmoke"   
+$REMOTEC.ForeColor = "white"
+$REMOTEC.Backcolor = "darkblue"   
 $REMOTEC.width = 110
 $REMOTEC.height = 40
 $REMOTEC.location = New-Object System.Drawing.Point(620, 595) #Horizontal, Vertical
@@ -3508,8 +3657,8 @@ $Form.Controls.Add($SHUTDOWNPC)
 #Enable Ping Button
 $MAINPING = New-Object system.Windows.Forms.Button
 $MAINPING.Text = "PING"  
-$MAINPING.ForeColor = "white"
-$MAINPING.Backcolor = "blue"   
+$MAINPING.ForeColor = "black"
+$MAINPING.Backcolor = "whitesmoke"   
 $MAINPING.width = 110
 $MAINPING.height = 40
 $MAINPING.location = New-Object System.Drawing.Point(620, 505) #Horizontal, Vertical
@@ -3533,8 +3682,8 @@ $Form.Controls.Add($Browserext)
 #Enable Downloaded files Button
 $UserDownloads = New-Object system.Windows.Forms.Button
 $UserDownloads.Text = "User Downloads"  
-$UserDownloads.ForeColor = ""
-$UserDownloads.Backcolor = ""   
+$UserDownloads.ForeColor = "white"
+$UserDownloads.Backcolor = "darkblue"   
 $UserDownloads.width = 125
 $UserDownloads.height = 40
 $UserDownloads.location = New-Object System.Drawing.Point(660, 270) #Horizontal, Vertical
@@ -3555,12 +3704,25 @@ $BrowserArtifacts.Add_Click( { BrowserArtifacts })
 $Form.Controls.Add($BrowserArtifacts)
 
 
+#Enable Browser Images Button
+$BrowserImages = New-Object system.Windows.Forms.Button
+$BrowserImages.Text = "BROWSER IMAGES - Run separately"  
+$BrowserImages.ForeColor = "white"
+$BrowserImages.Backcolor = "darkblue"   
+$BrowserImages.width = 145
+$BrowserImages.height = 40
+$BrowserImages.location = New-Object System.Drawing.Point(660, 380) #Horizontal, Vertical
+$BrowserImages.Font = 'Microsoft Sans Serif,8'
+$BrowserImages.Add_Click( { BrowserImages })
+$Form.Controls.Add($BrowserImages)
+
+
 #Enable Remove Windows Pin/Biometrics Button
 $REMOVEPIN = New-Object system.Windows.Forms.Button
 $REMOVEPIN.Text = "Remove Windows Pin/Biometrics"  
-$REMOVEPIN.ForeColor = ""
-$REMOVEPIN.Backcolor = ""   
-$REMOVEPIN.width = 125
+$REMOVEPIN.ForeColor = "black"
+$REMOVEPIN.Backcolor = "red"   
+$REMOVEPIN.width = 145
 $REMOVEPIN.height = 40
 $REMOVEPIN.location = New-Object System.Drawing.Point(660, 430) #Horizontal, Vertical
 $REMOVEPIN.Font = 'Microsoft Sans Serif,8'
@@ -3722,13 +3884,11 @@ $SQLVIEWER.height = 35
 $SQLVIEWER.location = New-Object System.Drawing.Point(250, 750) #Horizontal, Vertical
 $SQLVIEWER.Font = 'Microsoft Sans Serif,8'
 $SQLVIEWER.Add_Click( { SQLVIEWER })
-#$Form.Controls.Add($SQLVIEWER)
+$Form.Controls.Add($SQLVIEWER)
 
-
-#location to SQLViewer Portable
 function SQLVIEWER {
 
-  ii "LOCATION"
+  ii "Y:\00 Powershell EXE\Misc Powershell EXE\SQLiteDatabaseBrowserPortable\SQLiteDatabaseBrowserPortable.exe"
 
 }
 
@@ -3820,6 +3980,89 @@ ORDER BY
 
 ######################################################################################
 
+function GUIDSIDSEARCH {
+    [CmdletBinding()]
+    param()
+
+    Add-Type -AssemblyName Microsoft.VisualBasic
+    Add-Type -AssemblyName System.Windows.Forms
+
+    $inputValue = [Microsoft.VisualBasic.Interaction]::InputBox(
+        "Enter a SID, GUID, SamAccountName, or UserPrincipalName to resolve From AD:",
+        "Universal AD Identifier Resolver",
+        ""
+    )
+
+    if ([string]::IsNullOrWhiteSpace($inputValue)) {
+        [System.Windows.Forms.MessageBox]::Show("No input provided. Exiting.", "Cancelled", 0, [System.Windows.Forms.MessageBoxIcon]::Information)
+        return
+    }
+
+    $results = @()
+    try {
+        $root = [ADSI]"LDAP://RootDSE"
+        $domain = $root.defaultNamingContext
+        $searcher = New-Object DirectoryServices.DirectorySearcher([ADSI]"LDAP://$domain")
+        $searcher.PageSize = 1000
+        $searcher.PropertiesToLoad.AddRange(@("name", "objectClass", "distinguishedName", "samaccountname", "userPrincipalName"))
+
+        # Detect possible identifier types
+        $isSID = $inputValue -match '^S-\d(-\d+)+$'
+        $isGUID = $inputValue -match '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$' -or $inputValue -match '^\{[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\}$'
+
+        if ($isSID) {
+            $sid = New-Object System.Security.Principal.SecurityIdentifier($inputValue)
+            $sidBytes = New-Object byte[] ($sid.BinaryLength)
+            $sid.GetBinaryForm($sidBytes, 0)
+            $ldapSid = ($sidBytes | ForEach-Object { '\' + $_.ToString('X2') }) -join ''
+            $searcher.Filter = "(objectSID=$ldapSid)"
+            $results += "Searching by objectSID..."
+        }
+        elseif ($isGUID) {
+            $normalizedGUID = $inputValue.Trim('{}')
+            $guid = [GUID]$normalizedGUID
+            $guidBytes = $guid.ToByteArray()
+            $ldapGuid = ($guidBytes | ForEach-Object { '\' + $_.ToString('X2') }) -join ''
+            $searcher.Filter = "(objectGUID=$ldapGuid)"
+            $results += "Searching by objectGUID..."
+        }
+        else {
+            # Search by multiple common attributes if not SID/GUID
+            $searcher.Filter = "(|(
+                samAccountName=$inputValue
+            )(userPrincipalName=$inputValue)
+            (name=$inputValue))"
+            $results += "Searching by SamAccountName, UPN, or Name..."
+        }
+
+        # Perform the search
+        $result = $searcher.FindOne()
+
+        if ($result) {
+            $props = $result.Properties
+            $results += ""
+            $results += "✅ Object Found:"
+            $results += "  Name: $($props['name'][0])"
+            $results += "  Class: $($props['objectclass'][-1])"
+            $results += "  Distinguished Name: $($props['distinguishedname'][0])"
+            if ($props['samaccountname']) { $results += "  SamAccountName: $($props['samaccountname'][0])" }
+            if ($props['userprincipalname']) { $results += "  UserPrincipalName: $($props['userprincipalname'][0])" }
+        }
+        else {
+            $results += "❌ No AD object matched that identifier."
+        }
+    }
+    catch {
+        $results += "Error: $($_.Exception.Message)"
+    }
+    $outputBox.AppendText("`r`n $results `r`n")
+    # Show output
+    $msg = ($results -join "`n")
+    [System.Windows.Forms.MessageBox]::Show($msg, "AD Identifier Lookup Result", 0, [System.Windows.Forms.MessageBoxIcon]::Information)
+}
+
+
+#############################################################################################################
 
 
 function SuspectPC {
@@ -3913,9 +4156,22 @@ $form.Controls.Add($formLabel)
 
 
 
+
+##Version Number Form Space
+$GUIDSIDSEARCH = New-Object system.Windows.Forms.Button
+$GUIDSIDSEARCH.Text = "UNIVERSAL SID/GUID SEARCH"  
+$GUIDSIDSEARCH.ForeColor = "limegreen"
+$GUIDSIDSEARCH.Backcolor = "black"   
+$GUIDSIDSEARCH.width = 250
+$GUIDSIDSEARCH.height = 24
+$GUIDSIDSEARCH.location = New-Object System.Drawing.Point(550, 10) #Horizontal, Vertical
+$GUIDSIDSEARCH.Font = 'Microsoft Sans Serif,8'
+$GUIDSIDSEARCH.Add_Click( { GUIDSIDSEARCH })
+$Form.Controls.Add($GUIDSIDSEARCH)
+
 ##Version Number Form Space
 $VER = New-Object system.Windows.Forms.Button
-$VER.Text = "v3.2"  
+$VER.Text = "v3.3"  
 $VER.ForeColor = "black"
 $VER.Backcolor = "whitesmoke"   
 $VER.width = 50
@@ -4074,7 +4330,7 @@ $Form.Controls.Add($TREXFileReport)
 #END OF RIGHT SIDE APPLICATION
 ####################################################################################
 
-
+#######       RUN AS ADMIN CHECK       #######
 
 
 # Check if the current user is an administrator
@@ -4108,7 +4364,7 @@ if (!$isAdministrator) {
   exit
 }
 
-
+#######      END RUN AS ADMIN CHECK       #######
 
 
 
@@ -4122,14 +4378,14 @@ if (!$isAdministrator) {
 #################################################################################################
 
 
-#######       RUN AS ADMIN CHECK       #######
-#######     TURNED OFF BY DEFAULT       #######
+
+
 
 ############################################################
 #                WELCOME MESSAGE TEXT                      #
 ############################################################
 
-$outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX RAPID RESPONSE: `r`n`r`n ALL REPORTS WILL GENERATE THEIR OWN HTML FILE IN A FOLDER ON YOUR DESKTOP WITH THE COMPUTER NAME. `r`n`r`n  THIS WAS DESIGNED TO BE RAN AGAINST AN INFECTED OR SUSPECT MACHINE TO HELP GATHER INFORMATION ABOUT AN INCIDENT.`r`n`r`n GOOD LUCK THREAT HUNTING!`r`n`r`n - SHIFTY - `r`n`r`n`r`n`r`n" + [Environment]::NewLine)
+$outputBox.AppendText("`r`n`r`n`r`n`r`n WELCOME TO T-REX `r`n`r`n REPORTS ARE SAVED TO A FOLDER ON YOUR DESKTOP CALLED T-REX REPORTS. `r`n`r`n ANY COMMAND IN DARK BLUE COULD POTENTIALLY LEAK YOUR CREDENTIALS IF MIMIKATZ IS PRESENT.   `r`n`r`n - SHIFTY -" + [Environment]::NewLine)
 
 ############################################################
 
