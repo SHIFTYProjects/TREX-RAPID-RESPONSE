@@ -1,7 +1,7 @@
 # TREX-RAPID-RESPONSE
 
-Powershell incident investigation tool for PC.
-
+Powershell incident investigation tool for PC.   **COPY THE CODE AND RUN IN A POWERSHELL WINDOW TO RUN.
+**
 I needed a way to investigate a machine I believed was compromised.  There are quite a few applications that require a client to be installed first on the machine.  
 
 There are a bunch of tools from systeminternals that do an excellent job of providing information.  
