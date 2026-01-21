@@ -1,0 +1,1079 @@
+<#
+    Name: Left Click Tools - Ultimate Edition (v7.14)
+    Description: Admin Toolkit + TREX + Global Tools
+    Changelog: 
+    - v7.14: Fixed Alert Box "Error" log (Switched to Start-Process for msg.exe). Visual Popup is now more reliable.
+    - v7.13: Added Mandatory Administrator Privilege Check (Self-Elevation).
+    - v7.12: Fixed MAC Info logging syntax.
+#>
+
+# ==========================================
+#      ADMINISTRATOR CHECK (SELF-ELEVATION)
+# ==========================================
+$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $processInfo.FileName = "powershell.exe"
+    $processInfo.Verb = "RunAs"
+    $processInfo.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    try {
+        [System.Diagnostics.Process]::Start($processInfo)
+        exit
+    } catch {
+        # If elevation fails or is cancelled, show error and exit.
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.MessageBox]::Show("This tool requires Administrator privileges to function correctly.`n`nPlease Right-Click > 'Run as Administrator'.", "Access Denied", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        exit
+    }
+}
+
+$ErrorActionPreference = 'SilentlyContinue'
+
+# ==========================================
+#      CONFIGURATION
+# ==========================================
+$TrexWhitelist = @("*") 
+
+# ==========================================
+# 1. FORM SETUP
+# ==========================================
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName Microsoft.VisualBasic
+Add-Type -AssemblyName System.DirectoryServices
+Add-Type -AssemblyName System.Net.Http
+[System.Windows.Forms.Application]::EnableVisualStyles()
+
+$wshell = New-Object -ComObject WScript.Shell
+
+$Form = New-Object System.Windows.Forms.Form
+$Form.ClientSize = '1270,720'
+$Form.Text = "LEFT CLICK TOOLS + TREX COMPLETE (v7.14 - ADMIN)"
+$Form.StartPosition = "CenterScreen"
+$Form.FormBorderStyle = 'Fixed3D'
+$Form.MaximizeBox = $false
+$Form.BackColor = "Black"
+$Form.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+
+# -------------------------
+# 2. CONTROLS & LAYOUT
+# -------------------------
+
+# Output Box
+$lblLog = New-Object System.Windows.Forms.Label
+$lblLog.Text = "Activity Log"
+$lblLog.ForeColor = "LightGreen"
+$lblLog.Location = New-Object System.Drawing.Point(880, 20)
+$lblLog.AutoSize = $true
+$Form.Controls.Add($lblLog)
+
+$outputBox = New-Object System.Windows.Forms.TextBox
+$outputBox.Multiline = $true
+$outputBox.ScrollBars = "Vertical"
+$outputBox.Location = New-Object System.Drawing.Point(880, 50)
+$outputBox.Size = New-Object System.Drawing.Size(360, 560)
+$outputBox.BackColor = "Black"
+$outputBox.ForeColor = "LightGreen"
+$outputBox.Font = "Consolas, 9"
+$outputBox.BorderStyle = "FixedSingle"
+$Form.Controls.Add($outputBox)
+
+# Computer List
+$lblList = New-Object System.Windows.Forms.Label
+$lblList.Text = "Target Computers"
+$lblList.ForeColor = "White"
+$lblList.Location = New-Object System.Drawing.Point(20, 20)
+$lblList.AutoSize = $true
+$Form.Controls.Add($lblList)
+
+$itemList = New-Object System.Windows.Forms.ListBox
+$itemList.Location = New-Object System.Drawing.Point(20, 50)
+$itemList.Size = New-Object System.Drawing.Size(220, 500)
+$itemList.Font = "Microsoft Sans Serif, 11"
+$itemList.BackColor = [System.Drawing.Color]::FromArgb(30,30,30)
+$itemList.ForeColor = "White"
+$itemList.BorderStyle = "FixedSingle"
+$Form.Controls.Add($itemList)
+
+# Progress Bar
+$ProgressBar = New-Object System.Windows.Forms.ProgressBar
+$ProgressBar.Width = 1230
+$ProgressBar.Height = 15
+$ProgressBar.Location = New-Object System.Drawing.Point(20, 690)
+$Form.Controls.Add($ProgressBar)
+
+# Status Label
+$statusText = New-Object System.Windows.Forms.Label
+$statusText.Text = "Ready"
+$statusText.AutoSize = $true
+$statusText.ForeColor = "Cyan"
+$statusText.Location = New-Object System.Drawing.Point(20, 665)
+$Form.Controls.Add($statusText)
+
+# -------------------------
+# 3. HELPER FUNCTIONS
+# -------------------------
+
+function Write-Log([string]$msg) {
+    $cleanMsg = $msg.Trim()
+    if (-not [string]::IsNullOrWhiteSpace($cleanMsg)) {
+        $timestamp = Get-Date -Format "HH:mm:ss"
+        $outputBox.AppendText("[$timestamp] $cleanMsg`r`n")
+        $outputBox.SelectionStart = $outputBox.Text.Length
+        $outputBox.ScrollToCaret()
+    }
+}
+
+function New-ToolkitButton($Text, $X, $Y, $Parent, $Color, $Width, $Script) {
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = $Text
+    $btn.Location = New-Object System.Drawing.Point($X, $Y)
+    $btn.Size = New-Object System.Drawing.Size($Width, 30)
+    $btn.BackColor = $Color
+    $btn.ForeColor = "White"
+    $btn.FlatStyle = "Flat"
+    $btn.FlatAppearance.BorderSize = 1
+    $btn.FlatAppearance.BorderColor = "DimGray"
+    if ($Color -eq "LightGreen") { $btn.ForeColor = "Black" }
+    $btn.Add_Click($Script)
+    $Parent.Controls.Add($btn)
+}
+
+function New-GlobalButton($Text, $X, $Y, $Script) {
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = $Text
+    $btn.Location = New-Object System.Drawing.Point($X, $Y)
+    $btn.Size = New-Object System.Drawing.Size(120, 26) 
+    $btn.BackColor = "SeaGreen"
+    $btn.ForeColor = "White"
+    $btn.FlatStyle = "Flat"
+    $btn.FlatAppearance.BorderSize = 1
+    $btn.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+    $btn.Add_Click($Script)
+    $Form.Controls.Add($btn)
+}
+
+function New-TabBanner($Text, $Parent, $Color) {
+    $lbl = New-Object System.Windows.Forms.Label
+    $lbl.Text = $Text
+    $lbl.Location = New-Object System.Drawing.Point(0, 0)
+    $lbl.Size = New-Object System.Drawing.Size(600, 40)
+    $lbl.BackColor = $Color
+    $lbl.ForeColor = "White"
+    $lbl.TextAlign = "MiddleCenter"
+    $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+    $Parent.Controls.Add($lbl)
+}
+
+function addList {
+    $pcInput = [Microsoft.VisualBasic.Interaction]::InputBox("Enter Hostname/IP:", "Add Computer")
+    if ($pcInput) { 
+        $itemList.Items.Add($pcInput)
+        Write-Log "Added $pcInput"
+    }
+}
+function removeList {
+    if ($itemList.SelectedIndex -ge 0) { 
+        Write-Log "Removed $($itemList.SelectedItem)"
+        $itemList.Items.RemoveAt($itemList.SelectedIndex) 
+    }
+}
+function clearList { 
+    $itemList.Items.Clear()
+    Write-Log "List cleared."
+}
+function importList {
+    $fd = New-Object System.Windows.Forms.OpenFileDialog
+    $fd.Filter = "Text Files|*.txt|All Files|*.*"
+    if ($fd.ShowDialog() -eq "OK") {
+        Get-Content $fd.FileName | ForEach-Object { $itemList.Items.Add($_) }
+        Write-Log "Imported list from $($fd.FileName)"
+    }
+}
+function Get-SelectedPC {
+    if ($itemList.SelectedIndex -eq -1) {
+        if ($itemList.Items.Count -gt 0) { return [string]$itemList.Items[0] } 
+        else { [System.Windows.Forms.MessageBox]::Show("Please select a computer from the list first."); return $null }
+    }
+    return [string]$itemList.SelectedItem
+}
+
+# -------------------------
+# 4. GLOBAL REMOTE FUNCTIONS (RDP & SCCM)
+# -------------------------
+
+function STARTRDP {
+    Write-Log "Starting RDP Session Tool."
+    $msgBoxInput = $wshell.Popup("Start RDP Session with selected PC(s)?", 0, "Confirm", 0x1)
+    
+    switch ($msgBoxInput) {
+        '1' { 
+            $ctr = $itemList.Items.Count
+            if ($ctr -eq 0) { Write-Log "No computers in list."; return }
+            
+            $x = 100 / $ctr; $y = 0 
+
+            foreach ($item in $itemList.Items) {
+                $targetPC = [string]$item
+                try {
+                    if (Test-Connection -Count 1 -ComputerName $targetPC -Quiet) {
+                        Write-Log "$targetPC : ONLINE - Launching RDP"
+                        Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList "/v:$targetPC"
+                    } else {
+                        Write-Log "$targetPC : OFFLINE - Skipping RDP"
+                        $statusText.Text = "$targetPC Offline"
+                    }
+                } catch { Write-Log "$targetPC | Error: $($_.Exception.Message)" }
+                $y += $x; $ProgressBar.Value = [Math]::Min($y, 100)
+                [System.Windows.Forms.Application]::DoEvents()
+            }
+            $statusText.Text = "Ready"; $ProgressBar.Value = 0
+        }
+    }
+}
+
+function CONTROL {
+    Write-Log "Starting SCCM Remote Control."
+    
+    $paths = @(
+        "C:\Program Files (x86)\Microsoft Endpoint Manager\AdminConsole\bin\i386\CmRcViewer.exe",
+        "C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole\bin\i386\CmRcViewer.exe",
+        "C:\Program Files\Microsoft Endpoint Manager\AdminConsole\bin\i386\CmRcViewer.exe",
+        "C:\Program Files\Microsoft Configuration Manager\AdminConsole\bin\i386\CmRcViewer.exe"
+    )
+
+    $viewerPath = $null
+    foreach ($p in $paths) {
+        if (Test-Path -Path $p) { 
+            $viewerPath = $p
+            break 
+        }
+    }
+
+    if (-not $viewerPath) {
+        [System.Windows.Forms.MessageBox]::Show("CmRcViewer.exe not found in standard Admin Console locations.`n`nPlease ensure the SCCM Console is installed.", "Missing Component", 0, 16)
+        Write-Log "Error: CmRcViewer.exe not found."
+        return
+    }
+    Write-Log "Using Viewer: $viewerPath"
+
+    $msgBoxInput = $wshell.Popup("Start SCCM Remote Control on selected PC(s)?", 0, "Confirm", 0x1)
+    if ($msgBoxInput -eq 1) { 
+        $ctr = $itemList.Items.Count
+        if ($ctr -eq 0) { Write-Log "No computers in list."; return }
+
+        $x = 100 / $ctr; $y = 0 
+
+        foreach ($item in $itemList.Items) {
+            $targetPC = [string]$item
+
+            try {
+                if (Test-Connection -Count 1 -ComputerName $targetPC -Quiet) {
+                    Write-Log "$targetPC : ONLINE - Launching Control"
+                    Start-Process -FilePath $viewerPath -ArgumentList $targetPC
+                } else {
+                    Write-Log "$targetPC : OFFLINE"
+                }
+            } catch { Write-Log "$targetPC | Error: $($_.Exception.Message)" }
+            $y += $x; $ProgressBar.Value = [Math]::Min($y, 100)
+            [System.Windows.Forms.Application]::DoEvents()
+        }
+        $statusText.Text = "Ready"; $ProgressBar.Value = 0
+    }
+}
+
+# -------------------------
+# 5. GLOBAL BUTTONS (TOP OF FORM)
+# -------------------------
+
+New-GlobalButton "Start RDP"      260 15 { STARTRDP }
+New-GlobalButton "SCCM Control"   390 15 { CONTROL }
+
+
+# -------------------------
+# 6. REMOTE EXECUTION ENGINE
+# -------------------------
+
+function Run-RemoteBlock ($Title, $ScriptBlock) {
+    $total = $itemList.Items.Count
+    if ($total -eq 0) { Write-Log "No computers selected."; return }
+    
+    if ($wshell.Popup("Run '$Title' on $total computers?", 0, "Confirm", 0x1) -ne 1) { return }
+    
+    Write-Log "--- Starting $Title ---"
+    $step = 100 / $total; $curr = 0
+
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        $statusText.Text = "$Title : $pc"
+        if (Test-Connection $pc -Count 1 -Quiet) {
+            Write-Log "$pc : ONLINE"
+            try {
+                $results = Invoke-Command -ComputerName $pc -ScriptBlock $ScriptBlock -ErrorAction Stop | Out-String
+                Write-Log $results
+            } catch {
+                Write-Log "$pc : Error: $($_.Exception.Message)"
+            }
+        } else {
+            Write-Log "$pc : OFFLINE"
+        }
+        $curr += $step
+        $ProgressBar.Value = [Math]::Min($curr, 100)
+        [System.Windows.Forms.Application]::DoEvents()
+    }
+    $ProgressBar.Value = 0
+    $statusText.Text = "Ready"
+    Write-Log "--- Completed $Title ---"
+}
+
+# -------------------------
+# 7. TREX FUNCTIONS
+# -------------------------
+
+function Generate-HTMLReport ($Title, $FileName, $ScriptBlock) {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers in list."; return }
+
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        
+        if (-not (Test-Connection -ComputerName $pc -Count 1 -Quiet)) {
+            Write-Log "$pc : OFFLINE - Skipping $Title"
+            continue
+        }
+
+        Write-Log "$pc : Generating $Title..."
+        $ReportFolder = "$env:USERPROFILE\Desktop\$pc TREX REPORTS"
+        if (-not (Test-Path $ReportFolder)) { New-Item -Path $ReportFolder -ItemType Directory | Out-Null }
+
+        $AdminUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+        $ReportTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        
+        $HeaderHTML = @"
+        <div style="background-color:#e0e0e0; border-bottom:3px solid #b30000; padding:15px; margin-bottom:20px; font-family:Segoe UI, sans-serif;">
+            <h2 style="margin:0; color:#b30000;">TREX REPORT: $Title</h2>
+            <p style="margin:5px 0 0 0; font-size:14px;">
+                <b>Target Computer:</b> $pc <span style="margin:0 10px;">|</span>
+                <b>Date Pulled:</b> $ReportTime <span style="margin:0 10px;">|</span>
+                <b>Generated By:</b> $AdminUser
+            </p>
+        </div>
+"@
+
+        try {
+            $rawHtml = Invoke-Command -ComputerName $pc -ScriptBlock $ScriptBlock -ErrorAction Stop
+            $finalHtml = $rawHtml -replace "(?i)(<body[^>]*>)", "`$1$HeaderHTML"
+            $finalHtml | Out-File "$ReportFolder\$FileName"
+            Write-Log "$pc : Saved $FileName"
+            
+            # --- AUTO OPEN FOLDER (II) ---
+            Invoke-Item $ReportFolder
+            
+        } catch {
+            Write-Log "$pc : Error generating report: $($_.Exception.Message)"
+        }
+        [System.Windows.Forms.Application]::DoEvents()
+    }
+}
+
+# --- Report Definitions ---
+
+$Script_NetworkReport = {
+    $html = "<html><head><style>body{font-family:'Segoe UI'} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:10px} th{background:#0078D7;color:white} .up{background-color:#d4edda;color:#155724;font-weight:bold} .down{background-color:#f8f9fa;color:#888;font-style:italic}</style></head><body><h1>Network Report</h1>"
+    
+    # 1. Primary Active Connection
+    $html += "<h3>Primary Active Connection (Gateway)</h3><table><tr><th>Adapter</th><th>IP Address</th><th>Interface Description</th></tr>"
+    try {
+        $defaultRoute = Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($defaultRoute) {
+            $activeAdapter = Get-NetAdapter -InterfaceIndex $defaultRoute.InterfaceIndex -ErrorAction SilentlyContinue
+            $activeIP = Get-NetIPAddress -InterfaceIndex $defaultRoute.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty IPAddress
+            $html += "<tr class='up'><td>$($activeAdapter.Name)</td><td>$activeIP</td><td>$($activeAdapter.InterfaceDescription)</td></tr>"
+        } else {
+            $html += "<tr><td colspan='3'>No Active Internet Gateway Found</td></tr>"
+        }
+    } catch {
+        $html += "<tr><td colspan='3'>Error determining active connection: $($_.Exception.Message)</td></tr>"
+    }
+    $html += "</table>"
+
+    # 2. Wifi Details
+    $html += "<h3>Wireless Radio Details (WLAN Only)</h3><table><tr><th>Property</th><th>Value</th></tr>"
+    netsh wlan show interfaces | %{ if($_ -match "^\s*([^:]+):\s*(.+)$") { $html+="<tr><td>$($matches[1])</td><td>$($matches[2])</td></tr>" } }
+    
+    # 3. All Adapters
+    $html += "</table><h3>All Network Adapters</h3><table><tr><th>Name</th><th>Status</th><th>IP (v4)</th><th>MAC</th><th>Description</th></tr>"
+    try {
+        $adapters = Get-NetAdapter -ErrorAction SilentlyContinue
+        $allIPs   = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue
+        foreach ($a in $adapters) {
+            $ipMatch = $allIPs | Where-Object { $_.InterfaceIndex -eq $a.InterfaceIndex }
+            $ipStr = if ($ipMatch) { $ipMatch.IPAddress } else { "No IP" }
+            $statusClass = if ($a.Status -eq "Up") { "class='up'" } else { "class='down'" }
+            $html+="<tr><td>$($a.Name)</td><td $statusClass>$($a.Status)</td><td>$ipStr</td><td>$($a.MacAddress)</td><td>$($a.InterfaceDescription)</td></tr>" 
+        }
+    } catch {
+        $html += "<tr><td colspan='5'>Error retrieving adapter details: $($_.Exception.Message)</td></tr>"
+    }
+    $html += "</table></body></html>"; return $html
+}
+
+$Script_Uptime = {
+    $os = Get-CimInstance Win32_OperatingSystem
+    $lastBoot = $os.LastBootUpTime
+    $now = Get-Date
+    $uptime = $now - $lastBoot
+    
+    $days = $uptime.Days
+    $hours = $uptime.Hours
+    $minutes = $uptime.Minutes
+    
+    $html = "<html><head><style>body{font-family:'Segoe UI'} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:10px} th{background:#2E8B57;color:white} .highlight{font-size:1.2em;font-weight:bold;color:#2E8B57}</style></head><body>"
+    $html += "<h1>System Uptime Report</h1>"
+    
+    $html += "<table>"
+    $html += "<tr><th>Metric</th><th>Value</th></tr>"
+    $html += "<tr><td><b>Current System Time</b></td><td>$now</td></tr>"
+    $html += "<tr><td><b>Last Boot Time</b></td><td>$lastBoot</td></tr>"
+    $html += "<tr><td><b>Total Uptime</b></td><td class='highlight'>$days Days, $hours Hours, $minutes Minutes</td></tr>"
+    $html += "</table>"
+    
+    $html += "<h3>Raw Uptime Data</h3><pre>Total Hours: $([math]::Round($uptime.TotalHours, 2))`nTotal Minutes: $([math]::Round($uptime.TotalMinutes, 0))</pre>"
+    $html += "</body></html>"
+    return $html
+}
+
+$Script_WifiPass_Unsafe = {
+    $html = "<html><head><style>body{font-family:'Segoe UI';background:#ffe6e6} .pass{display:none;color:red;font-weight:bold} .btn{padding:5px;background:red;color:white}</style><script>function t(){var e=document.getElementsByClassName('pass');for(var i=0;i<e.length;i++)e[i].style.display=e[i].style.display==='inline'?'none':'inline';}</script></head><body><h1>Wi-Fi Passwords (UNSAFE)</h1><button class='btn' onclick='t()'>Show/Hide Passwords</button><table><tr><th>SSID</th><th>Password</th></tr>"
+    $ps = netsh wlan show profiles | %{if($_ -match "All User Profile\s*:\s*(.+)"){$matches[1].Trim()}}
+    foreach($p in $ps){
+        $k="Not Found"; netsh wlan show profile name="$p" key=clear | %{if($_ -match "Key Content\s*:\s*(.+)"){$k=$matches[1].Trim()}}
+        $html+="<tr><td>$p</td><td><span class='pass'>$k</span></td></tr>"
+    }
+    $html += "</table></body></html>"; return $html
+}
+
+function WifiPass_Unsafe_Wrapper {
+    if ([System.Windows.Forms.MessageBox]::Show("Warning: Pulling passwords may trigger SIEM alerts. Continue for ALL computers?", "Unsafe Action", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Warning) -eq 'Yes') {
+        Generate-HTMLReport "WifiPasswords" "WifiPasswords.html" $Script_WifiPass_Unsafe
+    }
+}
+
+$Script_PCInfo = { 
+    $cs = Get-CimInstance Win32_ComputerSystem
+    $os = Get-CimInstance Win32_OperatingSystem
+    $bios = Get-CimInstance Win32_BIOS
+    $mem = Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum
+    $ramGB = [Math]::Round($mem.Sum / 1GB, 1)
+    $net = Get-CimInstance Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true } | Select-Object -First 1
+    
+    $html = "<html><head><style>body{font-family:'Segoe UI'} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:10px;text-align:left} th{background:#4B0082;color:white}</style></head><body><h1>System Information</h1>"
+    $html += "<table>"
+    $html += "<tr><th>HOST</th><td>$($cs.Name)</td></tr>"
+    $html += "<tr><th>SERIAL</th><td>$($bios.SerialNumber)</td></tr>"
+    $html += "<tr><th>OS</th><td>$($os.Caption)</td></tr>"
+    $html += "<tr><th>RAM</th><td>$($ramGB) GB</td></tr>"
+    $html += "<tr><th>IP</th><td>$($net.IPAddress[0])</td></tr>"
+    $html += "<tr><th>MAC</th><td>$($net.MACAddress)</td></tr>"
+    $html += "</table>"
+
+    $html += "<h3>Physical Disks</h3><table><tr><th>Disk Model</th><th>Size (GB)</th></tr>"
+    $disks = Get-CimInstance Win32_DiskDrive
+    $i = 1
+    foreach ($d in $disks) {
+        $size = [Math]::Round($d.Size / 1GB, 0)
+        $html += "<tr><td>DISK $i : $($d.Model)</td><td>$size GB</td></tr>"
+        $i++
+    }
+    $html += "</table></body></html>"
+    return $html
+}
+
+$Script_LocalUsers = { $u = Get-LocalUser; "<html><body><h1>Local Users</h1><pre>$($u | Out-String)</pre></body></html>" }
+$Script_Services = { $s = Get-Service | Where {$_.Status -eq 'Running'}; "<html><body><h1>Running Services</h1><pre>$($s | Out-String)</pre></body></html>" }
+$Script_Processes = { $p = Get-Process | Sort CPU -Descending | Select -First 50; "<html><body><h1>Top Processes</h1><pre>$($p | Out-String)</pre></body></html>" }
+$Script_Software = { $app = Get-WmiObject -Class Win32_Product; "<html><body><h1>Installed Software</h1><pre>$($app | Select Name, Version | Out-String)</pre></body></html>" }
+$Script_Netstat = { $n = netstat -ano; "<html><body><h1>Netstat</h1><pre>$($n | Out-String)</pre></body></html>" }
+$Script_IPConfig = { $i = ipconfig /all; "<html><body><h1>IP Config</h1><pre>$($i | Out-String)</pre></body></html>" }
+$Script_DiskSpace = { $d = Get-WmiObject Win32_LogicalDisk; "<html><body><h1>Disk Space</h1><pre>$($d | Select DeviceID, @{N='SizeGB';E={[math]::round($_.Size/1GB,2)}}, @{N='FreeGB';E={[math]::round($_.FreeSpace/1GB,2)}} | Out-String)</pre></body></html>" }
+$Script_Drivers = { $d = Get-WmiObject Win32_SystemDriver; "<html><body><h1>Drivers</h1><pre>$($d | Select Name, State, StartMode | Out-String)</pre></body></html>" }
+$Script_Startup = { $s = Get-CimInstance Win32_StartupCommand; "<html><body><h1>Startup Items</h1><pre>$($s | Out-String)</pre></body></html>" }
+$Script_SchedTask = { $t = Get-ScheduledTask; "<html><body><h1>Scheduled Tasks</h1><pre>$($t | Select TaskName, State | Out-String)</pre></body></html>" }
+$Script_Shares = { $s = Get-SmbShare; "<html><body><h1>Shares</h1><pre>$($s | Out-String)</pre></body></html>" }
+$Script_Updates = { $u = Get-HotFix | Sort InstalledOn -Desc | Select -First 20; "<html><body><h1>Recent Updates</h1><pre>$($u | Out-String)</pre></body></html>" }
+$Script_EnvVars = { $e = Get-ChildItem Env:; "<html><body><h1>Env Variables</h1><pre>$($e | Out-String)</pre></body></html>" }
+$Script_EventLog_Sec = { $l = Get-EventLog -LogName Security -Newest 100; "<html><body><h1>Security Log (Last 100)</h1><pre>$($l | Select TimeGenerated, EventID, Message | Out-String)</pre></body></html>" }
+$Script_EventLog_Sys = { $l = Get-EventLog -LogName System -Newest 100; "<html><body><h1>System Log (Last 100)</h1><pre>$($l | Select TimeGenerated, EventID, Message | Out-String)</pre></body></html>" }
+$Script_EventLog_App = { $l = Get-EventLog -LogName Application -Newest 100; "<html><body><h1>Application Log (Last 100)</h1><pre>$($l | Select TimeGenerated, EventID, Message | Out-String)</pre></body></html>" }
+
+# UPDATED v7.0: Safe USB History Report (No Timestamps)
+$Script_USBHistory = {
+    $usbDevices = @()
+    $rootKeys = Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Enum\USBSTOR" -ErrorAction SilentlyContinue
+    
+    foreach ($deviceKey in $rootKeys) {
+        $instances = Get-ChildItem -Path $deviceKey.PSPath -ErrorAction SilentlyContinue
+        foreach ($inst in $instances) {
+            try {
+                $friendly = (Get-ItemProperty -Path $inst.PSPath -ErrorAction Stop).FriendlyName
+                if ($friendly) {
+                    $obj = [PSCustomObject]@{ FriendlyName = $friendly; DeviceID = $inst.PSChildName }
+                    $usbDevices += $obj
+                }
+            } catch {}
+        }
+    }
+    if ($usbDevices) { "<html><body style='font-family:Segoe UI, sans-serif;'><h1>USB History</h1><pre>$($usbDevices | Select-Object FriendlyName, DeviceID | Format-Table -AutoSize | Out-String)</pre></body></html>" } 
+    else { "<html><body style='font-family:Segoe UI, sans-serif;'><h1>USB History</h1><p>No USB devices found.</p></body></html>" }
+}
+
+$Script_ARP = { $a = arp -a; "<html><body><h1>ARP Table</h1><pre>$($a | Out-String)</pre></body></html>" }
+$Script_Route = { $r = route print; "<html><body><h1>Route Table</h1><pre>$($r | Out-String)</pre></body></html>" }
+$Script_DNSCache = { $d = Get-DnsClientCache; "<html><body><h1>DNS Cache</h1><pre>$($d | Select Entry, Data | Out-String)</pre></body></html>" }
+$Script_Bitlocker = { $b = Get-BitLockerVolume; "<html><body><h1>Bitlocker Status</h1><pre>$($b | Select MountPoint, VolumeStatus, EncryptionPercentage | Out-String)</pre></body></html>" }
+
+$Script_Power = { 
+    $plan = powercfg /getactivescheme; $reqs = powercfg /requests
+    "<html><body><h1>Power Configuration</h1><h3>Active Scheme</h3><pre>$($plan | Out-String)</pre><h3>Power Requests (Sleep Blockers)</h3><pre>$($reqs | Out-String)</pre></body></html>" 
+}
+
+$Script_Firewall = { $f = Get-NetFirewallRule | Where Enabled -eq 'True'; "<html><body><h1>Active Firewall Rules</h1><pre>$($f | Select DisplayName, Direction, Action | Out-String)</pre></body></html>" }
+
+# UPDATED v7.4: Modified to allow silent running for Full Report
+function Run-UserDownloads ($SkipConfirm=$false) {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers in list."; return }
+    
+    if (-not $SkipConfirm) {
+        if ([System.Windows.Forms.MessageBox]::Show("Generate Download History Report for ALL listed computers?`n`nNote: This scans all user profiles via Admin Shares.", "Confirm Audit", "YesNo", "Question") -ne "Yes") { return }
+    }
+
+    Write-Log "--- Starting User Downloads Report Batch ---"
+    
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        if (-not (Test-Connection -ComputerName $pc -Count 1 -Quiet)) { Write-Log "$pc : OFFLINE - Skipping Downloads"; continue }
+        Write-Log "$pc : Scanning Downloads..."
+        $destBase = "$env:USERPROFILE\Desktop\$pc TREX REPORTS\Downloads"
+        if (-not (Test-Path $destBase)) { New-Item -ItemType Directory -Path $destBase -Force | Out-Null }
+        $AdminUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+        $ReportTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $HeaderHTML = @"
+        <div style="background-color:#e0e0e0; border-bottom:3px solid #b30000; padding:15px; margin-bottom:20px; font-family:Segoe UI, sans-serif;">
+            <h2 style="margin:0; color:#b30000;">TREX REPORT: Download History</h2>
+            <p style="margin:5px 0 0 0; font-size:14px;"><b>Target Computer:</b> $pc <span style="margin:0 10px;">|</span><b>Date Pulled:</b> $ReportTime <span style="margin:0 10px;">|</span><b>Generated By:</b> $AdminUser</p>
+        </div>
+"@
+        try {
+            $userProfiles = Get-ChildItem "\\$pc\C$\Users" | Where-Object { $_.PSIsContainer }
+            foreach ($profile in $userProfiles) {
+                $username = $profile.Name; $downloadsPath = "\\$pc\C$\Users\$username\Downloads"
+                if (Test-Path $downloadsPath) {
+                    $files = Get-ChildItem -Path $downloadsPath -ErrorAction SilentlyContinue | Select-Object Name, Length, LastWriteTime
+                    if ($files) {
+                        $htmlPath = "$destBase\Downloads_$username.html"
+                        $html = "<html><head><title>Downloads - $username</title><style>body{font-family:Segoe UI} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:8px} th{background:#0078D7;color:white}</style></head><body>"
+                        $html += $HeaderHTML; $html += "<h3>User: $username</h3><table><tr><th>File</th><th>Size (KB)</th><th>Date</th></tr>"
+                        foreach ($f in $files) { $size = [math]::Round($f.Length / 1KB, 0); $html += "<tr><td>$($f.Name)</td><td>$size</td><td>$($f.LastWriteTime)</td></tr>" }
+                        $html += "</table></body></html>"; $html | Out-File -FilePath $htmlPath -Encoding UTF8
+                        Write-Log "$pc : Saved Downloads_$username.html"
+                    }
+                }
+            }
+            # Auto-open downloads folder
+            Invoke-Item $destBase
+        } catch { Write-Log "$pc : Error accessing Admin Share (C$). Check permissions." }
+        [System.Windows.Forms.Application]::DoEvents()
+    }
+    Write-Log "--- Downloads Report Batch Complete ---"
+}
+
+# UPDATED v7.4: Modified to allow silent running for Full Report
+function Run-WebHistory ($SkipConfirm=$false) {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers in list."; return }
+
+    if (-not $SkipConfirm) {
+        if ([System.Windows.Forms.MessageBox]::Show("Pull Browser History artifacts from ALL listed computers?`n`nNote: This copies .db/.sqlite files to your desktop.`nBrowsers must be CLOSED on target or files may be locked.", "Artifact Collection", "YesNo", "Warning") -ne "Yes") { return }
+    }
+
+    Write-Log "--- Starting Browser Artifact Collection Batch ---"
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        if (-not (Test-Connection -ComputerName $pc -Count 1 -Quiet)) { Write-Log "$pc : OFFLINE - Skipping Browser History"; continue }
+        Write-Log "$pc : Pulling artifacts..."
+        $destBase = "$env:USERPROFILE\Desktop\$pc TREX REPORTS\BrowserHistory"
+        if (-not (Test-Path $destBase)) { New-Item -ItemType Directory -Path $destBase -Force | Out-Null }
+        
+        try {
+            $users = Get-ChildItem "\\$pc\C$\Users" | Where-Object { $_.PSIsContainer }
+            foreach ($u in $users) {
+                $user = $u.Name; $root = "\\$pc\C$\Users\$user\AppData"
+                if (Test-Path "$root\Local\Google\Chrome\User Data\Default\History") { Copy-Item "$root\Local\Google\Chrome\User Data\Default\History" "$destBase\Chrome_$user.db" -ErrorAction SilentlyContinue; Write-Log "$pc : Got Chrome ($user)" }
+                if (Test-Path "$root\Local\Microsoft\Edge\User Data\Default\History") { Copy-Item "$root\Local\Microsoft\Edge\User Data\Default\History" "$destBase\Edge_$user.db" -ErrorAction SilentlyContinue; Write-Log "$pc : Got Edge ($user)" }
+                $fx = Get-ChildItem "$root\Roaming\Mozilla\Firefox\Profiles" -Filter "places.sqlite" -Recurse -ErrorAction SilentlyContinue | Select -First 1
+                if ($fx) { Copy-Item $fx.FullName "$destBase\Firefox_$user.sqlite" -ErrorAction SilentlyContinue; Write-Log "$pc : Got Firefox ($user)" }
+            }
+            # Auto-open artifacts folder
+            Invoke-Item $destBase
+        } catch { Write-Log "$pc : Error accessing C$ share." }
+        [System.Windows.Forms.Application]::DoEvents()
+    }
+    Write-Log "--- Artifact Collection Batch Complete ---"
+}
+
+# -------------------------
+# 8. STANDARD TOOLS
+# -------------------------
+
+function PingTool {
+    Write-Log "--- Starting Ping Check ---"
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        $statusText.Text = "Pinging $pc..."
+        [System.Windows.Forms.Application]::DoEvents()
+        if (Test-Connection -ComputerName $pc -Count 1 -Quiet) { Write-Log "$pc : ONLINE" } else { Write-Log "$pc : OFFLINE" }
+    }
+    $statusText.Text = "Ready"
+    Write-Log "--- Ping Check Complete ---"
+}
+
+function PCINFO {
+    Run-RemoteBlock "Get PC Info" {
+        $cs = Get-CimInstance Win32_ComputerSystem; $os = Get-CimInstance Win32_OperatingSystem; $bios = Get-CimInstance Win32_BIOS
+        $mem = Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum; $ramGB = [Math]::Round($mem.Sum / 1GB, 1)
+        $net = Get-CimInstance Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true } | Select-Object -First 1
+        return "------------------------------`r`n HOST:   $($cs.Name)`r`n SERIAL: $($bios.SerialNumber)`r`n OS:     $($os.Caption)`r`n RAM:    $($ramGB) GB`r`n IP:     $($net.IPAddress[0])`r`n MAC:    $($net.MACAddress)`r`n------------------------------"
+    }
+}
+
+function ViewUser { Run-RemoteBlock "Get User" { (Get-WmiObject Win32_ComputerSystem).UserName } }
+
+# --- MESSAGE TOOLS ---
+function SENDMESSAGE {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers selected."; return }
+    $msg = [Microsoft.VisualBasic.Interaction]::InputBox("Enter message (Text Only):", "Standard Message")
+    if ([string]::IsNullOrWhiteSpace($msg)) { return }
+    Write-Log "--- Sending Standard Message ---"
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        if (Test-Connection -ComputerName $pc -Count 1 -Quiet) {
+            try { Invoke-WmiMethod -Path Win32_Process -Name Create -ArgumentList "msg * $msg" -ComputerName $pc | Out-Null; Write-Log "$pc : Sent" } catch { Write-Log "$pc : Error - $($_.Exception.Message)" }
+        } else { Write-Log "$pc : OFFLINE" }
+    }
+    Write-Log "--- Done ---"
+}
+
+# UPDATED v7.14: Fixed "Error" log by using Start-Process for msg.exe and separating error handling
+function SENDMESSAGE_ALERT {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers selected."; return }
+    $msg = [Microsoft.VisualBasic.Interaction]::InputBox("Enter URGENT message:", "Voice/Alert Broadcast")
+    if ([string]::IsNullOrWhiteSpace($msg)) { return }
+    if ($wshell.Popup("BROADCAST ALERT to $($itemList.Items.Count) computers?`n`nMessage: $msg", 0, "Confirm Broadcast", 0x1) -ne 1) { return }
+    Write-Log "--- Starting Alert Broadcast ---"
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        if (Test-Connection -ComputerName $pc -Count 1 -Quiet) {
+            try {
+                Invoke-Command -ComputerName $pc -ScriptBlock {
+                    param($messageText)
+                    
+                    # 1. VISUAL POPUP
+                    # Using Start-Process to avoid pipeline errors crashing the script block.
+                    # This is more reliable than "cmd /c echo | msg"
+                    $cleanMsg = "IT DEPT ALERT: $messageText"
+                    try {
+                        Start-Process "msg.exe" -ArgumentList "* /TIME:300 `"$cleanMsg`"" -WindowStyle Hidden -ErrorAction SilentlyContinue
+                    } catch {}
+
+                    # 2. VOLUME BOOST
+                    $wsh = New-Object -ComObject WScript.Shell
+                    Start-Sleep -Milliseconds 100
+                    try {
+                        for ($i=0; $i -lt 15; $i++) { 
+                            $wsh.SendKeys([char]175) 
+                            Start-Sleep -Milliseconds 30
+                        }
+                    } catch {}
+
+                    # 3. TTS
+                    try { 
+                        Add-Type -AssemblyName System.Speech
+                        $s = New-Object System.Speech.Synthesis.SpeechSynthesizer
+                        $s.Volume = 100 
+                        $s.Speak("Attention. This is an important message from the IT Department. $messageText") 
+                    } catch {}
+                    
+                    try { [Console]::Beep(1000, 400); [Console]::Beep(1500, 400) } catch {}
+                } -ArgumentList $msg -ErrorAction Stop
+                Write-Log "$pc : Alert Sent"
+            } catch { Write-Log "$pc : Error sending Alert (Check connection)" }
+        } else { Write-Log "$pc : OFFLINE" }
+    }
+    Write-Log "--- Alert Broadcast Complete ---"
+}
+
+# GLOBAL POWER ACTIONS
+function Restart { Run-RemoteBlock "Restart" { Restart-Computer -Force; "Restarted" } }
+function Shutdn { Run-RemoteBlock "Shutdown" { Stop-Computer -Force; "Shutdown" } }
+function LogOff { Run-RemoteBlock "Logoff" { (Get-WmiObject -Class Win32_OperatingSystem -EnableAllPrivileges).Win32Shutdown(0); "Logoff Sent" } }
+
+function RemoveFile {
+    $fileLoc = [Microsoft.VisualBasic.Interaction]::InputBox("Path (e.g. C:\Windows\file.exe)", "Delete File")
+    if ($fileLoc -match "^([A-Za-z]):\\(.*)") {
+        $path = $matches[2]; $adminPath = "$($matches[1])`$\$path"
+        foreach ($item in $itemList.Items) {
+            $pc = [string]$item
+            if (Test-Path "\\$pc\$adminPath") { Remove-Item "\\$pc\$adminPath" -Force; Write-Log "$pc : Deleted" } else { Write-Log "$pc : Not found" }
+        }
+    }
+}
+function RepairSCCM { Run-RemoteBlock "SCCM Repair" { Stop-Service CcmExec -Force -ErrorAction SilentlyContinue; Start-Process "C:\windows\ccm\ccmrepair.exe" -Wait; "Done" } }
+
+function SubFolder {
+    Write-Log "--- Sub Folder Tool Started ---"
+    if ($wshell.Popup("Create 'SUB FOLDER' shortcut on all PC's?", 0, "Confirm", 0x1) -ne 1) { return }
+    $ctr = $itemList.Items.Count; if ($ctr -eq 0) { return }
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        if (Test-Connection -ComputerName $pc -Count 1 -Quiet) {
+            try {
+                Invoke-Command -ComputerName $pc -ScriptBlock {
+                    $s = (New-Object -ComObject WScript.Shell).CreateShortcut("C:\Users\Public\Desktop\SUB FOLDER.lnk"); $s.TargetPath = "C:\Users\Public\Documents"; $s.Save()
+                }; Write-Log "$pc : Shortcut Created"
+            } catch { Write-Log "$pc : Error" }
+        } else { Write-Log "$pc : OFFLINE" }
+    }
+    $wshell.Popup("Created Shortcuts.", 0, "Done")
+}
+
+function REMOTEFILECOPY {
+    Write-Log "Starting Remote File Copy Tool."
+    $fd = New-Object System.Windows.Forms.OpenFileDialog; $fd.Title = "Select File to Copy"
+    if ($fd.ShowDialog() -ne "OK") { Write-Log "No file selected."; return }
+    $sourceFile = $fd.FileName; $fileName = [System.IO.Path]::GetFileName($sourceFile)
+    $remotePath = [Microsoft.VisualBasic.Interaction]::InputBox("Enter destination path (use Admin Share format):", "Destination", "C$\Users\Public\Desktop")
+    if ([string]::IsNullOrWhiteSpace($remotePath)) { return }
+    if ($wshell.Popup("Copy '$fileName' to '$remotePath' on $($itemList.Items.Count) computers?", 0, "Confirm", 0x1) -ne 1) { return }
+    
+    foreach ($item in $itemList.Items) {
+        $pc = [string]$item
+        if (Test-Connection -ComputerName $pc -Count 1 -Quiet) {
+            try { Copy-Item -Path $sourceFile -Destination "\\$pc\$remotePath" -Force -ErrorAction Stop; Write-Log "$pc : Copied" } 
+            catch { Write-Log "$pc : Error - $($_.Exception.Message)" }
+        } else { Write-Log "$pc : OFFLINE" }
+    }
+    $wshell.Popup("File Copy Complete.", 0, "Done")
+}
+
+function BULKUNINSTALL {
+    Write-Log "Starting Bulk Uninstall Tool."; if ($itemList.Items.Count -eq 0) { Write-Log "No computers selected."; return }
+    $firstComputer = [string]$itemList.Items[0]; Write-Log "Querying $firstComputer..."
+    try {
+        if (-not (Test-Connection $firstComputer -Count 1 -Quiet)) { [System.Windows.Forms.MessageBox]::Show("First computer offline.", "Error"); return }
+        $softwareList = Invoke-Command -ComputerName $firstComputer -ScriptBlock {
+            $keys = @("HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*", "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*")
+            $apps = foreach ($key in $keys) { Get-ItemProperty $key -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -and $_.UninstallString } | Select-Object DisplayName, UninstallString }
+            return $apps | Sort-Object DisplayName -Unique
+        }
+        $selectedSoftware = $softwareList | Out-GridView -OutputMode Multiple -Title "Select software to uninstall"
+        if (-not $selectedSoftware) { return }
+
+        foreach ($app in $selectedSoftware) {
+            $rawCmd = $app.UninstallString; $appName = $app.DisplayName
+            $proposedCmd = if ($rawCmd -match "MsiExec.exe") { $rawCmd.Replace("/I","/X").Replace("/i","/X") + " /qn /norestart" } else { "$rawCmd /S" }
+            $userConfirmedCmd = [Microsoft.VisualBasic.Interaction]::InputBox("VERIFY COMMAND for: $appName", "Verify Uninstall Command", $proposedCmd)
+            if ([string]::IsNullOrWhiteSpace($userConfirmedCmd)) { continue }
+
+            foreach ($item in $itemList.Items) {
+                $pc = [string]$item
+                if (Test-Connection -ComputerName $pc -Count 1 -Quiet) {
+                    Write-Log "$pc : Uninstalling $appName..."
+                    Invoke-Command -ComputerName $pc -ScriptBlock { param($cmd) try { Start-Process "cmd.exe" -ArgumentList "/c $cmd" -Wait -NoNewWindow } catch {} } -ArgumentList $userConfirmedCmd
+                } else { Write-Log "$pc : OFFLINE" }
+            }
+        }
+        $wshell.Popup("Uninstall process finished.", 0, "Done")
+    } catch { Write-Log "Error: $($_.Exception.Message)" }
+}
+
+
+function NICSPEED {
+    Write-Log "Starting NIC Speed Tool."
+    if ($wshell.Popup("Check NIC Link Speeds on all PC(s)?", 0, "Confirm", 0x1) -eq 1) {
+        foreach ($item in $itemList.Items) {
+            $pc = [string]$item
+            if (Test-Connection -Count 1 -ComputerName $pc -Count 1 -Quiet) {
+                Write-Log "$pc : ONLINE"
+                try {
+                    $speed = Invoke-Command -ComputerName $pc -ScriptBlock { Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty LinkSpeed } -ErrorAction SilentlyContinue
+                    if ($speed) { $outputBox.AppendText("$pc : Link Speed $speed`r`n"); Write-Log "$pc : $speed" } else { $outputBox.AppendText("$pc : No active adapter found.`r`n") }
+                } catch { Write-Log "$pc : Error - $($_.Exception.Message)" }
+            } else { Write-Log "$pc : OFFLINE" }
+        }
+        Write-Log "--- NIC Check Complete ---"
+    }
+}
+
+function REMOVEPIN {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers selected."; return }
+    if ([System.Windows.Forms.MessageBox]::Show("WARNING: This will remove the Windows PIN and Biometrics and RESTART computers!", "Confirm Action", "YesNo", "Warning") -eq "Yes") {
+        Run-RemoteBlock "Remove PIN/Bio" {
+            Stop-Service WbioSrvc -Force -ErrorAction SilentlyContinue
+            cmd.exe /c takeown /F C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /R /D Y | Out-Null
+            cmd.exe /c icacls C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC /grant administrators:F /T | Out-Null
+            Remove-Item "C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\NGC" -Recurse -Force -ErrorAction SilentlyContinue
+            cmd.exe /c takeown /F C:\Windows\System32\WinBioDatabase /R /D Y | Out-Null
+            cmd.exe /c icacls C:\Windows\System32\WinBioDatabase /grant administrators:F /T | Out-Null
+            Remove-Item "C:\Windows\System32\WinBioDatabase" -Recurse -Force -ErrorAction SilentlyContinue
+            Restart-Computer -Force
+        }
+    }
+}
+
+# --- AD SEARCH ---
+function GUIDSIDSEARCH {
+    $inputValue = [Microsoft.VisualBasic.Interaction]::InputBox("Enter a SID, GUID, SamAccountName, or UserPrincipalName:", "Universal AD Identifier Resolver", "")
+    if ([string]::IsNullOrWhiteSpace($inputValue)) { return }
+    $results = @(); Write-Log "--- Starting AD Search for: $inputValue ---"
+    try {
+        $root = [ADSI]"LDAP://RootDSE"; $domain = $root.defaultNamingContext
+        $searcher = New-Object DirectoryServices.DirectorySearcher([ADSI]"LDAP://$domain")
+        $searcher.PageSize = 1000
+        $searcher.PropertiesToLoad.AddRange(@("name", "objectClass", "distinguishedName", "samaccountname", "userPrincipalName"))
+        $isSID = $inputValue -match '^S-\d(-\d+)+$'; $isGUID = $inputValue -match '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$' -or $inputValue -match '^\{[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\}$'
+        if ($isSID) { $sid = New-Object System.Security.Principal.SecurityIdentifier($inputValue); $sidBytes = New-Object byte[] ($sid.BinaryLength); $sid.GetBinaryForm($sidBytes, 0); $ldapSid = ($sidBytes | ForEach-Object { '\' + $_.ToString('X2') }) -join ''; $searcher.Filter = "(objectSID=$ldapSid)"; $results += "Searching by objectSID..." }
+        elseif ($isGUID) { $normalizedGUID = $inputValue.Trim('{}'); $guid = [GUID]$normalizedGUID; $guidBytes = $guid.ToByteArray(); $ldapGuid = ($guidBytes | ForEach-Object { '\' + $_.ToString('X2') }) -join ''; $searcher.Filter = "(objectGUID=$ldapGuid)"; $results += "Searching by objectGUID..." }
+        else { $searcher.Filter = "(|(samAccountName=$inputValue)(userPrincipalName=$inputValue)(name=$inputValue))"; $results += "Searching by SamAccountName, UPN, or Name..." }
+        $result = $searcher.FindOne()
+        if ($result) { $props = $result.Properties; $results += "✅ Object Found:`n Name: $($props['name'][0])`n Class: $($props['objectclass'][-1])`n DN: $($props['distinguishedname'][0])" } else { $results += "❌ No AD object matched that identifier." }
+    } catch { $results += "Error: $($_.Exception.Message)" }
+    [System.Windows.Forms.MessageBox]::Show(($results -join "`n"), "AD Lookup", 0, [System.Windows.Forms.MessageBoxIcon]::Information)
+}
+
+# UPDATED v7.4: TREX Full Run includes DL History and Web Artifacts (Silent Mode)
+function TrexFullRun {
+    if ($itemList.Items.Count -eq 0) { Write-Log "No computers selected."; return }
+    Write-Log "--- RUNNING TREX FULL BATCH ---"
+    
+    # Run all automated HTML reports (25+ items)
+    Generate-HTMLReport "PC Info" "PCInfo.html" $Script_PCInfo
+    Generate-HTMLReport "Local Users" "LocalUsers.html" $Script_LocalUsers
+    Generate-HTMLReport "Services" "Services.html" $Script_Services
+    Generate-HTMLReport "Processes" "Processes.html" $Script_Processes
+    Generate-HTMLReport "Software" "Software.html" $Script_Software
+    Generate-HTMLReport "Netstat" "Netstat.html" $Script_Netstat
+    Generate-HTMLReport "IP Config" "IPConfig.html" $Script_IPConfig
+    Generate-HTMLReport "Disk Space" "Disk.html" $Script_DiskSpace
+    Generate-HTMLReport "Drivers" "Drivers.html" $Script_Drivers
+    Generate-HTMLReport "Startup Apps" "Startup.html" $Script_Startup
+    Generate-HTMLReport "Event: Security" "Events_Sec.html" $Script_EventLog_Sec
+    Generate-HTMLReport "Event: System" "Events_Sys.html" $Script_EventLog_Sys
+    Generate-HTMLReport "Event: Apps" "Events_App.html" $Script_EventLog_App
+    Generate-HTMLReport "Sched Tasks" "Tasks.html" $Script_SchedTask
+    Generate-HTMLReport "Network Shares" "Shares.html" $Script_Shares
+    Generate-HTMLReport "Updates" "Updates.html" $Script_Updates
+    Generate-HTMLReport "Env Vars" "EnvVars.html" $Script_EnvVars
+    Generate-HTMLReport "USB History" "USBHistory.html" $Script_USBHistory
+    Generate-HTMLReport "ARP Table" "ARP.html" $Script_ARP
+    Generate-HTMLReport "Route Table" "Route.html" $Script_Route
+    Generate-HTMLReport "DNS Cache" "DNSCache.html" $Script_DNSCache
+    Generate-HTMLReport "Bitlocker" "Bitlocker.html" $Script_Bitlocker
+    Generate-HTMLReport "Power Config" "Power.html" $Script_Power
+    Generate-HTMLReport "Firewall" "Firewall.html" $Script_Firewall
+    Generate-HTMLReport "Network Rpt" "NetworkReport.html" $Script_NetworkReport
+    Generate-HTMLReport "Uptime Report" "Uptime.html" $Script_Uptime
+    
+    # NEW: Run Artifact Collectors Silently
+    Run-UserDownloads $true  # $true skips popup
+    Run-WebHistory $true     # $true skips popup
+
+    Write-Log "--- BATCH COMPLETE ---"
+}
+
+function MACINFO {
+  $outputBox.AppendText("Looking Up MAC Address Vendor..." + [Environment]::NewLine)
+  Add-Type -AssemblyName System.Windows.Forms; $form = New-Object System.Windows.Forms.Form; $form.Text = 'MAC'; $form.Width = 350; $form.Height = 200; $form.StartPosition = 'CenterScreen'
+  $label = New-Object System.Windows.Forms.Label; $label.Location = New-Object System.Drawing.Point(10, 20); $label.Size = New-Object System.Drawing.Size(280, 20); $label.Text = 'Enter MAC Address:'; $form.Controls.Add($label)
+  $textbox = New-Object System.Windows.Forms.TextBox; $textbox.Location = New-Object System.Drawing.Point(10, 40); $textbox.Size = New-Object System.Drawing.Size(260, 20); $form.Controls.Add($textbox)
+  $button = New-Object System.Windows.Forms.Button; $button.Location = New-Object System.Drawing.Point(180, 80); $button.Size = New-Object System.Drawing.Size(90, 30); $button.Text = 'OK'; $button.DialogResult = [System.Windows.Forms.DialogResult]::OK; $form.AcceptButton = $button; $form.Controls.Add($button)
+  $form.Topmost = $true
+  if ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+    # UPDATED v7.12: Removed colon from output to fix syntax/display issue
+    $macAddress = $textbox.Text; Add-Type -AssemblyName System.Net.Http; $httpClient = New-Object System.Net.Http.HttpClient; $url = "https://api.macvendors.com/$macAddress"
+    try { $result = $httpClient.GetStringAsync($url).Result; $outputBox.AppendText("MAC Info for $macAddress $result" + [Environment]::NewLine) } catch { $outputBox.AppendText("Error fetching MAC info." + [Environment]::NewLine) }
+  }
+}
+
+function TINYURL {
+  Add-Type -AssemblyName System.Windows.Forms; $form = New-Object System.Windows.Forms.Form; $form.Text = 'Tiny URL Tracer'; $form.Width = 400; $form.Height = 200; $form.StartPosition = 'CenterScreen'
+  $label = New-Object System.Windows.Forms.Label; $label.Location = New-Object System.Drawing.Point(10, 20); $label.Size = New-Object System.Drawing.Size(280, 20); $label.Text = 'Enter URL:'; $form.Controls.Add($label)
+  $textbox = New-Object System.Windows.Forms.TextBox; $textbox.Location = New-Object System.Drawing.Point(10, 40); $textbox.Size = New-Object System.Drawing.Size(360, 20); $form.Controls.Add($textbox)
+  $button = New-Object System.Windows.Forms.Button; $button.Location = New-Object System.Drawing.Point(280, 80); $button.Size = New-Object System.Drawing.Size(90, 30); $button.Text = 'OK'; $button.DialogResult = [System.Windows.Forms.DialogResult]::OK; $form.AcceptButton = $button; $form.Controls.Add($button)
+  $form.Topmost = $true
+  if ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+    $startUrl = $textbox.Text; if ($startUrl -notmatch "^http") { $startUrl = "http://$startUrl" }
+    $outputBox.AppendText("Tracing: $startUrl`r`n"); $currentUrl = $startUrl; $hop = 0
+    while ($hop -lt 10) {
+        try {
+            $req = [System.Net.HttpWebRequest]::Create($currentUrl); $req.Method = "GET"; $req.AllowAutoRedirect = $false; $resp = $req.GetResponse()
+            $code = [int]$resp.StatusCode; if ($code -ge 300 -and $code -lt 400) { $newUrl = $resp.Headers["Location"]; $outputBox.AppendText("Hop $($hop+1) [$code]: $newUrl`r`n"); $resp.Close(); $currentUrl = $newUrl; $hop++ } else { $outputBox.AppendText("Final [$code]: $currentUrl`r`n"); $resp.Close(); break }
+        } catch { $outputBox.AppendText("Error: $($_.Exception.Message)`r`n"); break }
+    }
+  }
+}
+
+function HASH {
+    Write-Log "Opening Hash Tool..."; Add-Type -AssemblyName System.Windows.Forms
+    $form = New-Object System.Windows.Forms.Form; $form.StartPosition = 'CenterScreen'; $form.Size = New-Object System.Drawing.Size(500, 200); $form.Text = "Hash Calc"
+    $label = New-Object System.Windows.Forms.Label; $label.Location = New-Object System.Drawing.Point(10, 20); $label.Size = New-Object System.Drawing.Size(460, 20); $label.Text = "Select file to hash:"
+    $textbox = New-Object System.Windows.Forms.TextBox; $textbox.Location = New-Object System.Drawing.Point(10, 50); $textbox.Size = New-Object System.Drawing.Size(350, 25); $textbox.ReadOnly = $true
+    $btnBrowse = New-Object System.Windows.Forms.Button; $btnBrowse.Text = "Browse..."; $btnBrowse.Location = New-Object System.Drawing.Point(370, 48); $btnBrowse.Size = New-Object System.Drawing.Size(100, 27)
+    $btnCalc = New-Object System.Windows.Forms.Button; $btnCalc.Text = "Calculate"; $btnCalc.Location = New-Object System.Drawing.Point(150, 100); $btnCalc.Size = New-Object System.Drawing.Size(180, 35)
+    $form.Controls.AddRange(@($label, $textbox, $btnBrowse, $btnCalc))
+    $btnBrowse.Add_Click({ $ofd = New-Object System.Windows.Forms.OpenFileDialog; if ($ofd.ShowDialog() -eq 'OK') { $textbox.Text = $ofd.FileName } })
+    $btnCalc.Add_Click({ 
+        if ([string]::IsNullOrWhiteSpace($textbox.Text)) { return }
+        $algos = "MD5", "SHA1", "SHA256"; foreach ($a in $algos) { try { $h = Get-FileHash $textbox.Text -Algorithm $a; Write-Log "$a : $($h.Hash)" } catch { Write-Log "Error hashing $a" } } 
+    })
+    $form.Topmost = $true; [void]$form.ShowDialog()
+}
+
+function WHOIS {
+    Add-Type -AssemblyName System.Windows.Forms; $form = New-Object System.Windows.Forms.Form; $form.Size = New-Object System.Drawing.Size(400, 600); $form.Text = "Whois"; $form.StartPosition = 'CenterScreen'
+    $ipLabel = New-Object System.Windows.Forms.Label; $ipLabel.Location = New-Object System.Drawing.Point(20, 20); $ipLabel.Text = "Enter IP/URL:"; $form.Controls.Add($ipLabel)
+    $ipTextBox = New-Object System.Windows.Forms.TextBox; $ipTextBox.Location = New-Object System.Drawing.Point(20, 50); $ipTextBox.Size = New-Object System.Drawing.Size(200, 20); $form.Controls.Add($ipTextBox)
+    $outputTextBox = New-Object System.Windows.Forms.TextBox; $outputTextBox.Location = New-Object System.Drawing.Point(20, 100); $outputTextBox.Size = New-Object System.Drawing.Size(360, 420); $outputTextBox.Multiline = $true; $outputTextBox.ScrollBars = "Vertical"; $form.Controls.Add($outputTextBox)
+    $btn = New-Object System.Windows.Forms.Button; $btn.Location = New-Object System.Drawing.Point(230, 50); $btn.Size = New-Object System.Drawing.Size(150, 20); $btn.Text = "Lookup"; $form.Controls.Add($btn)
+    $btn.Add_Click({ 
+        try { 
+            $ip = $ipTextBox.Text; if ($ip -notmatch "\d+\.\d+\.\d+\.\d+") { $ip = (Resolve-DnsName $ip -ErrorAction Stop | Select -First 1).IPAddress }
+            $r = Invoke-WebRequest "http://ip-api.com/json/$ip" -UseBasicParsing; $outputTextBox.Text = ($r.Content -replace '[{}"]', '' -replace ',', "`r`n") 
+        } catch { $outputTextBox.Text = "Error: $($_.Exception.Message)" } 
+    })
+    $form.Topmost = $true; [void]$form.ShowDialog()
+}
+
+# -------------------------
+# 9. TAB LAYOUT
+# -------------------------
+
+$tabControl = New-Object System.Windows.Forms.TabControl
+$tabControl.Location = New-Object System.Drawing.Point(260, 50)
+$tabControl.Size = New-Object System.Drawing.Size(600, 560)
+$tabControl.SizeMode = "Fixed"
+$tabControl.ItemSize = New-Object System.Drawing.Size(115, 40)
+$tabControl.Appearance = "Normal" 
+$tabControl.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+$Form.Controls.Add($tabControl)
+
+$tabRemote = New-Object System.Windows.Forms.TabPage("Home")
+$tabFix    = New-Object System.Windows.Forms.TabPage("Fix")
+$tabSec    = New-Object System.Windows.Forms.TabPage("Security")
+$tabTrex   = New-Object System.Windows.Forms.TabPage("TREX FORENSIC")
+
+$tabControl.TabPages.Add($tabRemote)
+$tabControl.TabPages.Add($tabFix)
+$tabControl.TabPages.Add($tabSec)
+
+if ($TrexWhitelist -contains "*" -or $TrexWhitelist -contains $env:USERNAME) { $tabControl.TabPages.Add($tabTrex) }
+foreach($t in $tabControl.TabPages){$t.BackColor="Black"}
+
+# --- HOME / REMOTE TAB ---
+New-TabBanner "Home / Remote Connectivity" $tabRemote "DarkCyan"
+New-ToolkitButton "Ping Check"    20 50 $tabRemote "DarkCyan" 160 { PingTool }
+New-ToolkitButton "Get PC Info"   200 50 $tabRemote "DarkSlateBlue" 160 { PCINFO }
+New-ToolkitButton "Current User"  380 50 $tabRemote "Teal" 160 { ViewUser }
+
+New-ToolkitButton "Remote C:"     20 100 $tabRemote "Orange" 160 { Invoke-Item "\\$(Get-SelectedPC)\c$" }
+New-ToolkitButton "Send Msg (Text)"  200 100 $tabRemote "DarkOrange" 160 { SENDMESSAGE }
+New-ToolkitButton "Send Msg (ALERT)" 380 100 $tabRemote "Red" 160 { SENDMESSAGE_ALERT }
+
+New-ToolkitButton "Check NIC Speed" 20 150 $tabRemote "DarkCyan" 160 { NICSPEED }
+
+# --- FIX TAB ---
+New-TabBanner "Quick Fixes & File Operations" $tabFix "Maroon"
+New-ToolkitButton "Repair SCCM"   20 50 $tabFix "Firebrick" 170 { RepairSCCM }
+New-ToolkitButton "Del File"      210 50 $tabFix "DimGray" 170 { RemoveFile }
+New-ToolkitButton "Sub Folder"    400 50 $tabFix "DimGray" 170 { SubFolder }
+New-ToolkitButton "Bulk Uninstall" 20 100 $tabFix "DarkRed" 550 { BULKUNINSTALL }
+New-ToolkitButton "Remote File Copy" 20 150 $tabFix "SteelBlue" 270 { REMOTEFILECOPY }
+
+
+# --- SECURITY TAB ---
+New-TabBanner "Security Checks" $tabSec "SteelBlue"
+New-ToolkitButton "SMBv1 Check"   20 50 $tabSec "SteelBlue" 260 { Run-RemoteBlock "SMBv1" { if ((Get-SmbServerConfiguration).EnableSMB1Protocol) { "CRITICAL: SMBv1 is ENABLED!`r`nRISK: High susceptibility to Ransomware (WannaCry) & lateral movement." } else { "SECURE: SMBv1 is Disabled." } } }
+New-ToolkitButton "Local Admin"   300 50 $tabSec "SteelBlue" 260 { Run-RemoteBlock "Admins" { $m = Get-LocalGroupMember Administrators | Select -Expand Name; "Local Administrators:`r`n$($m -join "`r`n")`r`n`r`nNOTE: Ensure only authorized IT accounts are listed." } }
+
+# NEW: VERBOSE SECURITY CHECKS
+New-ToolkitButton "LLMNR Status"      20 100 $tabSec "SteelBlue" 260 { Run-RemoteBlock "LLMNR" { $v = (Get-ItemProperty "HKLM:\Software\Policies\Microsoft\Windows NT\DNSClient" -Name EnableMulticast -ErrorAction SilentlyContinue).EnableMulticast; if ($v -eq 0) { "SECURE: LLMNR is Disabled." } else { "WARNING: LLMNR is ENABLED (Default).`r`nRISK: Susceptible to poisoning attacks (Responder) & credential theft." } } }
+New-ToolkitButton "NetBIOS (NBT-NS)"  300 100 $tabSec "SteelBlue" 260 { Run-RemoteBlock "NBT-NS" { $w = Get-WmiObject Win32_NetworkAdapterConfiguration | Where IPEnabled -eq True; if ($w.TcpipNetbiosOptions -contains 2) { "SECURE: NetBIOS over TCP/IP is Disabled." } else { "WARNING: NetBIOS over TCP/IP is ENABLED.`r`nRISK: Susceptible to NBT-NS poisoning/spoofing." } } }
+
+New-ToolkitButton "Defender RTP"      20 150 $tabSec "SteelBlue" 260 { Run-RemoteBlock "Defender" { if ((Get-MpComputerStatus).RealTimeProtectionEnabled) { "SECURE: Defender Real-Time Protection is ON." } else { "CRITICAL: Defender Real-Time Protection is OFF!`r`nRISK: No active protection against malware." } } }
+New-ToolkitButton "RDP NLA Check"     300 150 $tabSec "SteelBlue" 260 { Run-RemoteBlock "RDP NLA" { $r = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name "UserAuthentication"; if ($r.UserAuthentication -eq 1) { "SECURE: NLA is Enforced for RDP." } else { "WARNING: NLA is NOT Enforced!`r`nRISK: Vulnerable to BlueKeep/RDP Credential harvesting." } } }
+
+New-ToolkitButton "Firewall"          20 200 $tabSec "SteelBlue" 260 { Run-RemoteBlock "Firewall" { $p = Get-NetFirewallProfile | Where Enabled -eq True | Select -ExpandProperty Name; if ($p) { "Active Firewall Profiles: $p`r`nSTATUS: Firewall is ON." } else { "DANGER: Windows Firewall is COMPLETELY OFF!" } } }
+New-ToolkitButton "UAC Status"        300 200 $tabSec "SteelBlue" 260 { Run-RemoteBlock "UAC" { $v = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA; if ($v -eq 1) { "SECURE: UAC is Enabled." } else { "DANGER: UAC is DISABLED!`r`nRISK: Malicious scripts run with full Admin rights silently." } } }
+
+New-ToolkitButton "Last Reboot"       20 250 $tabSec "SteelBlue" 260 { Run-RemoteBlock "Reboot" { $b = (Get-CimInstance Win32_OperatingSystem).LastBootUpTime; $d = (New-TimeSpan -Start $b -End (Get-Date)).Days; "Last Reboot: $b`r`nUptime: $d Days`r`nRISK: >30 Days suggests missing patches." } }
+New-ToolkitButton "Pending Reboot"    300 250 $tabSec "SteelBlue" 260 { Run-RemoteBlock "Pending?" { if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired") { "ACTION: Pending Reboot Detected!`r`nRISK: Security patches are not applied." } else { "OK: No pending reboot flagged." } } }
+
+
+# --- TREX FORENSIC TAB ---
+New-TabBanner "TREX: Targeted Remote Examination Reports" $tabTrex "Purple"
+# Column 1
+New-ToolkitButton "FULL REPORT"     10 50 $tabTrex "DarkRed" 180 { TrexFullRun }
+New-ToolkitButton "PC Info"         10 85 $tabTrex "Purple" 180 { Generate-HTMLReport "Info" "PCInfo.html" $Script_PCInfo }
+New-ToolkitButton "Local Users"     10 120 $tabTrex "Purple" 180 { Generate-HTMLReport "Users" "LocalUsers.html" $Script_LocalUsers }
+New-ToolkitButton "Services"        10 155 $tabTrex "Purple" 180 { Generate-HTMLReport "Services" "Services.html" $Script_Services }
+New-ToolkitButton "Processes"       10 190 $tabTrex "Purple" 180 { Generate-HTMLReport "Processes" "Processes.html" $Script_Processes }
+New-ToolkitButton "Installed App"   10 225 $tabTrex "Purple" 180 { Generate-HTMLReport "Software" "Software.html" $Script_Software }
+New-ToolkitButton "Netstat"         10 260 $tabTrex "Purple" 180 { Generate-HTMLReport "Netstat" "Netstat.html" $Script_Netstat }
+New-ToolkitButton "IP Config"       10 295 $tabTrex "Purple" 180 { Generate-HTMLReport "IPConfig" "IPConfig.html" $Script_IPConfig }
+New-ToolkitButton "Disk Space"      10 330 $tabTrex "Purple" 180 { Generate-HTMLReport "Disk" "Disk.html" $Script_DiskSpace }
+New-ToolkitButton "Sys Drivers"     10 365 $tabTrex "Purple" 180 { Generate-HTMLReport "Drivers" "Drivers.html" $Script_Drivers }
+New-ToolkitButton "Startup Apps"    10 400 $tabTrex "Purple" 180 { Generate-HTMLReport "Startup" "Startup.html" $Script_Startup }
+# Column 2
+New-ToolkitButton "Event: Security" 200 50 $tabTrex "Navy" 180 { Generate-HTMLReport "SecLog" "Events_Sec.html" $Script_EventLog_Sec }
+New-ToolkitButton "Event: System"   200 85 $tabTrex "Navy" 180 { Generate-HTMLReport "SysLog" "Events_Sys.html" $Script_EventLog_Sys }
+New-ToolkitButton "Event: Apps"     200 120 $tabTrex "Navy" 180 { Generate-HTMLReport "AppLog" "Events_App.html" $Script_EventLog_App }
+New-ToolkitButton "Sched Tasks"     200 155 $tabTrex "Navy" 180 { Generate-HTMLReport "Tasks" "Tasks.html" $Script_SchedTask }
+New-ToolkitButton "Network Shares"  200 190 $tabTrex "Navy" 180 { Generate-HTMLReport "Shares" "Shares.html" $Script_Shares }
+New-ToolkitButton "Hotfix/Update"   200 225 $tabTrex "Navy" 180 { Generate-HTMLReport "Updates" "Updates.html" $Script_Updates }
+New-ToolkitButton "Env Variables"   200 260 $tabTrex "Navy" 180 { Generate-HTMLReport "EnvVars" "EnvVars.html" $Script_EnvVars }
+New-ToolkitButton "USB History"     200 295 $tabTrex "Navy" 180 { Generate-HTMLReport "USB" "USBHistory.html" $Script_USBHistory }
+New-ToolkitButton "ARP Table"       200 330 $tabTrex "Navy" 180 { Generate-HTMLReport "ARP" "ARP.html" $Script_ARP }
+New-ToolkitButton "Route Table"     200 365 $tabTrex "Navy" 180 { Generate-HTMLReport "Route" "Route.html" $Script_Route }
+New-ToolkitButton "DNS Cache"       200 400 $tabTrex "Navy" 180 { Generate-HTMLReport "DNS" "DNSCache.html" $Script_DNSCache }
+# Column 3 
+New-ToolkitButton "Bitlocker"       390 50 $tabTrex "DarkGreen" 180 { Generate-HTMLReport "Bitlocker" "Bitlocker.html" $Script_Bitlocker }
+New-ToolkitButton "Power Config"    390 85 $tabTrex "DarkGreen" 180 { Generate-HTMLReport "Power" "Power.html" $Script_Power }
+New-ToolkitButton "Firewall Rule"   390 120 $tabTrex "DarkGreen" 180 { Generate-HTMLReport "Firewall" "Firewall.html" $Script_Firewall }
+New-ToolkitButton "Network Rpt"     390 155 $tabTrex "DimGray" 180 { Generate-HTMLReport "Network" "NetworkReport.html" $Script_NetworkReport }
+New-ToolkitButton "Wifi Pass"       390 190 $tabTrex "Red" 180 { WifiPass_Unsafe_Wrapper } 
+New-ToolkitButton "Uptime Report"   390 225 $tabTrex "DimGray" 180 { Generate-HTMLReport "Uptime" "Uptime.html" $Script_Uptime }
+New-ToolkitButton "AD GUID/SID"     390 295 $tabTrex "DimGray" 180 { GUIDSIDSEARCH }
+New-ToolkitButton "REMOVE PIN"      390 330 $tabTrex "Red" 180 { REMOVEPIN }
+New-ToolkitButton "DL History"      390 365 $tabTrex "DarkOrange" 180 { Run-UserDownloads }
+New-ToolkitButton "Web Artifacts"   390 400 $tabTrex "DarkOrange" 180 { Run-WebHistory }
+
+
+# -------------------------
+# 10. GLOBAL BOTTOM BUTTONS
+# -------------------------
+New-ToolkitButton "RESTART PCs"   260 625 $Form "Maroon" 190 { Restart }
+New-ToolkitButton "SHUTDOWN PCs"  465 625 $Form "Maroon" 190 { Shutdn }
+New-ToolkitButton "LOG OFF PCs"   670 625 $Form "DarkOrange" 190 { LogOff }
+
+New-ToolkitButton "Whois"         880 625 $Form "DeepPink" 85 { WHOIS }
+New-ToolkitButton "Tiny URL"      970 625 $Form "DeepPink" 85 { TINYURL }
+New-ToolkitButton "Hash File"     1060 625 $Form "DeepPink" 85 { HASH }
+New-ToolkitButton "MAC Vendor"    1150 625 $Form "DeepPink" 85 { MACINFO }
+
+# -- Sidebar --
+New-ToolkitButton "Add PC"    20 560 $Form "LightGreen" 80 { addList }
+New-ToolkitButton "Remove"    105 560 $Form "Tomato" 80 { removeList }
+New-ToolkitButton "Clear"     190 560 $Form "Tomato" 50 { clearList }
+New-ToolkitButton "Import List" 20 605 $Form "SteelBlue" 220 { importList }
+
+# -------------------------
+# 11. EXECUTE
+# -------------------------
+[void]$Form.ShowDialog()
