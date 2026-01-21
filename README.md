@@ -1,8 +1,10 @@
 # TREX-RAPID-RESPONSE
 
-Powershell incident investigation tool for PC.   **COPY THE CODE AND RUN IN A POWERSHELL WINDOW TO RUN.
-**
-I needed a way to investigate a machine I believed was compromised.  There are quite a few applications that require a client to be installed first on the machine.  
+Powershell incident investigation tool for PC.   **COPY THE CODE AND RUN IN A POWERSHELL WINDOW TO RUN.  This was designed for a domain joined environment, but you can run it on a local machine by putting 127.0.0.1 as the Hostname.**
+
+I needed a way to investigate a machine I believed was compromised.  
+
+There are quite a few applications that require a client to be installed first on the machine.  
 
 There are a bunch of tools from systeminternals that do an excellent job of providing information.  
 
