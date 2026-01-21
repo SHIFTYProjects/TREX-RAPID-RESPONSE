@@ -1,6 +1,8 @@
 # TREX-RAPID-RESPONSE
 
-Powershell incident investigation tool for PC.   **COPY THE CODE AND RUN IN A POWERSHELL WINDOW TO RUN.  This was designed for a domain joined environment, but you can run it on a local machine by putting 127.0.0.1 as the Hostname.**
+Powershell incident investigation tool for PC.   
+
+**COPY THE CODE AND RUN IN A POWERSHELL WINDOW TO RUN.  This was designed for a domain joined environment, but you can run it on a local machine by putting 127.0.0.1 as the Hostname.**
 
 I needed a way to investigate a machine I believed was compromised.  
 
